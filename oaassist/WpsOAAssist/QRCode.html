@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>二维码生成</title>
+    <script type="text/javascript" src="./otherslib/qrcodejs/qrcode.min.js"></script>
+    <script type="text/javascript" src="./otherslib/lib/jquery.min.js"></script>
+    <script type="text/javascript" src='js/qrcode.js'></script>
+    <style>
+        .box {
+            width: 110px;
+            height: 110px;
+            border: 1px solid #999;
+        }
+
+        #qrcode {
+            width: 100px;
+            height: 100px;
+            margin: 5px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div id="qrcode">
+        </div>
+        <img src="" id="imgData"></img>
+    </div>
+    <input type="text" id="text" value="二维码文字"> <br>
+    <input type="button" id="btnMakeQRCode" value="生成二维码">
+    <input type="button" id="btnInsert" value="插入文档中">
+</body>
+
+</html>

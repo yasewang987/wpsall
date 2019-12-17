@@ -1,0 +1,24 @@
+<html>
+<meta charset="utf-8">
+<title>套用红头</title>
+</head>
+
+<body onload="getAllTemplelists()">
+    <script type="text/javascript" src='js/main.js'></script>
+    <script type="text/javascript" src='js/redhead.js'></script>
+    <div id="search">
+        <span>关键词：</span>
+        <input id="content" type="text" style="width:245px">
+        <button type="button" onClick="search()">查询</button>
+        <br />
+        <br />
+    </div>
+    <select id="templates" size=5 style='width:360px'>
+        <!--这里ajax动态拉取。-->
+    </select>
+    <br />
+    <br />
+    <button type="button" onClick="selectTemplate()">套红头</button>
+</body>
+
+</html>
