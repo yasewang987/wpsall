@@ -19,12 +19,12 @@
 * 使用该工程的时候，必须要安装WPS专业版，请咨询QQ：3253920855
 
 ### 使用此demo的步骤(以windows平台wps为例):
-0.安装支持wps加载项的wps2019企业版安装包。
-1.将WpsOAAssist文件夹拷贝到%appdata%\kingsoft\wps\jsaddons\下。
-2.将%appdata%\kingsoft\wps\jsaddons\WpsOAAssist文件夹重命名为%appdata%\kingsoft\wps\jsaddons\oaassist_1.0
-3.在%appdata%\kingsoft\wps\jsaddons下新建一个jsplugins.xml文件，在xml文件中输入如下内容并保存:
-   <jsplugins>
-	 <jsplugin name="oaassist"  version="1.0" type="wps" url="http://xxxxx/oaassist.7z"/>
-   </jsplugins>
-4.浏览器打开WebDemo/index.html， 就可以体验oa助手相关功能了。
+1. 安装支持wps加载项的wps2019企业版安装包。
+2. 将WpsOAAssist文件夹拷贝到%appdata%\kingsoft\wps\jsaddons\下。
+3. 将%appdata%\kingsoft\wps\jsaddons\WpsOAAssist文件夹重命名为%appdata%\kingsoft\wps\jsaddons\oaassist_1.0
+4. 在%appdata%\kingsoft\wps\jsaddons下新建一个jsplugins.xml文件，在xml文件中输入如下内容并保存:
+        <jsplugins>
+    		<jsplugin name="oaassist"  version="1.0" type="wps" url="http://xxxxx/oaassist.7z"></jsplugin>
+        </jsplugins>
+8. 浏览器打开WebDemo/index.html， 就可以体验oa助手相关功能了。
 
