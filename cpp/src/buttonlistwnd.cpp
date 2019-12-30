@@ -113,7 +113,7 @@ void ButtonListWnd::initEtButtonTree()
 				<< QString::fromUtf8("注册保存事件");
 	addRootItem(items);
 	items.clear();
-	items << QString::fromUtf8("其他") << QString::fromUtf8("关闭ET") << QString::fromUtf8("是否已保存");
+	items << QString::fromUtf8("其他") << QString::fromUtf8("关闭ET");
 	addRootItem(items);
 }
 
