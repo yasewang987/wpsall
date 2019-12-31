@@ -551,85 +551,6 @@ void WPSMainWindow::hideToolBtn()
 	m_mainArea->setFocus();
 }
 
-void WPSMainWindow::insertDocumentField()
-{
-	if (m_spApplication)
-		m_spApplication->insertDocumentField("wps");
-	m_mainArea->setFocus();
-}
-
-void WPSMainWindow::deleteDocumentField()
-{
-	if (m_spApplication)
-		m_spApplication->deleteDocumentField("wps");
-	m_mainArea->setFocus();
-}
-
-void WPSMainWindow::showDocumentField()
-{
-	if (m_spApplication)
-	{
-		static bool isShow = false;
-		m_spApplication->showDocumentField("wps", isShow);
-		isShow = !isShow;
-	}
-	m_mainArea->setFocus();
-}
-
-void WPSMainWindow::getDocumentFieldValue()
-{
-	if (m_spApplication)
-	{
-		QString text = m_spApplication->getDocumentFieldValue("wps");
-		QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), text);
-		message.exec();
-	}
-	m_mainArea->setFocus();
-}
-
-void WPSMainWindow::setDocumentFieldValue()
-{
-	if (m_spApplication)
-		m_spApplication->setDocumentField("wps", "123456");
-	m_mainArea->setFocus();
-}
-
-void WPSMainWindow::enableDocumentField()
-{
-	if (m_spApplication)
-	{
-		static bool isShow = false;
-		m_spApplication->enableDocumentField("wps", isShow);
-		isShow = !isShow;
-	}
-	m_mainArea->setFocus();
-}
-
-void WPSMainWindow::setDocumentFieldValueByItem()
-{
-	if (m_spApplication)
-	{
-		ks_stdptr<_Document> spDoc;
-		m_spApplication->get_ActiveDocument((Document**)&spDoc);
-		ks_stdptr<DocumentFields> spDocumentFields;
-		if (spDoc)
-		{
-			spDoc->get_DocumentFields(&spDocumentFields);
-			if (spDocumentFields)
-			{
-				KComVariant vIndex(__X("发文机关"));
-				ks_stdptr<DocumentField> spDocumentField;
-				spDocumentFields->Item(&vIndex, &spDocumentField);
-				if (spDocumentField)
-				{
-					ks_bstr sValue(__X("44444"));
-					spDocumentField->put_Value(sValue);
-				}
-			}
-		}
-	}
-}
-
 static HRESULT wpsDocumentBeforeCloseCallback(_Document* pdoc, VARIANT_BOOL* Cancel)
 {
 	*Cancel = VARIANT_FALSE;
@@ -693,12 +614,6 @@ void WPSMainWindow::slotButtonClick(const QString& name)
 		s_operationFunMap.insert(QString::fromUtf8("保护"), &WPSMainWindow::enableProtect);
 		s_operationFunMap.insert(QString::fromUtf8("取消保护"), &WPSMainWindow::disableProtect);
 		s_operationFunMap.insert(QString::fromUtf8("是否保存"), &WPSMainWindow::getSaved);
-		s_operationFunMap.insert(QString::fromUtf8("插入一个公文域"), &WPSMainWindow::insertDocumentField);
-		s_operationFunMap.insert(QString::fromUtf8("删除指定公文域"), &WPSMainWindow::deleteDocumentField);
-		s_operationFunMap.insert(QString::fromUtf8("公文域显示"), &WPSMainWindow::showDocumentField);
-		s_operationFunMap.insert(QString::fromUtf8("查询公文域内容"), &WPSMainWindow::getDocumentFieldValue);
-		s_operationFunMap.insert(QString::fromUtf8("设置公文域内容"), &WPSMainWindow::setDocumentFieldValue);
-		s_operationFunMap.insert(QString::fromUtf8("设置公文域是否编辑"), &WPSMainWindow::enableDocumentField);
 		s_operationFunMap.insert(QString::fromUtf8("注册关闭事件"), &WPSMainWindow::registerCloseEvent);
 		s_operationFunMap.insert(QString::fromUtf8("注册保存事件"), &WPSMainWindow::registerSaveEvent);
 		s_operationFunMap.insert(QString::fromUtf8("关闭WPS"), &WPSMainWindow::closeApp);

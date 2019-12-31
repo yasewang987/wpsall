@@ -91,14 +91,7 @@ public:
 	void showAllTool();
 	void hideToolBar();
 	void hideToolBtn();
-	//公文域
-	void insertDocumentField();
-	void deleteDocumentField();
-	void showDocumentField();
-	void getDocumentFieldValue();
-	void setDocumentFieldValue();
-	void enableDocumentField();
-	void setDocumentFieldValueByItem();
+
 	//注册事件
 	void registerCloseEvent();
 	void registerSaveEvent();

@@ -74,12 +74,6 @@ void ButtonListWnd::initWpsButtonTree()
 				<< QString::fromUtf8("取消保护") << QString::fromUtf8("是否保存");
 	addRootItem(items);
 	items.clear();
-	items << QString::fromUtf8("公文域") << QString::fromUtf8("插入一个公文域")\
-				<< QString::fromUtf8("删除指定公文域") << QString::fromUtf8("公文域显示")\
-				<< QString::fromUtf8("查询公文域内容") << QString::fromUtf8("设置公文域内容")\
-				<< QString::fromUtf8("设置公文域是否编辑");
-	addRootItem(items);
-	items.clear();
 	items << QString::fromUtf8("事件注册") << QString::fromUtf8("注册关闭事件")\
 				<< QString::fromUtf8("注册保存事件");
 	addRootItem(items);
