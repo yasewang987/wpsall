@@ -2,47 +2,78 @@
 <html lang="en">
 
 <head>
-    <title>自定义书签</title>
+    <title>导入模板</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="otherslib/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="otherslib/bootstrap/css/bootstrap-select.css">
-    <script type="text/javascript" src='js/main.js'></script>
+    <script type="text/javascript" src='main.js'></script>
     <script type="text/javascript" src="otherslib/lib/vue.min.js"></script>
-    <script type="text/javascript" src="otherslib/bootstrap/js/bootstrap.js"></script>
-    <script type="text/javascript" src="otherslib/bootstrap/js/bootstrap-select.js"></script>
     <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+
+        /*清除浮动*/
+        .clear:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+
         html,
         body,
         #template {
+            margin: 0;
+            padding: 0;
+            width: 100%;
             height: 100%;
         }
 
         .row {
+            width: 100%;
             border-top: 2px solid #e7e7e7;
+        }
+
+        .row>div {
+            height: 100%;
+        }
+
+        #file_select {
+            width: 100%;
+            padding-left: 5%;
+        }
+
+        .def_control {
+            height: 55%;
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .btn_box {
+            width: 16%;
+            float: right;
+            line-height: 4.5em;
+            margin-right: 3%;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container-fluid" id="template">
-        <div class="row" style="height:20%;padding-top: 3%;">
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="input-group">
-                    <span class="input-group-addon">文件名：</span>
-                    <select class="selectpicker form-control show-tick" v-model="templateItem" title="选择文件">
-                        <option v-for="(item,key) in templates" :value="item.tempId" :key="key">{{item.tempName}}
-                        </option>
-                    </select>
-                </div>
+    <div id="template">
+        <div class="row" style="height:50%;padding-top: 3%;">
+            <div id="file_select">
+                <span>文件名：</span>
+                <select class="def_control" style="width: 80%;" v-model="templateItem">
+                    <option value="-1">请选择模板</option>
+                    <option v-for="(item,key) in templates" :value="item.tempId" :key="key">{{item.tempName}}</option>
+                </select>
             </div>
         </div>
-        <div class="row" style="height: 80%;overflow: auto;">
-            <div class="col-xs-2 col-sm-2 col-md-2 col-xs-offset-8" style="top:85%;">
-                <button type="button" class="btn btn-primary btn-block" @click="OnImportTemplate()">导入</button>
+        <div class="row" style="height: 50%;">
+            <div class="btn_box">
+                <button class="def_control" type="button" @click="cancel()">取消</button>
             </div>
-            <div class="col-xs-2 col-sm-2 col-md-2 " style="top:85%;">
-                <button type="button" class="btn btn-primary btn-block" @click="cancel()">取消</button>
+            <div class="btn_box">
+                <button class="def_control" type="button" @click="OnImportTemplate()">导入</button>
             </div>
         </div>
     </div>
@@ -51,6 +82,7 @@
 
 </html>
 <script>
+
     /**
      * 导入公文模板，并替换当前文档全部内容
      * @param templateURL  模板路径
@@ -64,76 +96,71 @@
         }
         var selection = wpsApp.ActiveWindow.Selection;
         selection.WholeStory(); //选取全文
-        selection.Delete(); // 删除选中内容
+        selection.Delete();     // 删除选中内容
         selection.InsertFile(templateURL);
-        if (activeDoc.Revisions.Count > 0) { // 文档或区域中的修订
-            activeDoc.AcceptAllRevisions(); // 接受对指定文档的所有修订
+        if (activeDoc.Revisions.Count > 0) {  // 文档或区域中的修订
+            activeDoc.AcceptAllRevisions();  // 接受对指定文档的所有修订
         }
     }
 
     // 获取选中项，拼接模板Url进行导入模板
     function OnImportTemplate() {
+        var templateId = vm.templateItem;
+        console.log(vm);
+        if (templateId == -1) {
+            alert('请选中模板!!');
+            return;
+        }
         var p_Doc = wps.WpsApplication().ActiveDocument;
         var templatePath = GetDocParamsValue(p_Doc, "templatePath");
-        if (templatePath == "") {
-            templatePath = OA_DOOR.templateBaseURL;
-        }
-        var templateId = vue.templateItem;
-        var templateURL;
-        if (templatePath == undefined)
-            templateURL = getDemoTemplatePath();
-        else
-            templateURL = templatePath + templateId;
+        if (templatePath == "") { templatePath = OA_DOOR.templateBaseURL; }
+        var templateURL = templatePath + templateId;
 
         importTemlateFile(templateURL);
         window.opener = null;
         window.open('', '_self', '');
         window.close();
+        wps.OAAssist.ShellExecute("ksowebstartupwps://");
     }
 
-
-    function getAllTemplate() {
-        var p_Doc = wps.WpsApplication().ActiveDocument;
-        var templateData = GetDocParamsValue(p_Doc, "templateData");
-        if (templateData == "") {
-            templateData = OA_DOOR.templateDataUrl;
-        }
-        if (templateData == undefined) { //未配置的话，此处模拟网络请求的返回
-            var strData =
-                '[{"tempId":60,"tempName":"固定IP地址申请表2.xls"},{"tempId":65,"tempName":"企业秘模板.doc"},{"tempId":72,"tempName":"1呈批件（单一内设机构）.docx"},{"tempId":73,"tempName":"1呈批件（单一内设机构）2.docx"},{"tempId":74,"tempName":"企业秘模板.doc"},{"tempId":76,"tempName":"7电话记录11.docx"},{"tempId":77,"tempName":"4呈批件（两个部门三个内设机构）11.docx"},{"tempId":78,"tempName":"1呈批件（单一内设机构）11.docx"},{"tempId":79,"tempName":"OA模板：xx市高级人民法院排版用模版(无审判长).doc"},{"tempId":80,"tempName":"OA模板：xx市高级人民法院排版用模版(有审判长).doc"},{"tempId":81,"tempName":"OA模板1.doc"},{"tempId":82,"tempName":"测试插入速度空表格.xlsx"},{"tempId":97,"tempName":"模板.docx"},{"tempId":98,"tempName":"测试模板.docx"}]';
-            vue.templates = JSON.parse(strData);
-            console.log("数据：" + vue.templates);
-            return;
-        }
-        $.ajax({
-            url: templateData,
-            async: false,
-            method: "post",
-            dataType: 'json',
-            success: function (res) {
-                vue.templates = res;
-                console.log("模板列表数据：" + JSON.stringify(res));
-            },
-            error: function (res) {
-                alert("获取响应失败");
-                vue.templates = {}
-            }
-        });
-    }
 
     function cancel() { // 取消按钮
         window.close();
+        wps.OAAssist.ShellExecute("ksowebstartupwps://");   // 将WPS程序置前
     }
 
-    var vue = new Vue({
+    var vm = new Vue({
         el: "#template",
         data: {
-            templateItem: "",
+            templateItem: -1,
             templates: {}
         },
-        methods: {},
-        created: function () {
-            setTimeout(getAllTemplate, 0);
+        methods: {
+            getAllTemplate: function () {
+                var _this = this
+                var p_Doc = wps.WpsApplication().ActiveDocument;
+                var templateDataUrl = GetDocParamsValue(p_Doc, "templateDataUrl");
+                if (templateDataUrl == "") { templateDataUrl = OA_DOOR.templateDataUrl; }
+                $.ajax({
+                    url: templateDataUrl,
+                    async: false,
+                    method: "post",
+                    dataType: 'json',
+                    success: function (res) {
+                        _this.templates = res;
+                        console.log("模板列表数据：" + JSON.stringify(res));
+                    },
+                    error: function (res) {
+                        alert("获取响应失败");
+                        _this.templates = {}
+                    }
+                });
+            }
+        },
+        mounted: function () {
+            this.getAllTemplate();
         }
     });
+
+
 </script>

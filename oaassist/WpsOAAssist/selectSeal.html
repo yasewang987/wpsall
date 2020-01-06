@@ -2,60 +2,107 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
     <title>印章页面</title>
-    <link rel="stylesheet" href="otherslib/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="otherslib/bootstrap/css/bootstrap-select.css">
-    <script type="text/javascript" src='js/main.js'></script>
+    <script type="text/javascript" src='main.js'></script>
     <script type="text/javascript" src="otherslib/lib/vue.min.js"></script>
-    <script type="text/javascript" src="otherslib/bootstrap/js/bootstrap.js"></script>
-    <script type="text/javascript" src="otherslib/bootstrap/js/bootstrap-select.js"></script>
     <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+
+        /*清除浮动*/
+        .clear:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+
         html,
         body,
         #seal {
+            margin: 0;
+            padding: 0;
+            width: 100%;
             height: 100%;
         }
 
         .row {
+            width: 100%;
             border-top: 2px solid #e7e7e7;
+        }
+
+        .row>div {
+            height: 100%;
+        }
+
+        #seal_name,
+        #seal_password {
+            width: 38%;
+            float: left;
+            margin-left: 15px;
+        }
+
+        .seal_control {
+            height: 60%;
+            font-size: 16px;
+        }
+
+        #seal_load {
+            width: 13%;
+            float: right;
+            margin-right: 35px;
+        }
+
+        #seal_load>button {
+            width: 100%;
+        }
+
+        #btnBox {
+            padding-left: 75%;
+            line-height: 4em;
+        }
+
+        #btnBox>div {
+            display: inline-block;
+            width: 47%;
+        }
+
+        #btnBox button {
+            height: 60%;
+            width: 90%;
+            font-size: 14px;
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid" id="seal">
-        <div class="row" style="height: 15%;padding-top: 2%;">
-            <div class="col-xs-6 col-sm-6 col-md-6">
-                <div class="input-group">
-                    <span class="input-group-addon">印章名称：</span>
-                    <select class="selectpicker form-control show-tick" v-model="sealItem1" title="选择印章">
-                        <option v-for="item in seals" :value="item.signatureID">{{item.MarkName}}</option>
-                    </select>
-                </div>
+    <div id="seal">
+        <div class="row clear" style="height: 15%;padding-top: 2%;">
+            <div id="seal_name">
+                <span>印章名称：</span>
+                <select class="seal_control" v-model="sealItem" style="width: 60%;">
+                    <option value="-1">请选择印章</option>
+                    <option v-for="item in seals" :value="item.signatureID">{{item.MarkName}}</option>
+                </select>
             </div>
-            <div class="col-xs-4 col-sm-4 col-md-4">
-                <div class="input-group">
-                    <span class="input-group-addon">密码：</span>
-                    <input type="password" class="form-control center-block" v-model="sealPassword"
-                        placeholder="请输入密码" />
-                </div>
+            <div id="seal_password">
+                <span>密码：</span>
+                <input class="seal_control" type="password" v-model="sealPassword" placeholder="请输入密码" />
             </div>
-            <div class="col-xs-2 col-sm-2 col-md-2">
-                <button class="btn btn-primary btn-block" @click="vue.loadSeal()">盖章</button>
+            <div id="seal_load">
+                <button class="seal_control" @click="vm.loadSeal()">盖章</button>
             </div>
         </div>
-        <div class="row" style="height: 70%;padding-top: 5%;overflow: auto;">
+        <div id="seal_preview" class="row" style="height: 70%;padding-top: 5%;overflow: auto;">
             <img :src="seal" v-if="visible" style="width: 50%;height: 85%;" draggable="false">
         </div>
-        <div class="row" style="height: 15%;overflow: auto;">
-            <div class="col-xs-2 col-sm-2 col-md-2 col-xs-offset-8" style="top:25%;">
-                <button type="button" class="btn btn-primary btn-block" @click="vue.doSeal()">确定</button>
+        <div id="btnBox" class="row" style="height: 15%;">
+            <div>
+                <button type="button" @click="vm.doSeal()">确定</button>
             </div>
-            <div class="col-xs-2 col-sm-2 col-md-2 " style="top:25%;">
-                <button type="button" class="btn btn-primary btn-block" @click="vue.cancle()">取消</button>
+            <div>
+                <button type="button" @click="vm.cancle()">取消</button>
             </div>
         </div>
     </div>
@@ -64,59 +111,38 @@
 </html>
 
 <script>
-    var vue = new Vue({
+    var vm = new Vue({
         el: "#seal",
         data: {
-            seals: //印章下拉框数据
-                [{
-                        MarkName: 'New York',
-                        signatureID: 'New York'
-                    },
-                    {
-                        MarkName: 'London',
-                        signatureID: 'London'
-                    },
-                    {
-                        MarkName: 'Sydney',
-                        signatureID: 'Sydney'
-                    }
-                ],
-            sealItem1: "", // 选中的印章
-            sealPassword: "", // 印章密码
-            seal: "", // 中间区域显示的印章图片路径
-            visible: false, // 是否显示中间区域的印章图片
-            picPath: "" // 印章图片路径(插入文档使用)
+            seals: [], //印章下拉框数据
+            sealItem: -1,      // 选中的印章
+            sealPassword: "",   // 印章密码
+            seal: "",           // 中间区域显示的印章图片路径
+            visible: false,     // 是否显示中间区域的印章图片
+            picPath: ""         // 印章图片路径(插入文档使用)
         },
         methods: {
             // 取消按钮
             cancle: function () {
-                window.close(); // 大概率引发WPS程序窗口最小化
+                window.close();     // 大概率引发WPS程序窗口最小化
+                wps.OAAssist.ShellExecute("ksowebstartupwps://");   // 将WPS程序置前
             },
             // 获取印章下拉框数据
             getAllSeal: function () {
-                var doc = wps.WpsApplication().ActiveDocument;
-                var url = GetDocParamsValue(doc, "sealsPath");
-                if (url == "") {
-                    alert("未传入有效的Url,将使用样例数据!");
+                var l_doc = wps.WpsApplication().ActiveDocument;
+                var l_sealData = GetDocParamsValue(l_doc, "sealData");
+                if (typeof (l_sealData) == undefined || l_sealData == null || l_sealData == "") {
+                    alert("未传入有效的印章数据,下拉框加载失败!");
                     return;
                 }
-                $.ajax({
-                    url: url,
-                    async: false, // 同步
-                    method: "post",
-                    dataType: "json",
-                    success: function (res) {
-                        vue.seals = res;
-                        console.log("数据：" + vue.seals);
-                    },
-                    error: function (response) {
-                        console.log("获取响应失败");
-                        vue.seals = {};
-                    }
-                });
+                this.seals = l_sealData;
+                console.log("数据：" + l_sealData);
             },
             loadSeal: function () {
-                if (this.sealItem1 == "") {
+                // this.visible = true;
+                // this.picPath = "data:image/gif;base64,R0lGODlhMwAxAIAAAAAAAP///yH5BAAAAAAALAAAAAAzADEAAAK8jI+pBr0PowytzotTtbm/DTqQ6C3hGXElcraA9jIr66ozVpM3nseUvYP1UEHF0FUUHkNJxhLZfEJNvol06tzwrgdLbXsFZYmSMPnHLB+zNJFbq15+SOf50+6rG7lKOjwV1ibGdhHYRVYVJ9Wnk2HWtLdIWMSH9lfyODZoZTb4xdnpxQSEF9oyOWIqp6gaI9pI1Qo7BijbFZkoaAtEeiiLeKn72xM7vMZofJy8zJys2UxsCT3kO229LH1tXAAAOw==";
+                // this.seal = this.picPath;
+                if (this.sealItem == "" || this.sealItem == -1) {
                     alert("请选择印章!");
                     return;
                 }
@@ -127,42 +153,36 @@
                 var doc = wps.WpsApplication().ActiveDocument;
                 var url = GetDocParamsValue(doc, "validatePath");
                 if (url == "") {
-                    alert("未传入有效的Url,将使用样例数据!");
-                    this.visible = true;
-                    this.seal = this.picPath = getDemoSealPath();
+                    alert("未传入有效的印章验证URL,盖章失败!");
                     return;
                 }
-                url += "&signatureID=" + this.sealItem1 + "&passwd=" + this.sealPassword;
-                $.ajax({
-                    url: url,
-                    async: true,
-                    method: "get",
-                    dataType: "json",
-                    success: function(res) {
-                        var data = res.body;
-                        if (data.code == "0") {
-                            this.visible = true;
-                            this.picPath = data.url;
-                            this.seal = this.picPath;
-                        } else {
-                            this.picPath = "";
-                            this.$Message.error(data.message);
-                        }
-                    },
-                    error: function (response) {
-                        console.log("获取响应失败");
+                url += "&signatureID=" + this.sealItem + "&passwd=" + this.sealPassword;
+                this.$http.get(url).then(function (res) {
+                    var data = res.body;
+                    if (data.code == "0") {
+                        this.visible = true;
+                        this.picPath = data.url;
+                        this.seal = this.picPath;
+                    } else {
+                        this.picPath = "";
+                        this.$Message.error(data.message);
                     }
+                }, function () {
+                    console.log("获取响应失败");
                 });
             },
             doSeal: function () {
                 var l_doc = wps.WpsApplication().ActiveDocument;
-                OnInsertPicToDoc(l_doc, this.picPath, 95, 95); // 调用插入图片函数
+                if (!l_doc) {
+                    return;
+                }
+                OnInsertPicToDoc(l_doc, this.picPath, 95, 95);  // 调用插入图片函数
                 window.opener = null;
                 window.open('', '_self', '');
                 window.close();
             }
         },
-        created: function () {
+        mounted: function () {
             this.getAllSeal();
         }
     });
