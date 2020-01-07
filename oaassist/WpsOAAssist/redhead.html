@@ -5,7 +5,6 @@
 
 <body onload="getAllTemplelists()">
     <script type="text/javascript" src='js/main.js'></script>
-    <script type="text/javascript" src='js/redhead.js'></script>
     <div id="search">
         <span>关键词：</span>
         <input id="content" type="text" style="width:245px">
@@ -64,13 +63,7 @@ function isWord(suffix) {
 }
 
 function getAllTemplelists() {
-    var xmlhttp;
-    if (window.XMLHttpRequest) { //IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else { // IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    //上面的http请求对象的生成做了一个浏览器兼容性处理
+    var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         //当接受到响应时回调该方法
         if (xmlhttp.readyState == 4 && (xmlhttp.status == 200 || xmlhttp.status == 0)) {
@@ -117,13 +110,7 @@ function getAllTemplelists() {
 }
 
 function search() {
-    var xmlhttp;
-    if (window.XMLHttpRequest) { //IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else { // IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    //上面的http请求对象的生成做了一个浏览器兼容性处理
+    var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         //当接受到响应时回调该方法
         if (xmlhttp.readyState == 4 && (xmlhttp.status == 200 || xmlhttp.status == 0)) {
