@@ -40,6 +40,19 @@ app.use("/FileList", function (request, response) {
 		}
 	});
 });
+
+//wps安装包是否正确的检测
+app.use("/WpsSetup", (request, response)=>{
+	response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" })
+	response.end("成功");
+});
+
+//wps安装包是否正确的检测
+app.use("/OAAssistDeploy", (request, response)=>{
+	response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" })
+	response.end("成功");
+});
+
 app.use("/Download/:fileName", function (request, response) {
 	var fileName = request.params.fileName;
 	var filePath = path.join(__dirname, './wwwroot/file');

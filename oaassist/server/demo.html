@@ -3,36 +3,60 @@
 <meta charset="utf-8">
 
 <script>
-    var isEnvOk = false
+    var isServerOk = false
+    var isSetupOk = false
+    var isOAAssistOk = false
     function gotoDemo()
     {
-        if (!isEnvOk){
+        if (!isEnvOk || !isSetupOk || !isOAAssistOk){
             alert("环境检测失败，请启动本地服务端")
             return
         }
         window.location.href="http://127.0.0.1:3888/index.html"
     }
     function envTest(){
+        //1.服务端检测
         var xhr = new XMLHttpRequest()
         xhr.onload=e=>{
-            isEnvOk = true
-            let result = "检测成功"
-            window.document.getElementById("envTest").innerHTML = result
+            isServerOk = true
+            let result = window.document.getElementById("serverTest").innerHTML;
+            window.document.getElementById("serverTest").innerHTML = result + "检测成功，服务端地址为http://127.0.0.1:3888"
         }
         xhr.onerror=e=>{
-            isEnvOk = false
-            let result="检测失败"
-            window.document.getElementById("envTest").innerHTML = result
+            isServerOk = false
+            let result = window.document.getElementById("serverTest").innerHTML;
+            window.document.getElementById("serverTest").innerHTML = result + "检测失败, 请先通过node启动StartupServer.js"
         }
         xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
         xhr.send()
+
+        //2.安装包检测
+        var xhr1 = new XMLHttpRequest()
+        xhr1.onload=e=>{
+            isSetupOk = true
+            let aa = xhr1.statusText
+            let result = window.document.getElementById("setupTest").innerHTML;
+            window.document.getElementById("setupTest").innerHTML = result + "安装包检测成功"
+        }
+        xhr1.onerror=e=>{
+            isSetupOk = false
+            let result = window.document.getElementById("setupTest").innerHTML;
+            window.document.getElementById("setupTest").innerHTML = result + "安装包检测失败"
+        }
+        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetup', true)
+        xhr1.send()
+
+        //3OA助手部署
     }
 </script>
 
 <body onload="envTest()">
     <div style="display: flex;"><span style="color: #1890ff; margin: 30px auto; font-size: 50px; font-weight: bolder;">OA助手演示Demo</span></div>
     <div class="divstyle0" id="envTest">
-        环境检测：
+        <span>开始境检测：</span><br>
+        <span id="serverTest">1.检测本地服务端(http://127.0.0.1:3888)是否连通：</span><br>
+        <span id="setupTest">2.检测wps安装包是否正确：</span><br>
+        <span id="oaassistTest">3.检测wps加载项部署是否正确：</span><br>
     </div>
     <div class="divstyle">
             <span class="arrow">&rarr;</span>
@@ -44,9 +68,8 @@
     height: 300px;
     width: 40%;
     float: left;
-    vertical-align: middle;
-    display:flex;
-    align-items:center;
+    font-size: 15px;
+    color: dimgray;
 }
 .divstyle{
     height: 300px;

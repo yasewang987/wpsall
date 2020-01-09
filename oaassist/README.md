@@ -6,7 +6,7 @@
 
 ### 工程结构
 
-* WebDemo 	包含了一些前端文件和演示场景的模板文件，为网页端场景代码，其中wpsstartup.js为封装的sdk。
+* server 	包含了一些前端文件和演示场景的模板文件，为网页端场景代码, 此外有几个场景需要服务端的支持，用nodejs写了一个本地服务程序用于模拟服务端场景。
 * EtOAAssist	WPS 表格组件的OA助手WPS加载项，提供简单的OA场景功能示例。
 * WppOAAssist	WPS 演示组件的OA助手WPS加载项，提供简单的OA场景功能示例。
 * WpsOAAssist	WPS 文字组件的OA助手WPS加载项，提供常见的OA场景功能示例。
@@ -26,5 +26,6 @@
         <jsplugins>
     		<jsplugin name="oaassist"  version="1.0" type="wps" url="http://xxxxx/oaassist.7z"></jsplugin>
         </jsplugins>
-8. 浏览器打开WebDemo/index.html， 就可以体验oa助手相关功能了。
+5. 查看server/README.md中的内容，启动本地服务开始体验oa助手相关功能。
+
 
