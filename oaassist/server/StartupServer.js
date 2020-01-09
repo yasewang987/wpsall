@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 var urlencode = require('urlencode');
 const formidable = require('formidable')
+var ini = require('ini')
+var regedit = require('regedit')
 
 const app = express()
 
@@ -14,7 +16,7 @@ app.all('*', function (req, res, next) {
 	//res.header('Access-Control-Allow-Methods', '*');
 	//res.header('Content-Type', 'text/html;charset=utf-8');
 	next();
-  });
+});
 
 app.use("/FileList", function (request, response) {
 	var filePath = path.join(__dirname, './wwwroot/file');
@@ -42,13 +44,13 @@ app.use("/FileList", function (request, response) {
 });
 
 //wps安装包是否正确的检测
-app.use("/WpsSetup", (request, response)=>{
+app.use("/WpsSetup", (request, response) => {
 	response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" })
 	response.end("成功");
 });
 
 //wps安装包是否正确的检测
-app.use("/OAAssistDeploy", (request, response)=>{
+app.use("/OAAssistDeploy", (request, response) => {
 	response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" })
 	response.end("成功");
 });
@@ -96,46 +98,40 @@ app.post("/Upload", function (request, response) {
 	})
 });
 
-function getLocalIP() {
-    const os = require('os');
-    const osType = os.type(); //系统类型
-    const netInfo = os.networkInterfaces(); //网络信息
-    let ip = '';
-    if (osType === 'Windows_NT') { 
-        for (let dev in netInfo) {
-        	//win7的网络信息中显示为本地连接，win10显示为以太网
-            if (dev === '本地连接' || dev === '以太网') {
-                for (let j = 0; j < netInfo[dev].length; j++) {
-                    if (netInfo[dev][j].family === 'IPv4') {
-                        ip = netInfo[dev][j].address;
-                        break;
-                    }
-                }
-            }
-        }
+var oemResult = "Success";
+app.use("/OemResult", function (request, response) {
+	response.writeHead(200, {
+		"Content-Type": "text/html;charset=utf-8"
+	})
+	response.end(oemResult);
+});
 
-    } else if (osType === 'Linux') {
-        ip = netInfo.eth0[0].address;
-    }
-
-    return ip;
-}
-
-app.use(express.static(path.join(__dirname,"wwwroot"))); //wwwroot代表http服务器根目录
+app.use(express.static(path.join(__dirname, "wwwroot"))); //wwwroot代表http服务器根目录
 app.use('/plugin/et', express.static('../EtOAAssist'));
 app.use('/plugin/wps', express.static('../WpsOAAssist'));
 app.use('/plugin/wpp', express.static('../WppOAAssist'));
 
 var server = app.listen(3888, function () {
-	const host = server.address().address
-	const port = server.address().port
-	console.log("启动本地web服务(http://127.0.0.1:3888)成功！")
-	/*console.log("监听 http://%s:%s", "127.0.0.1", port)
-	console.log("监听 http://%s:%s", "localhost", port)
-	console.log("监听 http://%s:%s", getLocalIP(), port)
-	console.log("获取文件列表地址为 http://%s:%s/FileList", getLocalIP(), port)
-	console.log("下载地址为 http://%s:%s/Download/*文件名", getLocalIP(), port)
-	console.log("上传地址为 http://%s:%s/Upload", getLocalIP(), port)*/
+	var key = 'HKCR\\Excel.Sheet.12\\shell\\open\\command'
+	var path = regedit.list(key, function (error, e) {
+		try {
+			var val = e[key].values[''].value;
+			var pos = val.indexOf("et.exe");
+			var path = val.substring(1, pos) + 'cfgs\\oem.ini';
+			var config = ini.parse(fs.readFileSync(path, 'utf-8'))
+			if (!config.Support)
+				config.Support = {}
+			config.Support.JsApiPlugin = true
+			config.Support.JsApiShowWebDebugger = true
+			if (!config.Server)
+				config.Server = {}
+			config.Server.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
+			fs.writeFileSync(path, ini.stringify(config))
 
-	
+			console.log("启动本地web服务(http://127.0.0.1:3888)成功！")
+		} catch (e) {
+			oemResult = "配置oem失败，请尝试以管理员重新运行！！";
+			console.log(oemResult)
+		}
+	})
 });
