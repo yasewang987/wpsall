@@ -121,7 +121,7 @@ function getLocalIP() {
     return ip;
 }
 
-app.use(express.static(path.join(process.cwd(),"wwwroot"))); //wwwroot代表http服务器根目录
+app.use(express.static(path.join(__dirname,"wwwroot"))); //wwwroot代表http服务器根目录
 app.use('/plugin/et', express.static('../EtOAAssist'));
 app.use('/plugin/wps', express.static('../WpsOAAssist'));
 app.use('/plugin/wpp', express.static('../WppOAAssist'));

@@ -5,10 +5,9 @@
 <script>
     var isServerOk = false
     var isSetupOk = false
-    var isOAAssistOk = false
     function gotoDemo()
     {
-        if (!isEnvOk || !isSetupOk || !isOAAssistOk){
+        if (!isServerOk || !isSetupOk){
             alert("环境检测失败，请启动本地服务端")
             return
         }
@@ -45,8 +44,6 @@
         }
         xhr1.open('get', 'http://127.0.0.1:3888/WpsSetup', true)
         xhr1.send()
-
-        //3OA助手部署
     }
 </script>
 
@@ -56,7 +53,6 @@
         <span>开始境检测：</span><br>
         <span id="serverTest">1.检测本地服务端(http://127.0.0.1:3888)是否连通：</span><br>
         <span id="setupTest">2.检测wps安装包是否正确：</span><br>
-        <span id="oaassistTest">3.检测wps加载项部署是否正确：</span><br>
     </div>
     <div class="divstyle">
             <span class="arrow">&rarr;</span>

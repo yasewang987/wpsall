@@ -6,6 +6,7 @@
 
 ### 工程结构
 
+* demo.html 	包含了本地是否安装了正确的wps安装包、是否启动了本地服务端等的环境检测。
 * server 	包含了一些前端文件和演示场景的模板文件，为网页端场景代码, 此外有几个场景需要服务端的支持，用nodejs写了一个本地服务程序用于模拟服务端场景。
 * EtOAAssist	WPS 表格组件的OA助手WPS加载项，提供简单的OA场景功能示例。
 * WppOAAssist	WPS 演示组件的OA助手WPS加载项，提供简单的OA场景功能示例。
@@ -20,12 +21,8 @@
 
 ### 使用此demo的步骤(以windows平台wps为例):
 1. 安装支持wps加载项的wps2019企业版安装包。
-2. 将WpsOAAssist文件夹拷贝到%appdata%\kingsoft\wps\jsaddons\下。
-3. 将%appdata%\kingsoft\wps\jsaddons\WpsOAAssist文件夹重命名为%appdata%\kingsoft\wps\jsaddons\oaassist_1.0
-4. 在%appdata%\kingsoft\wps\jsaddons下新建一个jsplugins.xml文件，在xml文件中输入如下内容并保存:
-        <jsplugins>
-    		<jsplugin name="oaassist"  version="1.0" type="wps" url="http://xxxxx/oaassist.7z"></jsplugin>
-        </jsplugins>
-5. 查看server/README.md中的内容，启动本地服务开始体验oa助手相关功能。
-
+2. 确保安装了nodejs。
+3. 打开命令行，cd到server目录，执行“npm install express urlencode formidable”, 用于安装相关依赖包。
+4. 执行命令“node StartupServer.js”, 用于启动本地服务端程序。
+5. 浏览器打开demo.html, 开始体验相关流程。
 
