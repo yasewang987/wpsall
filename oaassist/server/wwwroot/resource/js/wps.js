@@ -5,7 +5,7 @@ function _WpsStartUp(funcs) {
 
     info.funcs = funcs;
     WpsStartUp.StartUp(WpsStartUp.ClientType.wps, // 组件类型
-        "oaassist", // 插件名，与wps客户端加载的加载的插件名对应
+        "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据
         function (result) { // 调用回调，status为0为成功，其他是错误

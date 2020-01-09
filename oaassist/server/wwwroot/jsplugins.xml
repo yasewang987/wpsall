@@ -1,0 +1,5 @@
+<jsplugins>
+	<jspluginonline name="EtOAAssist" type="et" url="http://127.0.0.1:3888/plugin/et"/>
+	<jspluginonline name="WpsOAAssist" type="wps" url="http://127.0.0.1:3888/plugin/wps"/>
+	<jspluginonline name="WppOAAssist" type="wpp" url="http://127.0.0.1:3888/plugin/wpp"/>
+</jsplugins>

@@ -10,9 +10,9 @@ const app = express()
 app.all('*', function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
 	//Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
-	res.header('Access-Control-Allow-Headers', 'Content-Type');
-	res.header('Access-Control-Allow-Methods', '*');
-	res.header('Content-Type', 'application/json;charset=utf-8');
+	//res.header('Access-Control-Allow-Headers', 'Content-Type');
+	//res.header('Access-Control-Allow-Methods', '*');
+	//res.header('Content-Type', 'text/html;charset=utf-8');
 	next();
   });
 
@@ -122,6 +122,9 @@ function getLocalIP() {
 }
 
 app.use(express.static(path.join(process.cwd(),"wwwroot"))); //wwwroot代表http服务器根目录
+app.use('/plugin/et', express.static('../EtOAAssist'));
+app.use('/plugin/wps', express.static('../WpsOAAssist'));
+app.use('/plugin/wpp', express.static('../WppOAAssist'));
 
 var server = app.listen(3888, function () {
 	const host = server.address().address
