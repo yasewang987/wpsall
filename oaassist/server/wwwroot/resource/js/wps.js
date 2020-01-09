@@ -409,6 +409,8 @@ window.onload = function () {
             document.getElementById("codeDes").innerText = _wps[this.id].detail.toString()
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             document.getElementById("demoBtn").onclick = _wps[this.id].action;
+
+            hljs.highlightBlock(document.getElementById("code"));
         }
     }
 }

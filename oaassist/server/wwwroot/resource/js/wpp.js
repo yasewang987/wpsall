@@ -81,6 +81,8 @@ window.onload = function () {
             document.getElementById("codeDes").innerText = _wpp[this.id].detail.toString()
             document.getElementById("code").innerText = _wpp[this.id].code.toString()
             document.getElementById("demoBtn").onclick = _wpp[this.id].action;
+
+            hljs.highlightBlock(document.getElementById("code"));
         }
     }
 }
