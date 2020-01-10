@@ -20,7 +20,7 @@ app.all('*', function (req, res, next) {
 
 app.use("/FileList", function (request, response) {
 	var filePath = path.join(__dirname, './wwwroot/file');
-	console.log(filePath)
+	console.log(getNow() + filePath)
 	fs.readdir(filePath, function (err, results) {
 		if (err) {
 			response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" });
@@ -59,16 +59,17 @@ app.use("/Download/:fileName", function (request, response) {
 	var fileName = request.params.fileName;
 	var filePath = path.join(__dirname, './wwwroot/file');
 	filePath = path.join(filePath, fileName);
-	console.log(filePath)
 	var stats = fs.statSync(filePath);
 	if (stats.isFile()) {
 		let name = urlencode(fileName, "utf-8");
 		response.set({
 			'Content-Type': 'application/octet-stream',
-			'Content-Disposition': "attachment; filename* = UTF-8''" + name,
+			//'Content-Disposition': "attachment; filename* = UTF-8''" + name,
+			'Content-Disposition': "attachment; filename=" + name,
 			'Content-Length': stats.size
 		});
 		fs.createReadStream(filePath).pipe(response);
+		console.log(getNow() + "下载文件接被调用，文件路径：" + filePath)
 	} else {
 		response.writeHead(200, "Failed", { "Content-Type": "text/html; charset=utf-8" });
 		response.end("文件不存在");
@@ -77,18 +78,18 @@ app.use("/Download/:fileName", function (request, response) {
 app.post("/Upload", function (request, response) {
 	const form = new formidable.IncomingForm();
 	form.encoding = 'utf-8';
-	form.uploadDir = "tmp";
+	form.uploadDir = "wwwroot/tmp";
 	form.parse(request, function (error, fields, files) {
 		for (let key in files) {
 			let file = files[key]
 			// 过滤空文件
 			if (file.size == 0 && file.name == '') continue
 
-			let oldPath = file.path,
-				newPath = 'wwwroot/file/' + file.name
+			let oldPath = file.path
+			let	newPath = 'wwwroot/file/' + file.name
 
 			fs.rename(oldPath, newPath, function (error) {
-				console.info(newPath)
+				console.log(getNow() + "上传文件成功，路径：" + newPath)
 			})
 		}
 		response.writeHead(200, {
@@ -98,13 +99,29 @@ app.post("/Upload", function (request, response) {
 	})
 });
 
+function getNow(){
+	let nowDate = new Date()
+	let year = nowDate.getFullYear()
+	let month = nowDate.getMonth()+1
+	let day = nowDate.getDate()
+	let hour = nowDate.getHours()
+	let minute = nowDate.getMinutes()
+	let second = nowDate.getSeconds()
+ 	return year+'年'+month+'月'+day+'日 '+hour+':'+minute+':'+second + "  "
+}
+
 function configOem(callback) {
-	var key = 'HKCR\\Excel.Sheet.12\\shell\\open\\command'
+	let oemPath;
+	var key = 'HKCR\\KET.Sheet.12\\shell\\open\\command'
 	var path = regedit.list(key, function (error, e) {
 		try {
 			var val = e[key].values[''].value;
 			var pos = val.indexOf("et.exe");
+			if (pos < 0){
+				return callback({status:1,msg:"wps安装异常，请确认有没有正确的安装wps2019企业版！"})
+			}
 			var path = val.substring(1, pos) + 'cfgs\\oem.ini';
+			oemPath = path
 			var config = ini.parse(fs.readFileSync(path, 'utf-8'))
 			var sup = config.support || config.Support;
 			var ser = config.server || config.Server;
@@ -128,17 +145,17 @@ function configOem(callback) {
 			if (needUpdate)
 				fs.writeFileSync(path, ini.stringify(config))
 		} catch (e) {
-			oemResult = "配置oem失败，请尝试以管理员重新运行！！";
+			oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
 			console.log(oemResult)
 			return callback({ status: 1, msg: oemResult })
 		}
-		callback({ status: 0, msg: "OK" })
+		callback({ status: 0, msg: "wps安装正常，" + oemPath + "文件设置正常。" })
 	})
 }
 
-app.use("/OemResult", function (request, response) {
+app.use("/WpsSetupTest", function (request, response) {
 	configOem(function (res) {
-		response.writeHead(200, {
+		response.writeHead(200, res.status, {
 			"Content-Type": "text/html;charset=utf-8"
 		})
 		response.end(res.msg);
@@ -150,13 +167,8 @@ app.use('/plugin/et', express.static('../EtOAAssist'));
 app.use('/plugin/wps', express.static('../WpsOAAssist'));
 app.use('/plugin/wpp', express.static('../WppOAAssist'));
 
-
-
 var server = app.listen(3888, function() {
-	configOem(function (res) {
-		if (!res.status)
-			console.log("启动本地web服务(http://127.0.0.1:3888)成功！")
-	})
+	console.log(getNow() + "启动本地web服务(http://127.0.0.1:3888)成功！")
 });
 
 server.on('error', (e) => {

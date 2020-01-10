@@ -534,7 +534,8 @@ function OnBtnSaveToServer() {
 
     var l_FieldName = GetDocParamsValue(l_doc, constStrEnum.uploadFieldName); //上载到后台的字段名称
     if (l_FieldName == "") {
-        l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName); // 默认为‘file’
+        //l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName); // 默认为‘file’
+        l_FieldName = wps.WpsApplication().ActiveDocument.Name;
     }
 
     var l_UploadName = GetDocParamsValue(l_doc, constStrEnum.uploadFileName); //设置OA传入的文件名称参数

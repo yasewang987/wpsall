@@ -291,7 +291,8 @@ function DownloadFile(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            var path = wps.Env.GetTempPath() + "/" + pGetFileName(xhr, url);
+            var fileName = pGetFileName(xhr, url)
+            var path = wps.Env.GetTempPath() + "/" + fileName
             var reader = new FileReader();
             reader.onload = function () {
                 wps.FileSystem.writeAsBinaryString(path, reader.result);
@@ -312,7 +313,7 @@ function UploadFile(strFileName, strPath, uploadPath, strFieldName, OnSuccess, O
     var fileData = wps.FileSystem.readAsBinaryString(strPath);
     var data = new FakeFormData();
     data.append('file', {
-        name: strFieldName,
+        name: utf16ToUtf8(strFieldName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
         type: "application/octet-stream",
         getAsBinary: function () {
             return fileData;

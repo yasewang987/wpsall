@@ -35,15 +35,24 @@ _wps['newDoc'] = {
 }
 
 function GetDemoPath(fileName) {
+
+    var url = document.location.host;
+    return document.location.protocol + "//" +  url + "/Download/" + fileName;
+
     var url = document.location.toString();
     url = decodeURI(url);
     if (url.indexOf("/") != -1) {
         url = url.substring(0, url.lastIndexOf("/"));
     }
     if (url.length !== 0)
-        url = url.concat("/" + fileName);
+        url = url.concat("/Download/" + fileName);
 
     return url;
+}
+
+function GetUploadPath() {
+    var url = document.location.host;
+    return document.location.protocol + "//" +  url + "/Upload";
 }
 
 function GetDemoPngPath() {
@@ -70,7 +79,7 @@ function GetDemoPngPath() {
 function openDoc() {
 
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.docx"))
-    var uploadPath = prompt("请输入文档上传路径:")
+    var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
     var backupPath = prompt("请输入文档备份路径:")
 
     _WpsStartUp([{

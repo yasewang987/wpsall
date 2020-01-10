@@ -13,17 +13,23 @@
         }
         window.location.href="http://127.0.0.1:3888/index.html"
     }
+    function envReTest(){
+        window.document.getElementById("serverTest").innerHTML = ""
+        window.document.getElementById("setupTest").innerHTML = ""
+        setTimeout(envTest, 1000);
+    }
     function envTest(){
         //1.服务端检测
+        
         var xhr = new XMLHttpRequest()
         xhr.onload=e=>{
             isServerOk = true
-            let result = window.document.getElementById("serverTest").innerHTML;
+            let result = "1.检测本地服务端(http://127.0.0.1:3888)是否连通："
             window.document.getElementById("serverTest").innerHTML = result + "检测成功，服务端地址为http://127.0.0.1:3888"
         }
         xhr.onerror=e=>{
             isServerOk = false
-            let result = window.document.getElementById("serverTest").innerHTML;
+            let result = "1.检测本地服务端(http://127.0.0.1:3888)是否连通："
             window.document.getElementById("serverTest").innerHTML = result + "检测失败, 请先通过node启动StartupServer.js"
         }
         xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
@@ -33,16 +39,10 @@
         var xhr1 = new XMLHttpRequest()
         xhr1.onload=e=>{
             isSetupOk = true
-            let aa = xhr1.statusText
-            let result = window.document.getElementById("setupTest").innerHTML;
-            window.document.getElementById("setupTest").innerHTML = result + "安装包检测成功"
+            let result = "2.检测wps安装是否正确："
+            window.document.getElementById("setupTest").innerHTML = result + xhr1.responseText
         }
-        xhr1.onerror=e=>{
-            isSetupOk = false
-            let result = window.document.getElementById("setupTest").innerHTML;
-            window.document.getElementById("setupTest").innerHTML = result + "安装包检测失败"
-        }
-        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetup', true)
+        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest', true)
         xhr1.send()
     }
 </script>
@@ -51,13 +51,15 @@
     <div style="display: flex;"><span style="color: #1890ff; margin: 30px auto; font-size: 50px; font-weight: bolder;">OA助手演示Demo</span></div>
     <div class="divstyle0" id="envTest">
         <span>开始境检测：</span><br>
-        <span id="serverTest">1.检测本地服务端(http://127.0.0.1:3888)是否连通：</span><br>
-        <span id="setupTest">2.检测wps安装包是否正确：</span><br>
+        <span id="serverTest"></span><br>
+        <span id="setupTest"></span><br>
     </div>
     <div class="divstyle">
             <span class="arrow">&rarr;</span>
             <button class="ant-btn" onclick="gotoDemo()">点击开始体验</button>
     </div>
+    <br>
+    <div><button id="btnEnvTest" onclick="envReTest()">重新开始环境检测</button></div>
 <style>
 .divstyle0{
     border:1px solid black;
@@ -70,7 +72,6 @@
 .divstyle{
     height: 300px;
     width: 40%;
-    float: left;
     vertical-align: middle;
     display:flex;
     align-items:center;
@@ -102,6 +103,36 @@
     -ms-touch-action: manipulation;
     touch-action: manipulation;
     height: 50px;
+    padding: 0 15px;
+    font-size: 20px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+#btnEnvTest {
+    vertical-align: middle;
+    margin: 5px;
+    line-height: 1.499;
+    position: relative;
+    display: inline-block;
+    font-weight: 200;
+    white-space: nowrap;
+    text-align: center;
+    background-image: none;
+    border: 1px solid transparent;
+    -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.015);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.015);
+    -webkit-transition: all .3s cubic-bezier(.645, .045, .355, 1);
+    transition: all .3s cubic-bezier(.645, .045, .355, 1);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    height: 30px;
     padding: 0 15px;
     font-size: 20px;
     border-radius: 4px;
