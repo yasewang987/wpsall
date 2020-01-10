@@ -98,20 +98,7 @@ app.post("/Upload", function (request, response) {
 	})
 });
 
-var oemResult = "Success";
-app.use("/OemResult", function (request, response) {
-	response.writeHead(200, {
-		"Content-Type": "text/html;charset=utf-8"
-	})
-	response.end(oemResult);
-});
-
-app.use(express.static(path.join(__dirname, "wwwroot"))); //wwwroot代表http服务器根目录
-app.use('/plugin/et', express.static('../EtOAAssist'));
-app.use('/plugin/wps', express.static('../WpsOAAssist'));
-app.use('/plugin/wpp', express.static('../WppOAAssist'));
-
-var server = app.listen(3888, function () {
+function configOem(callback) {
 	var key = 'HKCR\\Excel.Sheet.12\\shell\\open\\command'
 	var path = regedit.list(key, function (error, e) {
 		try {
@@ -119,19 +106,65 @@ var server = app.listen(3888, function () {
 			var pos = val.indexOf("et.exe");
 			var path = val.substring(1, pos) + 'cfgs\\oem.ini';
 			var config = ini.parse(fs.readFileSync(path, 'utf-8'))
-			if (!config.Support)
-				config.Support = {}
-			config.Support.JsApiPlugin = true
-			config.Support.JsApiShowWebDebugger = true
-			if (!config.Server)
-				config.Server = {}
-			config.Server.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
-			fs.writeFileSync(path, ini.stringify(config))
+			var sup = config.support || config.Support;
+			var ser = config.server || config.Server;
+			var needUpdate = false;
+			if (!sup || !sup.JsApiPlugin || !sup.JsApiShowWebDebugger)
+				needUpdate = true;
+			if (!ser || !ser.JSPluginsServer || ser.JSPluginsServer != "http://127.0.0.1:3888/jsplugins.xml")
+				needUpdate = true;
+			if (!sup) {
+				sup = {}
+				config.Support = sup
+			}
+			if (!ser) {
+				ser = {}
+				config.Server = ser
+			}
+			sup.JsApiPlugin = true
+			sup.JsApiShowWebDebugger = true
+			ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
 
-			console.log("启动本地web服务(http://127.0.0.1:3888)成功！")
+			if (needUpdate)
+				fs.writeFileSync(path, ini.stringify(config))
 		} catch (e) {
 			oemResult = "配置oem失败，请尝试以管理员重新运行！！";
 			console.log(oemResult)
+			return callback({ status: 1, msg: oemResult })
 		}
+		callback({ status: 0, msg: "OK" })
 	})
+}
+
+app.use("/OemResult", function (request, response) {
+	configOem(function (res) {
+		response.writeHead(200, {
+			"Content-Type": "text/html;charset=utf-8"
+		})
+		response.end(res.msg);
+	});
+});
+
+app.use(express.static(path.join(__dirname, "wwwroot"))); //wwwroot代表http服务器根目录
+app.use('/plugin/et', express.static('../EtOAAssist'));
+app.use('/plugin/wps', express.static('../WpsOAAssist'));
+app.use('/plugin/wpp', express.static('../WppOAAssist'));
+
+
+
+var server = app.listen(3888, function() {
+	configOem(function (res) {
+		if (!res.status)
+			console.log("启动本地web服务(http://127.0.0.1:3888)成功！")
+	})
+});
+
+server.on('error', (e) => {
+	if (e.code === 'EADDRINUSE') {
+		console.log('地址正被使用，重试中...');
+		setTimeout(() => {
+			server.close();
+			server.listen(3888);
+		}, 2000);
+	}
 });
