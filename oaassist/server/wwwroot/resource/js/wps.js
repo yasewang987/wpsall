@@ -114,8 +114,8 @@ _wps['openDoc'] = {
 }
 
 function onlineEditDoc() {
-    var filePath = prompt("请输入打开文件路径（本地或是url）：")
-    var uploadPath = prompt("请输入文档上传路径:")
+    var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.docx"))
+    var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
 
     _WpsStartUp([{
         "OnlineEditDoc": {

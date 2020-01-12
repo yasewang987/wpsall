@@ -77,8 +77,14 @@ app.use("/Download/:fileName", function (request, response) {
 });
 app.post("/Upload", function (request, response) {
 	const form = new formidable.IncomingForm();
+	var uploadDir = path.join(__dirname, './wwwroot/uploaded/');
 	form.encoding = 'utf-8';
-	form.uploadDir = "wwwroot/tmp";
+	form.uploadDir = uploadDir;
+	console.log(getNow() + "上传文件夹地址是：" + uploadDir);
+	//判断上传文件夹地址是否存在，如果不存在就创建
+	if (!fs.existsSync(form.uploadDir)) {
+		fs.mkdirSync(form.uploadDir);
+	}
 	form.parse(request, function (error, fields, files) {
 		for (let key in files) {
 			let file = files[key]
@@ -86,7 +92,7 @@ app.post("/Upload", function (request, response) {
 			if (file.size == 0 && file.name == '') continue
 
 			let oldPath = file.path
-			let	newPath = 'wwwroot/file/' + file.name
+			let newPath = uploadDir + file.name
 
 			fs.rename(oldPath, newPath, function (error) {
 				console.log(getNow() + "上传文件成功，路径：" + newPath)
@@ -157,15 +163,17 @@ app.use("/WpsSetupTest", function (request, response) {
 	configOem(function (res) {
 		response.writeHead(200, res.status, {
 			"Content-Type": "text/html;charset=utf-8"
-		})
+		});
+		response.write('<head><meta charset="utf-8"/></head>');
+		response.write("当前检测时间为： " + getNow() + "<br/>");
 		response.end(res.msg);
 	});
 });
 
 app.use(express.static(path.join(__dirname, "wwwroot"))); //wwwroot代表http服务器根目录
-app.use('/plugin/et', express.static('../EtOAAssist'));
-app.use('/plugin/wps', express.static('../WpsOAAssist'));
-app.use('/plugin/wpp', express.static('../WppOAAssist'));
+app.use('/plugin/et', express.static(path.join(__dirname, "../EtOAAssist")));
+app.use('/plugin/wps', express.static(path.join(__dirname, "../WpsOAAssist")));
+app.use('/plugin/wpp', express.static(path.join(__dirname, "../WppOAAssist")));
 
 var server = app.listen(3888, function() {
 	console.log(getNow() + "启动本地web服务(http://127.0.0.1:3888)成功！")
