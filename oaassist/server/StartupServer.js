@@ -5,6 +5,7 @@ var urlencode = require('urlencode');
 const formidable = require('formidable')
 var ini = require('ini')
 var regedit = require('regedit')
+const os = require('os');
 
 const app = express()
 
@@ -116,47 +117,55 @@ function getNow(){
  	return year+'年'+month+'月'+day+'日 '+hour+':'+minute+':'+second + "  "
 }
 
+function configOemFileInner(oemPath, callback) {
+	var config = ini.parse(fs.readFileSync(oemPath, 'utf-8'))
+	var sup = config.support || config.Support;
+	var ser = config.server || config.Server;
+	var needUpdate = false;
+	if (!sup || !sup.JsApiPlugin || !sup.JsApiShowWebDebugger)
+		needUpdate = true;
+	if (!ser || !ser.JSPluginsServer || ser.JSPluginsServer != "http://127.0.0.1:3888/jsplugins.xml")
+		needUpdate = true;
+	if (!sup) {
+		sup = {}
+		config.Support = sup
+	}
+	if (!ser) {
+		ser = {}
+		config.Server = ser
+	}
+	sup.JsApiPlugin = true
+	sup.JsApiShowWebDebugger = true
+	ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
+	if (needUpdate)
+		fs.writeFileSync(oemPath, ini.stringify(config))
+
+	callback({ status: 0, msg: "wps安装正常，" + oemPath + "文件设置正常。" })
+}
+
 function configOem(callback) {
 	let oemPath;
-	var key = 'HKCR\\KET.Sheet.12\\shell\\open\\command'
-	var path = regedit.list(key, function (error, e) {
-		try {
-			var val = e[key].values[''].value;
-			var pos = val.indexOf("et.exe");
-			if (pos < 0){
-				return callback({status:1,msg:"wps安装异常，请确认有没有正确的安装wps2019企业版！"})
-			}
-			var path = val.substring(1, pos) + 'cfgs\\oem.ini';
-			oemPath = path
-			var config = ini.parse(fs.readFileSync(path, 'utf-8'))
-			var sup = config.support || config.Support;
-			var ser = config.server || config.Server;
-			var needUpdate = false;
-			if (!sup || !sup.JsApiPlugin || !sup.JsApiShowWebDebugger)
-				needUpdate = true;
-			if (!ser || !ser.JSPluginsServer || ser.JSPluginsServer != "http://127.0.0.1:3888/jsplugins.xml")
-				needUpdate = true;
-			if (!sup) {
-				sup = {}
-				config.Support = sup
-			}
-			if (!ser) {
-				ser = {}
-				config.Server = ser
-			}
-			sup.JsApiPlugin = true
-			sup.JsApiShowWebDebugger = true
-			ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
-
-			if (needUpdate)
-				fs.writeFileSync(path, ini.stringify(config))
-		} catch (e) {
-			oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
-			console.log(oemResult)
-			return callback({ status: 1, msg: oemResult })
+	try {
+		if (os.platform() == 'win32') {
+			var key = 'HKCR\\KET.Sheet.12\\shell\\open\\command'
+			regedit.list(key, function (error, e) {
+				var val = e[key].values[''].value;
+				var pos = val.indexOf("et.exe");
+				if (pos < 0) {
+					return callback({ status: 1, msg: "wps安装异常，请确认有没有正确的安装wps2019企业版！" })
+				}
+				oemPath = val.substring(1, pos) + 'cfgs\\oem.ini';
+				configOemFileInner(oemPath, callback)
+			})
+		} else {
+			oemPath = "/opt/kingsoft/wps-office/office6/cfgs/oem.ini";
+			configOemFileInner(oemPath, callback);
 		}
-		callback({ status: 0, msg: "wps安装正常，" + oemPath + "文件设置正常。" })
-	})
+	} catch (e) {
+		oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
+		console.log(oemResult)
+		return callback({ status: 1, msg: oemResult })
+	}
 }
 
 app.use("/WpsSetupTest", function (request, response) {
