@@ -31,8 +31,9 @@ function dispatcher(info) {
                 OpenDoc(func[key]);
             } else if (key === "InsertRedHead") {
                 InsertRedHead(func[key]);
+            } else if (key === "taskPaneBookMark"){
+                taskPaneBookMark(func[key])
             }
-
         }
     }
 }
@@ -57,5 +58,29 @@ function OpenDoc(OaParams) {
     } else {
         //OA传来下载文件的URL地址，调用openFile 方法打开
         OpenFile(OaParams);
+    }
+}
+
+function taskPaneBookMark(OaParams){
+    let filePath = OaParams.fileName
+    if (filePath == "")
+        return
+    OpenFile(OaParams);
+
+    //创建taskpane，只创建一次
+    let id = wps.PluginStorage.getItem(constStrEnum.taskpaneid)
+    if (id){
+        let tp = wps.GetTaskpane(id)
+        tp.Visible = true
+    }
+    else{
+        let url = getHtmlURL("taskpane.html");
+        let tp =  wps.CreateTaskPane(url, "书签操作")
+        if (tp){
+            //tp.DockPosition = 
+            tp.Width = 300
+            tp.Visible = true
+            wps.PluginStorage.setItem(constStrEnum.taskpaneid, tp.ID)
+        }
     }
 }

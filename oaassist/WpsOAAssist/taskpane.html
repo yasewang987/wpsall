@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>操作书签</title>
+    <style type="text/css">
+        .content{
+            font-size: 15px;
+            color:darkslategray;
+            margin: 5px;
+        }
+        .li{
+            cursor: pointer;
+            color:blueviolet;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body onload="bookMarkList()">
+    <div class="content">这是一个网页，按f12可以打开调试器</div>
+    <div class="content">书签列表如下:</div>
+    <div id="bookMarkDiv">
+        
+    </div>
+</body>
+
+</html>
+
+<script>
+    function bookMarkList(){
+        let doc = wps.WpsApplication().ActiveDocument
+        if (!doc)
+            return
+        
+        document.getElementById('bookMarkDiv').innerHTML = ""
+        let innerHtml = ""
+        let bookMarkCount = doc.Bookmarks.Count
+        for (let i = 1; i <= bookMarkCount; ++i){
+            let bookMakrItem = doc.Bookmarks.Item(i)
+            let bookMarkName = bookMakrItem.Name
+            innerHtml = innerHtml + "<li class='li' onclick=\"bookMarkClick('" + bookMarkName + "')\">" + bookMarkName + "</li>"
+        }
+
+        document.getElementById('bookMarkDiv').innerHTML = innerHtml
+    }
+
+    function bookMarkClick(bookMarkName){
+        let doc = wps.WpsApplication().ActiveDocument
+        if (!doc)
+            return 
+        let bookMark = doc.Bookmarks.Item(bookMarkName)
+        if (bookMark)
+            bookMark.Range.Select()
+    }
+</script>

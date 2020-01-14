@@ -37,17 +37,7 @@ _wps['newDoc'] = {
 function GetDemoPath(fileName) {
 
     var url = document.location.host;
-    return document.location.protocol + "//" +  url + "/Download/" + fileName;
-
-    var url = document.location.toString();
-    url = decodeURI(url);
-    if (url.indexOf("/") != -1) {
-        url = url.substring(0, url.lastIndexOf("/"));
-    }
-    if (url.length !== 0)
-        url = url.concat("/Download/" + fileName);
-
-    return url;
+    return document.location.protocol + "//" +  url + "/file/" + fileName;
 }
 
 function GetUploadPath() {
@@ -404,6 +394,31 @@ _wps['convertDoc'] = {
             uploadAppendPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
             suffix 转换类型\n\
+"
+}
+
+function taskPaneBookMark() {
+    var filePath = prompt("请输入打开带书签文件路径（本地或是url）：", GetDemoPath("样章.docx"))
+    _WpsStartUp([{
+        "taskPaneBookMark": {
+            "fileName": filePath
+        }
+    }]) // taskPaneBookMark方法对应于OA助手dispatcher支持的方法名
+}
+
+_wps['taskPaneBookMark'] = {
+    action: taskPaneBookMark,
+    code: _WpsStartUp.toString() + "\n\n" + taskPaneBookMark.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，输入要打开的文档路径，文档中的书签将会在OA助手的Taskpane中显示出来。\n\
+    点击TaskPane中的书签，会自动跳转到书签所对应的文件中的位置，点击Taskpane按F2键可以看Taskpane中的html源码。\n\
+    \n\
+  方法使用：\n\
+    页面点击按钮，通过wps客户端协议来启动WPS，调用oaassist插件，执行传输数据中的指令\n\
+    funcs参数信息说明:\n\
+    taskPaneBookMark 方法对应于OA助手dispatcher支持的方法名\n\
+        fileName 文档的路径\n\
 "
 }
 

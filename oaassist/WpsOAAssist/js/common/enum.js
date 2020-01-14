@@ -52,4 +52,5 @@ var constStrEnum = {
     uploadWithAppendPath: "uploadWithAppendPath",
     userName: "userName",
     WPSInitUserName: "WPSInitUserName",
+    taskpaneid: "taskpaneid"
 }
