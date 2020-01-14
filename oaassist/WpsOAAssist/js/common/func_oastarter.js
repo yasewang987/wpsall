@@ -70,14 +70,15 @@ function taskPaneBookMark(OaParams){
     //创建taskpane，只创建一次
     let id = wps.PluginStorage.getItem(constStrEnum.taskpaneid)
     if (id){
-        let tp = wps.GetTaskpane(id)
+        let tp = wps.GetTaskPane(id)
+        tp.Width = 300
         tp.Visible = true
     }
     else{
         let url = getHtmlURL("taskpane.html");
         let tp =  wps.CreateTaskPane(url, "书签操作")
         if (tp){
-            //tp.DockPosition = 
+            tp.DockPosition = WPS_Enum.msoCTPDockPositionRight  //这里可以设置taskapne是在左边还是右边
             tp.Width = 300
             tp.Visible = true
             wps.PluginStorage.setItem(constStrEnum.taskpaneid, tp.ID)

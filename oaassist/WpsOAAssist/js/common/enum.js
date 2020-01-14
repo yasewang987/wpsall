@@ -11,6 +11,8 @@ var WPS_Enum = { //wps api常用枚举值 具体参阅API文档
     wdPropertyPages: 14,
     wdRDIComments: 1,
     wdDialogInsertDateTime: 165,
+    msoCTPDockPositionLeft: 0,
+    msoCTPDockPositionRight: 2
 }
 
 if (typeof (wps.Enum) == "undefined") { // 如果没有内置枚举值
