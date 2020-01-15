@@ -118,11 +118,11 @@
             alert('请选择需要替换的书签')
             return
         } else {
-            let postion = bookMarks.Item(selectBookMarkId).Range.End
-            if (postion) {
-                doc.ActiveWindow.Selection.SetRange(postion, postion)
+            let bookMarkRange = bookMarks.Item(selectBookMarkId).Range
+            if (bookMarkRange) {
                 if (textOrFile == 'text') {
-                    doc.ActiveWindow.Selection.Range.Text = textareaStr
+                    bookMarkRange.Text = textareaStr
+                    bookMarkRange.Select()  //内容替换后不会刷新，让wps作一次刷新，这可能是wps的bug
                 } else {
                     OpenLocalFile()
                 }
