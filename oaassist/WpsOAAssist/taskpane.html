@@ -11,7 +11,7 @@
             margin: 5px;
         }
 
-        .content red{
+        .content_red {
             font-weight: bold;
             color: red;
         }
@@ -45,7 +45,7 @@
     </div>
     <div id="repleaseBookMarkDiv" class="content">
         <div class="content">选择的书签是：</div>
-        <div class="content red" id="selectBookMarkId"></div>
+        <div class="content_red" id="selectBookMarkId"></div>
         <div class="content">替换的内容是：</div>
         <div class="content">
             <textarea id="repleaseBookMarkContent" style="margin: 0px; width: 220px; height: 90px;"></textarea></div>
@@ -92,6 +92,14 @@
     }
 
     function repleaseBookMarkClick() {
+       getPositionInsert('text')
+    }
+
+    function insertLocalFileClick() {
+        getPositionInsert('file')
+    }
+
+    function getPositionInsert(textOrFile) {
         let doc = wps.WpsApplication().ActiveDocument
         let bookMarks = doc.Bookmarks
         let selectBookMarkId = document.getElementById("selectBookMarkId").innerHTML
@@ -105,21 +113,12 @@
             let postion = bookMarks.Item(selectBookMarkId).Range.End
             if (postion) {
                 doc.ActiveWindow.Selection.SetRange(postion, postion)
-                doc.ActiveWindow.Selection.Range.Text = textareaStr
+                if (textOrFile == 'text') {
+                    doc.ActiveWindow.Selection.Range.Text = textareaStr
+                } else {
+                    OpenLocalFile()
+                }
             }
         }
-    }
-
-    function insertLocalFileClick() {
-        let doc = wps.WpsApplication().ActiveDocument
-        let bookMarks = doc.Bookmarks
-        let selectBookMarkId = document.getElementById("selectBookMarkId").innerHTML
-        let textareaStr = document.getElementById("repleaseBookMarkContent").value
-        if (!doc)
-            return
-        let postion = bookMarks.Item(selectBookMarkId).Range.End
-        if (postion)
-            doc.ActiveWindow.Selection.SetRange(postion, postion)
-        OpenLocalFile()
     }
 </script>
