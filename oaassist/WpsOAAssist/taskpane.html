@@ -120,17 +120,17 @@
         } else {
             let bookMarkItem = bookMarks.Item(selectBookMarkId)
             if (bookMarkItem) {
+                let bookMarkName = bookMarkItem.Name
+                let bookMarkRange = bookMarkItem.Range
                 if (textOrFile == 'text') {
-                    let bookMarkName = bookMarkItem.Name
-                    let bookMarkRange = bookMarkItem.Range
                     bookMarkRange.Text = textareaStr
                     bookMarkRange.Select()  //内容替换后不会刷新，让wps作一次刷新，这可能是wps的bug
-                    //检测一下bookmark是不是失效了
-                    if (!bookMarks.Item(bookMarkName)){
-                        bookMarks.Add(bookMarkName, bookMarkRange)
-                    }
                 } else {
                     OpenLocalFile()
+                }
+                //检测一下bookmark是不是失效了
+                if (!bookMarks.Item(bookMarkName)){
+                    bookMarks.Add(bookMarkName, bookMarkRange)
                 }
                 bookMarkList()  //执行完内容替换后刷新任务窗格的书签列表
             }
