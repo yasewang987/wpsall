@@ -29,6 +29,13 @@
 </html>
 
 <script>
+    wps.ApiEvent.AddApiEventListener("WindowActivate", onDocActiveChange) //当前文档切换后的事件回调通知
+
+    //当前文档切换到其它文档时，重新获取新的文档的书签列表
+    function onDocActiveChange(doc, docwin){
+        bookMarkList()
+    }
+
     function bookMarkList(){
         let doc = wps.WpsApplication().ActiveDocument
         if (!doc)
