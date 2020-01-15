@@ -68,8 +68,9 @@
     //当前文档切换到其它文档时，重新获取新的文档的书签列表
     function onDocActiveChange(doc, docwin){
         bookMarkList()
+        clearSelectionBookmark()
     }
-
+    //获取文档中的书签列表并定义列表项的点击事件
     function bookMarkList(){
         let doc = wps.WpsApplication().ActiveDocument
         if (!doc)
@@ -87,7 +88,7 @@
 
         document.getElementById('bookMarkDiv').innerHTML = innerHtml
     }
-
+    //书签列表项的点击事件
     function bookMarkClick(bookMarkName) {
         let doc = wps.WpsApplication().ActiveDocument
         document.getElementById('selectBookMarkId').innerHTML = bookMarkName
@@ -97,15 +98,15 @@
         if (bookMark)
             bookMark.Range.Select()
     }
-
+    //书签内容替换按钮点击事件
     function repleaseBookMarkClick() {
        getPositionInsert('text')
     }
-
+    //本地文件替换已选择书签点击事件
     function insertLocalFileClick() {
         getPositionInsert('file')
     }
-
+    //定位到选择的书签位置的最末，插入文本内容或本地文件
     function getPositionInsert(textOrFile) {
         let doc = wps.WpsApplication().ActiveDocument
         let bookMarks = doc.Bookmarks
@@ -127,5 +128,9 @@
                 }
             }
         }
+    }
+    //清空选择的书签
+    function clearSelectionBookmark(){
+        document.getElementById('selectBookMarkId').innerHTML = ''
     }
 </script>
