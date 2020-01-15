@@ -5,53 +5,121 @@
     <meta charset="UTF-8">
     <title>操作书签</title>
     <style type="text/css">
-        .content{
+        .content {
             font-size: 15px;
-            color:darkslategray;
+            color: darkslategray;
             margin: 5px;
         }
-        .li{
+
+        .content red{
+            font-weight: bold;
+            color: red;
+        }
+
+        .li {
             cursor: pointer;
-            color:blueviolet;
+            color: blueviolet;
             margin: 10px;
+        }
+
+        .def_control {
+            height: 100%;
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .btn_box {
+            float: left;
+            line-height: 3.3em;
+            margin-left: 2%;
         }
     </style>
 </head>
 
 <body onload="bookMarkList()">
+    <script type="text/javascript" src='js/main.js'></script>
     <div class="content">这是一个网页，按f12可以打开调试器</div>
     <div class="content">书签列表如下:</div>
     <div id="bookMarkDiv">
-        
+
+    </div>
+    <div id="repleaseBookMarkDiv" class="content">
+        <div class="content">选择的书签是：</div>
+        <div class="content red" id="selectBookMarkId"></div>
+        <div class="content">替换的内容是：</div>
+        <div class="content">
+            <textarea id="repleaseBookMarkContent" style="margin: 0px; width: 220px; height: 90px;"></textarea></div>
+        <div class="btn_box">
+            <button class="def_control" type="button" id="repleaseBookMarkButton"
+                onclick="repleaseBookMarkClick()">书签内容替换</button>
+        </div>
+        <div class="btn_box">
+            <button class="def_control" type="button" id="insertLocalFileButton"
+                onclick="insertLocalFileClick()">本地文件替换已选择书签</button>
+        </div>
     </div>
 </body>
 
 </html>
 
 <script>
-    function bookMarkList(){
+    function bookMarkList() {
         let doc = wps.WpsApplication().ActiveDocument
         if (!doc)
             return
-        
+
         document.getElementById('bookMarkDiv').innerHTML = ""
         let innerHtml = ""
         let bookMarkCount = doc.Bookmarks.Count
-        for (let i = 1; i <= bookMarkCount; ++i){
+        for (let i = 1; i <= bookMarkCount; ++i) {
             let bookMakrItem = doc.Bookmarks.Item(i)
             let bookMarkName = bookMakrItem.Name
-            innerHtml = innerHtml + "<li class='li' onclick=\"bookMarkClick('" + bookMarkName + "')\">" + bookMarkName + "</li>"
+            innerHtml = innerHtml + "<li class='li' onclick=\"bookMarkClick('" + bookMarkName + "')\">" + bookMarkName +
+                "</li>"
         }
 
         document.getElementById('bookMarkDiv').innerHTML = innerHtml
     }
 
-    function bookMarkClick(bookMarkName){
+    function bookMarkClick(bookMarkName) {
         let doc = wps.WpsApplication().ActiveDocument
+        document.getElementById('selectBookMarkId').innerHTML = bookMarkName
         if (!doc)
-            return 
+            return
         let bookMark = doc.Bookmarks.Item(bookMarkName)
         if (bookMark)
             bookMark.Range.Select()
+    }
+
+    function repleaseBookMarkClick() {
+        let doc = wps.WpsApplication().ActiveDocument
+        let bookMarks = doc.Bookmarks
+        let selectBookMarkId = document.getElementById("selectBookMarkId").innerHTML
+        let textareaStr = document.getElementById("repleaseBookMarkContent").value
+        if (!doc)
+            return
+        if (selectBookMarkId.length == 0) {
+            alert('请选择需要替换的书签')
+            return
+        } else {
+            let postion = bookMarks.Item(selectBookMarkId).Range.End
+            if (postion) {
+                doc.ActiveWindow.Selection.SetRange(postion, postion)
+                doc.ActiveWindow.Selection.Range.Text = textareaStr
+            }
+        }
+    }
+
+    function insertLocalFileClick() {
+        let doc = wps.WpsApplication().ActiveDocument
+        let bookMarks = doc.Bookmarks
+        let selectBookMarkId = document.getElementById("selectBookMarkId").innerHTML
+        let textareaStr = document.getElementById("repleaseBookMarkContent").value
+        if (!doc)
+            return
+        let postion = bookMarks.Item(selectBookMarkId).Range.End
+        if (postion)
+            doc.ActiveWindow.Selection.SetRange(postion, postion)
+        OpenLocalFile()
     }
 </script>
