@@ -432,7 +432,19 @@ window.onload = function () {
             btn2.innerText = this.innerText;
             document.getElementById("codeDes").innerText = _wps[this.id].detail.toString()
             document.getElementById("code").innerText = _wps[this.id].code.toString()
-            document.getElementById("demoBtn").onclick = _wps[this.id].action;
+            var onBtnAction = _wps[this.id].action
+            document.getElementById("demoBtn").onclick = ()=>{
+                var xhr = new XMLHttpRequest()
+                xhr.onload=e=>{
+                    onBtnAction()
+                }
+                xhr.onerror=e=>{
+                    alert("请确认本地服务端(StartupServer.js)是启动状态")
+                    return
+                }
+                xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
+                xhr.send()
+            }
 
             hljs.highlightBlock(document.getElementById("code"));
         }
