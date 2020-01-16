@@ -323,7 +323,8 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
     }
     var l_FieldName = GetDocParamsValue(p_Doc, constStrEnum.uploadFieldName);
     if (l_FieldName == "") {
-        l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName);
+        l_FieldName = wps.WpsApplication().ActiveDocument.Name.split(".")[0] + l_suffix; //默认使用与当前打开文档相同的文件名
+        // l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName);
     }
 
     if (l_uploadPath == "" && pShowPrompt == true) {
