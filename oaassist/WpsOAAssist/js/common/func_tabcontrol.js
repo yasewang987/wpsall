@@ -1168,8 +1168,3 @@ function OnGetEnabled(control) {
     }
     return true;
 }
-
-function GetUrlPath() {
-    var e = document.location.toString();
-    return -1 != (e = decodeURI(e)).indexOf("/") && (e = e.substring(0, e.lastIndexOf("/"))), e
-}
