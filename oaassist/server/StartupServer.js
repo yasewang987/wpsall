@@ -149,6 +149,12 @@ function configOem(callback) {
 		if (os.platform() == 'win32') {
 			var key = 'HKCR\\KET.Sheet.12\\shell\\open\\command'
 			regedit.list(key, function (error, e) {
+				if (typeof (e) == "undefined" || e == null) {
+					return callback({
+						status: 1,
+						msg: "WPS未安装，请安装WPS2019企业版。"
+					})
+				}
 				var val = e[key].values[''].value;
 				var pos = val.indexOf("et.exe");
 				if (pos < 0) {
