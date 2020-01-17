@@ -37,8 +37,8 @@
                 <group id="grpOAExtend" label="扩展功能组"  getVisible="OnGetVisible">
                     <button id="btnInsertRedHeader" label="套红头" getLabel="OnGetLabel" onAction="OnAction" 
                         getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/> 
-                    <button id="btnInsertSeal" label="印章" getLabel="OnGetLabel" onAction="OnAction"   
-                        getEnabled="OnGetEnabled"  getVisible="OnGetVisible"  getImage="GetImage" size="large" />
+                    <!-- <button id="btnInsertSeal" label="印章" getLabel="OnGetLabel" onAction="OnAction"   
+                        getEnabled="OnGetEnabled"  getVisible="OnGetVisible"  getImage="GetImage" size="large" /> -->
                     <button id="btnUploadOABackup" label="备份正文" onAction="OnAction" getEnabled="OnGetEnabled" 
                         getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                     <button id="btnClearRevDoc" label="清稿"  getLabel="OnGetLabel" 
