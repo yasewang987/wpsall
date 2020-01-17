@@ -155,6 +155,11 @@ function currentTime() {
  */
 function getHtmlURL(html) {
     //弹出辅助窗格框
+    var GetUrlPath = ()=> {
+        var e = document.location.toString();
+        return -1 != (e = decodeURI(e)).indexOf("/") && (e = e.substring(0, e.lastIndexOf("/"))), e
+    }
+
     var url = GetUrlPath();
 
     if (url.length != 0) {
@@ -313,7 +318,7 @@ function UploadFile(strFileName, strPath, uploadPath, strFieldName, OnSuccess, O
     var fileData = wps.FileSystem.readAsBinaryString(strPath);
     var data = new FakeFormData();
     data.append('file', {
-        name: utf16ToUtf8(strFieldName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
+        name: utf16ToUtf8(strFileName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
         type: "application/octet-stream",
         getAsBinary: function () {
             return fileData;

@@ -79,6 +79,7 @@ function openDoc() {
             "fileName": filePath,
             "picPath": GetDemoPngPath(),
             "copyUrl": backupPath,
+            "userName":"东方不败"
         }
     }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -100,6 +101,7 @@ _wps['openDoc'] = {
             fileName 打开的文档路径\n\
             picPath 插入图片的路径\n\
             copyUrl 备份的服务器路径\n\
+            userName 传给wps要显示的OA用户名\n\
 "
 }
 
@@ -113,6 +115,7 @@ function onlineEditDoc() {
             "uploadPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
             "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
+            "userName":"东方不败"
         }
     }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -133,6 +136,7 @@ _wps['onlineEditDoc'] = {
             uploadPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
             buttonGroups 屏蔽的OA助手功能按钮\n\
+            userName 传给wps要显示的OA用户名\n\
 "
 }
 
@@ -401,7 +405,8 @@ function taskPaneBookMark() {
     var filePath = prompt("请输入打开带书签文件路径（本地或是url）：", GetDemoPath("样章.docx"))
     _WpsStartUp([{
         "taskPaneBookMark": {
-            "fileName": filePath
+            "fileName": filePath,
+            "userName":"东方不败"
         }
     }]) // taskPaneBookMark方法对应于OA助手dispatcher支持的方法名
 }
@@ -419,6 +424,7 @@ _wps['taskPaneBookMark'] = {
     funcs参数信息说明:\n\
     taskPaneBookMark 方法对应于OA助手dispatcher支持的方法名\n\
         fileName 文档的路径\n\
+        userName 传给wps要显示的OA用户名\n\
 "
 }
 
