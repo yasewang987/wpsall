@@ -6,7 +6,6 @@ const formidable = require('formidable')
 var ini = require('ini')
 var regedit = require('regedit')
 const os = require('os');
-
 const app = express()
 
 //设置允许跨域访问该服务.
@@ -19,6 +18,7 @@ app.all('*', function (req, res, next) {
 	next();
 });
 
+//获取file目录下文件列表
 app.use("/FileList", function (request, response) {
 	var filePath = path.join(__dirname, './wwwroot/file');
 	console.log(getNow() + filePath)
@@ -56,6 +56,7 @@ app.use("/OAAssistDeploy", (request, response) => {
 	response.end("成功");
 });
 
+//文件下载
 app.use("/Download/:fileName", function (request, response) {
 	var fileName = request.params.fileName;
 	var filePath = path.join(__dirname, './wwwroot/file');
@@ -76,6 +77,8 @@ app.use("/Download/:fileName", function (request, response) {
 		response.end("文件不存在");
 	}
 });
+
+//文件上传
 app.post("/Upload", function (request, response) {
 	const form = new formidable.IncomingForm();
 	var uploadDir = path.join(__dirname, './wwwroot/uploaded/');
@@ -106,6 +109,7 @@ app.post("/Upload", function (request, response) {
 	})
 });
 
+//获取当前时间
 function getNow(){
 	let nowDate = new Date()
 	let year = nowDate.getFullYear()
@@ -180,11 +184,12 @@ app.use("/WpsSetupTest", function (request, response) {
 			"Content-Type": "text/html;charset=utf-8"
 		});
 		response.write('<head><meta charset="utf-8"/></head>');
-		response.write("当前检测时间为： " + getNow() + "<br/>");
+		response.write("<br/>当前检测时间为： " + getNow() + "<br/>");
 		response.end(res.msg);
 	});
 });
 
+//支持jsplugins.xml中，在线模式下，WPS加载项的请求地址
 app.use(express.static(path.join(__dirname, "wwwroot"))); //wwwroot代表http服务器根目录
 app.use('/plugin/et', express.static(path.join(__dirname, "../EtOAAssist")));
 app.use('/plugin/wps', express.static(path.join(__dirname, "../WpsOAAssist")));
@@ -203,3 +208,17 @@ server.on('error', (e) => {
 		}, 2000);
 	}
 });
+
+//获取服务端IP地址
+function getServerIPAdress() {
+	var interfaces = require('os').networkInterfaces();
+	for (var devName in interfaces) {
+		var iface = interfaces[devName];
+		for (var i = 0; i < iface.length; i++) {
+			var alias = iface[i];
+			if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+				return alias.address;
+			}
+		}
+	}
+}
