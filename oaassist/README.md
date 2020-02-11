@@ -20,9 +20,5 @@
 * 使用该工程的时候，必须要安装WPS专业版，请咨询QQ：3253920855
 
 ### 使用此demo的步骤(以windows平台wps为例):
-1. 安装wps2019企业版安装包。
-2. 确保安装了[nodejs](https://nodejs.org/zh-cn/)。
-3. 打开命令行（**使用管理员权限**,），cd到server目录，执行“npm install”, 用于安装相关依赖包。
-4. 执行命令“node StartupServer.js”, 用于启动本地服务端程序。
-5. 浏览器打开demo.html, 开始体验相关流程。
 
+参考[JSAPI快速上手说明.pdf](JSAPI快速上手说明.pdf)
