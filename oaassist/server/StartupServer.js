@@ -50,7 +50,7 @@ app.use("/WpsSetup", (request, response) => {
 	response.end("成功");
 });
 
-//wps安装包是否正确的检测
+//wps加载项配置是否正确的检测
 app.use("/OAAssistDeploy", (request, response) => {
 	response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" })
 	response.end("成功");
@@ -177,7 +177,7 @@ function configOem(callback) {
 		return callback({ status: 1, msg: oemResult })
 	}
 }
-
+//检测WPS客户端环境
 app.use("/WpsSetupTest", function (request, response) {
 	configOem(function (res) {
 		response.writeHead(200, res.status, {
