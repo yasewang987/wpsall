@@ -303,14 +303,14 @@ function insertRedHeader() {
                 "docId": "123", // 文档ID
                 "fileName": filePath,
                 "insertFileUrl": templateURL,
-                "bkInsertFile": 'Content', //红头模板中填充正文的位置书签名
+                "bkInsertFile": 'Content' //红头模板中填充正文的位置书签名
             }
         }])
     } else {
         _WpsStartUp([{
             "InsertRedHead": {
                 "insertFileUrl": templateURL,
-                "bkInsertFile": 'Content', //红头模板中填充正文的位置书签名
+                "bkInsertFile": 'Content' //红头模板中填充正文的位置书签名
             }
         }])
     }
@@ -345,7 +345,7 @@ function fillTemplate() {
         "OpenDoc": {
             "docId": "c2de1fcd1d3e4ac0b3cda1392c36c9", // 文档ID
             "fileName": filePath,
-            "templateDataUrl": templatePath,
+            "templateDataUrl": templatePath
         }
     }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -377,7 +377,7 @@ function convertDoc() {
             "docId": "123", // 文档ID
             "uploadAppendPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
-            "suffix": ".pdf ",
+            "suffix": ".pdf "
         }
     }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -440,7 +440,7 @@ window.onload = function () {
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             var onBtnAction = _wps[this.id].action
             document.getElementById("demoBtn").onclick = ()=>{
-                var xhr = new XMLHttpRequest()
+                var xhr = new WpsStartUp.CreateXHR();
                 xhr.onload=e=>{
                     onBtnAction()
                 }

@@ -17,7 +17,7 @@ function _EtStartUp(funcs) {
 function newDoc() {
     _EtStartUp([{
         "OpenDoc": {
-            showButton: "btnSaveFile;btnSaveAsLocal",
+            showButton: "btnSaveFile;btnSaveAsLocal"
         }
     }])
 }
@@ -46,7 +46,7 @@ function openDoc() {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
-            showButton: "btnSaveFile;btnSaveAsLocal",
+            showButton: "btnSaveFile;btnSaveAsLocal"
         }
     }])
 }
@@ -78,8 +78,8 @@ window.onload = function () {
             document.getElementById("blockFunc").style.visibility = "visible";
             var btn2 = document.getElementById("demoBtn");
             btn2.innerText = this.innerText;
-            document.getElementById("codeDes").innerText = _et[this.id].detail.toString()
-            document.getElementById("code").innerText = _et[this.id].code.toString()
+            document.getElementById("codeDes").innerText = _et[this.id].detail.toString();
+            document.getElementById("code").innerText = _et[this.id].code.toString();
             document.getElementById("demoBtn").onclick = _et[this.id].action;
             hljs.highlightBlock(document.getElementById("code"));
         }

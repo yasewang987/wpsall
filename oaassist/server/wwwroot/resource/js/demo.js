@@ -27,9 +27,6 @@ function SwitchTab(crtTabIndex) {
                 iframe_et.setAttribute("height", "0px");
                 break;
         }
-        console.log("wps height: " + iframe_wps.getAttribute("height"));
-        console.log("wpp height: " + iframe_wpp.getAttribute("height"));
-        console.log("et height: " + iframe_et.getAttribute("height"));
     }
 }
 

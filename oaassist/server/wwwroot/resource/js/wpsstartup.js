@@ -21,12 +21,34 @@
 			try {
 				httpobj = new XDomainRequest();
 			} catch (e1) {
-				httpobj = new XMLHttpRequest();
+				httpobj = new createXHR();
 			}
 		} else {
-			httpobj = new XMLHttpRequest();
+			httpobj = new createXHR();
 		}
 		return httpobj;
+	}
+	//兼容IE低版本的创建xmlhttprequest对象的方法
+	function createXHR() {
+		if (typeof XMLHttpRequest != 'undefined') { //兼容高版本浏览器
+			return new XMLHttpRequest();
+		} else if(typeof ActiveXObject != 'undefined') { //IE6 采用 ActiveXObject， 兼容IE6
+			var versions = [ //由于MSXML库有3个版本，因此都要考虑
+				'MSXML2.XMLHttp.6.0',
+				'MSXML2.XMLHttp.3.0',
+				'MSXML2.XMLHttp'
+			];
+
+			for (var i = 0; i < versions.length; i++) {
+				try {
+					return new ActiveXObject(versions[i]);
+				} catch (e) {
+					//跳过
+				}
+			}
+		} else {
+			throw new Error('您的浏览器不支持XHR对象');
+		}
 	}
 
 	function startWps(clientType, t, callback) {
@@ -212,7 +234,8 @@
 			wps: "wps",
 			et: "et",
 			wpp: "wpp"
-		}
+		},
+		CreateXHR: createXHR
 	}
 
 	return {
