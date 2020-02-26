@@ -439,12 +439,13 @@ window.onload = function () {
             document.getElementById("codeDes").innerText = _wps[this.id].detail.toString()
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             var onBtnAction = _wps[this.id].action
-            document.getElementById("demoBtn").onclick = ()=>{
+            
+            document.getElementById("demoBtn").onclick = function () {//IE不支持箭头函数，改为通用写法
                 var xhr = new WpsStartUp.CreateXHR();
-                xhr.onload=e=>{
+                xhr.onload = function () {
                     onBtnAction()
                 }
-                xhr.onerror=e=>{
+                xhr.onerror = function () {
                     alert("请确认本地服务端(StartupServer.js)是启动状态")
                     return
                 }

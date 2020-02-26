@@ -17,7 +17,7 @@ function _WppStartUp(funcs) {
 function newDoc() {
     _WppStartUp([{
         "OpenDoc": {
-            showButton: "btnSaveFile;btnSaveAsLocal",
+            showButton: "btnSaveFile;btnSaveAsLocal"
         }
     }])
 }
@@ -46,7 +46,7 @@ function openDoc() {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
-            showButton: "btnSaveFile;btnSaveAsLocal",
+            showButton: "btnSaveFile;btnSaveAsLocal"
         }
     }])
 }
