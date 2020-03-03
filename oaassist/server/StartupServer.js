@@ -177,6 +177,7 @@ function configOem(callback) {
 		} else {
 			oemPath = "/opt/kingsoft/wps-office/office6/cfgs/oem.ini";
 			configOemFileInner(oemPath, callback);
+			cp.exec("quickstartoffice restart");
 		}
 	} catch (e) {
 		oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
