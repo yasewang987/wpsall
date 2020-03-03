@@ -7,6 +7,7 @@ var ini = require('ini')
 var regedit = require('regedit')
 const os = require('os');
 const app = express()
+var cp = require('child_process');
 
 //设置允许跨域访问该服务.
 app.all('*', function (req, res, next) {
@@ -110,15 +111,15 @@ app.post("/Upload", function (request, response) {
 });
 
 //获取当前时间
-function getNow(){
+function getNow() {
 	let nowDate = new Date()
 	let year = nowDate.getFullYear()
-	let month = nowDate.getMonth()+1
+	let month = nowDate.getMonth() + 1
 	let day = nowDate.getDate()
 	let hour = nowDate.getHours()
 	let minute = nowDate.getMinutes()
 	let second = nowDate.getSeconds()
- 	return year+'年'+month+'月'+day+'日 '+hour+':'+minute+':'+second + "  "
+	return year + '年' + month + '月' + day + '日 ' + hour + ':' + minute + ':' + second + "  "
 }
 
 function configOemFileInner(oemPath, callback) {
@@ -151,22 +152,28 @@ function configOem(callback) {
 	let oemPath;
 	try {
 		if (os.platform() == 'win32') {
-			var key = 'HKCR\\KET.Sheet.12\\shell\\open\\command'
-			regedit.list(key, function (error, e) {
-				if (typeof (e) == "undefined" || e == null) {
-					return callback({
-						status: 1,
-						msg: "WPS未安装，请安装WPS2019企业版。"
-					})
+			cp.exec("REG QUERY HKEY_CLASSES_ROOT\\KWPS.Document.12\\shell\\open\\command /ve", function (error, stdout, stderr) {
+				try {
+					var val = stdout.split("    ")[3].split('"')[1];
+					if (typeof (val) == "undefined" || val == null) {
+						return callback({
+							status: 1,
+							msg: "WPS未安装，请安装WPS2019企业版。"
+						})
+					}
+					var pos = val.indexOf("wps.exe");
+					if (pos < 0) {
+						return callback({ status: 1, msg: "wps安装异常，请确认有没有正确的安装wps2019企业版！" })
+					}
+					oemPath = val.substring(0, pos) + 'cfgs\\oem.ini';
+					configOemFileInner(oemPath, callback);
+				} catch (e) {
+					oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
+					console.log(oemResult)
+					console.log(e)
+					return callback({ status: 1, msg: oemResult })
 				}
-				var val = e[key].values[''].value;
-				var pos = val.indexOf("et.exe");
-				if (pos < 0) {
-					return callback({ status: 1, msg: "wps安装异常，请确认有没有正确的安装wps2019企业版！" })
-				}
-				oemPath = val.substring(1, pos) + 'cfgs\\oem.ini';
-				configOemFileInner(oemPath, callback)
-			})
+			});
 		} else {
 			oemPath = "/opt/kingsoft/wps-office/office6/cfgs/oem.ini";
 			configOemFileInner(oemPath, callback);
@@ -174,6 +181,7 @@ function configOem(callback) {
 	} catch (e) {
 		oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
 		console.log(oemResult)
+		console.log(e)
 		return callback({ status: 1, msg: oemResult })
 	}
 }
@@ -195,7 +203,7 @@ app.use('/plugin/et', express.static(path.join(__dirname, "../EtOAAssist")));
 app.use('/plugin/wps', express.static(path.join(__dirname, "../WpsOAAssist")));
 app.use('/plugin/wpp', express.static(path.join(__dirname, "../WppOAAssist")));
 
-var server = app.listen(3888, function() {
+var server = app.listen(3888, function () {
 	console.log(getNow() + "启动本地web服务(http://127.0.0.1:3888)成功！")
 });
 
