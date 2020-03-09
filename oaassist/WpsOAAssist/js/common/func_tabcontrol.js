@@ -859,7 +859,7 @@ function SetDocParamsValue(Doc, Key, Value) {
  *  作用：插入二维码图片
  */
 function OnInsertQRCode() {
-    OnShowDialog("qrcode.html", "插入二维码", 400, 400);
+    OnShowDialog("QRCode.html", "插入二维码", 400, 400);
 }
 
 
