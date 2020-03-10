@@ -101,6 +101,12 @@ function OpenFile(params) {
     pOpenFile(doc, params, l_IsOnlineDoc);
 }
 
+/**
+ * 作用：文档打开后执行的动作集合
+ * @param {*} doc 文档对象
+ * @param {*} params 前端传递的参数集合
+ * @param {*} isOnlineDoc 在线打开/落地打开
+ */
 function pOpenFile(doc, params, isOnlineDoc) {
     var l_IsOnlineDoc = isOnlineDoc
     //Office文件打开后，设置该文件属性：从服务端来的OA文件
@@ -178,7 +184,7 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
 }
 
 /**
- * 文档打开服务器上的文件
+ * 打开服务端的文档（不落地）
  * @param {*} fileUrl 文件url路径
  */
 function OpenOnLineFile(OAParams) {
@@ -193,13 +199,8 @@ function OpenOnLineFile(OAParams) {
         wps.WpsApplication().Documents.OpenFromUrl(l_OAFileUrl, "OnOpenOnLineDocSuccess", "OnOpenOnLineDocDownFail");
         l_doc = wps.WpsApplication().ActiveDocument;
     }
-
-    //Office文件打开后，设置该文件属性：从服务端来的OA文件
-    pSetOADocumentFlag(l_doc, OAParams);
-    //设置当前文档为 本地磁盘落地模式
-    DoSetOADocLandMode(l_doc, EnumDocLandMode.DLM_OnlineDoc);
-    // 强制执行一次Activate事件
-    OnWindowActivate();
+    //执行文档打开后的方法
+    pOpenFile(l_doc,OAParams,true);
     return l_doc;
 }
 

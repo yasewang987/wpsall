@@ -280,30 +280,17 @@ _wps['openWithPassWd'] = {
 "
 }
 
-function GetDemoRedHeadPath() {
-    var url = document.location.toString();
-    url = decodeURI(url);
-    if (url.indexOf("/") != -1) {
-        url = url.substring(0, url.lastIndexOf("/"));
-    }
-    if (url.length !== 0)
-        url = url.concat("/红头文件.docx");
-
-    if (url.startsWith("file:///"))
-        url = url.substr("file:///".length);
-    return url;
-}
-
 function insertRedHeader() {
     var filePath = prompt("请输入打开文件路径，如果为空则对活动文档套红：")
-    var templateURL = prompt("请输入红头模板路径（本地或是url）:", GetDemoRedHeadPath())
+    var templateURL = prompt("请输入红头模板路径（本地或是url）:", GetDemoPath("红头文件.docx"))
     if (filePath != '' && filePath != null) {
         _WpsStartUp([{
-            "OpenDoc": {
+            "OnlineEditDoc": {
                 "docId": "123", // 文档ID
                 "fileName": filePath,
                 "insertFileUrl": templateURL,
-                "bkInsertFile": 'Content' //红头模板中填充正文的位置书签名
+                "bkInsertFile": 'Content', //红头模板中填充正文的位置书签名
+                "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark" //屏蔽功能按钮
             }
         }])
     } else {
