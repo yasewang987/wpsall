@@ -199,9 +199,9 @@ function OnOpenScanBtnClicked() {
 }
 
 /**
- *  作用：在文档的指定书签位置插入图片，主要场景：用于在公文的指定位置插入印章图片
+ *  作用：在文档的当前光标处插入从前端传递来的图片
  *  OA参数中 picPath 是需要插入的图片路径
- *  待验证
+ *  图片插入的默认版式是在浮于文档上方
  */
 function DoInsertPicToDoc() {
     console.log("DoInsertPicToDoc...");
@@ -229,23 +229,17 @@ function DoInsertPicToDoc() {
         l_picWidth = 72; //49.7mm=140.880768磅
     }
 
-
-    var s = l_doc.ActiveWindow.Selection; // 活动窗口选定范围或插入点
-    var pagecount = l_doc.BuiltInDocumentProperties.Item(wps.Enum.wdPropertyPages); //获取文档页数
-    s.GoTo(wps.Enum.wdGoToPage, wps.Enum.wdGoToPage, pagecount.Value); //将光标指向文档最后一页
-
-    var pic2 = s.InlineShapes.AddPicture(l_picPath, false, true); //插入图片
-    pic2.LockAspectRatio = 0; //在调整形状大小时可分别改变其高度和宽度
-    pic2.LockAspectRatio = 0;
-    pic2.Select(); //当前图片为焦点
-
-    //定义印章图片对象
-    var seal_shape = pic2.ConvertToShape(); //类型转换:嵌入型图片->粘贴版型图片
-
-    seal_shape.RelativeHorizontalPosition = wps.Enum.wdRelativeHorizontalPositionPage;
-    seal_shape.RelativeVerticalPosition = wps.Enum.wdRelativeHorizontalPositionPage;
+    var l_shape = l_doc.Shapes.AddPicture(l_picPath, false, true);
+    l_shape.Select();
+    // l_shape.WrapFormat.Type = WPS_Enum_WdWrapType.wdWrapBehind; //图片的默认版式为浮于文字上方，可通过此设置图片环绕模式
 }
-
+/**
+ * 作用：模拟插入签章图片
+ * @param {*} doc 文档对象
+ * @param {*} picPath 图片路径
+ * @param {*} picWidth 图片宽度
+ * @param {*} picHeight 图片高度
+ */
 function OnInsertPicToDoc(doc, picPath, picWidth, picHeight) {
     // alert("图片路径："+picPath);
     if (!doc) {
