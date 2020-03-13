@@ -173,3 +173,4 @@ WPS 加载项调试是对其中的一个网页单独进行的调试。调试时�
 - 在通过WPS宏编辑器进行了动作录制后，可以结合`wps.chm`的API手册，进行方法的查询。
 - 通过API手册查询出相同的方法时，优先选择对象树层级少的方法，可以提高效率。
 - 查看WPS接口中关于公文域的：wps.WpsApplication().ActiveDocument.DocumentFields
+- 在需要调用wps接口的代码工程目录下，通过`npm init`建一个`package.json`, 然后通过执行一下`npm install --save-dev wps-jsapi`，这样就在写代码时，关于wps相关接口就会有代码提示了
