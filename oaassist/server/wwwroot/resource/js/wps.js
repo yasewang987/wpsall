@@ -281,7 +281,7 @@ _wps['openWithPassWd'] = {
 }
 
 function insertRedHeader() {
-    var filePath = prompt("请输入打开文件路径，如果为空则对活动文档套红：")
+    var filePath = prompt("请输入打开文件路径，如果为空则对活动文档套红：", GetDemoPath("样章.docx"))
     var templateURL = prompt("请输入红头模板路径（本地或是url）:", GetDemoPath("红头文件.docx"))
     if (filePath != '' && filePath != null) {
         _WpsStartUp([{

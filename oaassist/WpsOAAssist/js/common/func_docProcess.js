@@ -126,7 +126,7 @@ function pOpenFile(doc, params, isOnlineDoc) {
         InsertRedHeadDoc(doc);
     }
 
-    l_NofityURL = GetParamsValue(params, constStrEnum.notifyUrl);
+    var l_NofityURL = GetParamsValue(params, constStrEnum.notifyUrl);
     if (l_NofityURL) {
         l_NofityURL = l_NofityURL.replace("{?}", "1"); //约定：参数为1则代码打开状态
         NotifyToServer(l_NofityURL);
