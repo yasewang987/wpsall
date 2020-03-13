@@ -24,14 +24,38 @@ var WPS_Enum = {
  * WPS图片版式枚举
  */
 var WPS_Enum_WdWrapType={
-    wdWrapInline: 7, //将形状嵌入到文字中。
-    wdWrapNone: 3, //将形状放在文字前面。 请参阅 wdWrapFront。
-    wdWrapSquare: 0, //使文字环绕形状。 行在形状的另一侧延续。
-    wdWrapThrough: 2, //使文字环绕形状。
-    wdWrapTight: 1, //使文字紧密地环绕形状。
-    wdWrapTopBottom: 4, //将文字放在形状的上方和下方。
-    wdWrapBehind: 5, //将形状放在文字后面。
-    wdWrapFront: 6 //将形状放在文字前面。
+    /**
+     * 将形状嵌入到文字中。
+     */
+    wdWrapInline: 7, 
+    /**
+     * 将形状放在文字前面。 请参阅 wdWrapFront。
+     */
+    wdWrapNone: 3, 
+    /**
+     * 使文字环绕形状。 行在形状的另一侧延续。
+     */
+    wdWrapSquare: 0, 
+    /**
+     * 使文字环绕形状。
+     */
+    wdWrapThrough: 2, 
+    /**
+     * 使文字紧密地环绕形状。
+     */
+    wdWrapTight: 1, 
+    /**
+     * 将文字放在形状的上方和下方。
+     */
+    wdWrapTopBottom: 4, 
+    /**
+     * 将形状放在文字后面。
+     */
+    wdWrapBehind: 5, 
+    /**
+     * 将形状放在文字前面。
+     */
+    wdWrapFront: 6 
 }
 
 /**
@@ -62,13 +86,28 @@ var constStrEnum = {
     revisionCtrl: "revisionCtrl",
     ShowOATabDocActive: "ShowOATabDocActive",
     SourcePath: "SourcePath",
+    /**
+     * 保存文档到业务系统服务端时，另存一份其他格式到服务端，其他格式支持：.pdf .ofd .uot .uof
+     */
     suffix: "suffix",
     templateDataUrl: "templateDataUrl",
     TempTimerID: "TempTimerID",
+    /**
+     * 文档上传到业务系统的保存地址：服务端接收文件流的地址
+     */
     uploadPath: "uploadPath",
+    /**
+     * 文档上传到服务端后的名称
+     */
     uploadFieldName: "uploadFieldName",
+    /**
+     * 文档上传时的名称，默认取当前活动文档的名称
+     */
     uploadFileName: "uploadFileName",
     uploadAppendPath: "uploadAppendPath",
+    /**
+     * 标志位： 1 在保存到业务系统时再保存一份suffix格式的文档， 需要和suffix参数配合使用
+     */
     uploadWithAppendPath: "uploadWithAppendPath",
     userName: "userName",
     WPSInitUserName: "WPSInitUserName",

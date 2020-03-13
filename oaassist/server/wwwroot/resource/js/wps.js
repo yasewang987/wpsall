@@ -70,6 +70,7 @@ function openDoc() {
 
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.docx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
+    var uploadFieldName = prompt("请输入文档上传到业务系统后的名称：","样章保存到服务端的新名称.docx")
     var backupPath = prompt("请输入文档备份路径:")
 
     _WpsStartUp([{
@@ -77,6 +78,7 @@ function openDoc() {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
+            "uploadFieldName": uploadFieldName,
             "picPath": GetDemoPngPath(),
             "copyUrl": backupPath,
             "userName":"东方不败"
@@ -99,6 +101,7 @@ _wps['openDoc'] = {
             docId 文档ID，OA助手用以标记文档的信息，以区分其他文档\n\
             uploadPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
+            uploadFieldName 文件上传到服务端后的名称（需要包含后缀名）\n\
             picPath 插入图片的路径\n\
             copyUrl 备份的服务器路径\n\
             userName 传给wps要显示的OA用户名\n\
@@ -326,7 +329,7 @@ _wps['insertRedHeader'] = {
 
 function fillTemplate() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章2.docx"))
-    var templatePath = prompt("请输入模板地址:")
+    var templatePath = prompt("请输入需要填充的数据的请求地址:", "http://127.0.0.1:3888/getTemplateData")
 
     _WpsStartUp([{
         "OpenDoc": {
@@ -357,14 +360,15 @@ _wps['fillTemplate'] = {
 
 function convertDoc() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.docx"))
-    var uploadPath = prompt("请输入文档转换后上传路径:")
+    var uploadPath = prompt("请输入文档转换后上传路径:", GetUploadPath())
 
     _WpsStartUp([{
         "OpenDoc": {
             "docId": "123", // 文档ID
-            "uploadAppendPath": uploadPath, // 保存文档上传路径
+            "uploadPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
-            "suffix": ".pdf "
+            "suffix": ".pdf",
+            "uploadWithAppendPath": "1" //与suffix配置使用，传入标志位即可
         }
     }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -382,9 +386,10 @@ _wps['convertDoc'] = {
     funcs参数信息说明:\n\
         OpenDoc方法对应于OA助手dispatcher支持的方法名\n\
             docId 文档ID，OA助手用以标记文档的信息，以区分其他文档\n\
-            uploadAppendPath 保存文档上传路径\n\
+            uploadPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
             suffix 转换类型\n\
+            uploadWithAppendPath 保存时一并转换的目标格式\n\
 "
 }
 

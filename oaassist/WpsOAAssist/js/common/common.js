@@ -263,7 +263,11 @@ function pGetParamName(data, attr) {
     data = data.substring(start + attr.length);
     return data;
 }
-
+/**
+ * 从requst中获取文件名（确保请求中有filename这个参数）
+ * @param {*} request 
+ * @param {*} url 
+ */
 function pGetFileName(request, url) {
     var disposition = request.getResponseHeader("Content-Disposition");
     var filename = "";
@@ -290,13 +294,18 @@ function StringToUint8Array(string) {
     }
     return buffer;
 }
-
+/**
+ * WPS下载文件到本地打开（业务系统可根据实际情况进行修改）
+ * @param {*} url 文件流的下载路径
+ * @param {*} callback 下载后的回调
+ */
 function DownloadFile(url, callback) {
-    // 需要根据业务实现一套
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
+            //需要业务系统的服务端在传递文件流时，确保请求中的参数有filename
             var fileName = pGetFileName(xhr, url)
+            //落地打开模式下，WPS会将文件下载到本地的临时目录，在关闭后会进行清理
             var path = wps.Env.GetTempPath() + "/" + fileName
             var reader = new FileReader();
             reader.onload = function () {
@@ -310,15 +319,26 @@ function DownloadFile(url, callback) {
     xhr.responseType = 'blob';
     xhr.send();
 }
-
+/**
+ * WPS上传文件到服务端（业务系统可根据实际情况进行修改，为了兼容中文，服务端约定用UTF-8编码格式）
+ * @param {*} strFileName 上传文件的文件名称
+ * @param {*} strPath 上传文件的文件路径（文件在操作系统的绝对路径）
+ * @param {*} uploadPath 上传文件的服务端地址
+ * @param {*} strFieldName 上传到服务端的文件名称（包含文件后缀）
+ * @param {*} OnSuccess 上传成功后的回调
+ * @param {*} OnFail 上传失败后的回调
+ */
 function UploadFile(strFileName, strPath, uploadPath, strFieldName, OnSuccess, OnFail) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', uploadPath);
 
     var fileData = wps.FileSystem.readAsBinaryString(strPath);
     var data = new FakeFormData();
+    if (strFieldName == ""){//默认采用用户自定义的上传到服务端的名称，如果未设置，将此配置置为活动文档的名称
+        strFieldName = strFileName;
+    }
     data.append('file', {
-        name: utf16ToUtf8(strFileName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
+        name: utf16ToUtf8(strFieldName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
         type: "application/octet-stream",
         getAsBinary: function () {
             return fileData;

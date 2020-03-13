@@ -277,11 +277,11 @@ function OnInsertPicToDoc(doc, picPath, picWidth, picHeight) {
 }
 
 
+
 /**
- *   作用：把当前文档保存为其他格式的文档并上传
- *   目前支持包括：.pdf .uof .uot 三个格式
- *   传入参数：FileSuffix  文件后缀名称 类似 .pdf
- *   返回值：无
+ * 作用： 把当前文档保存为其他格式的文档并上传
+ * @param {*} p_FileSuffix 输出的目标格式后缀名，支持：.pdf .uof .uot .ofd
+ * @param {*} pShowPrompt 是否弹出用户确认框
  */
 function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
     var l_suffix = p_FileSuffix; // params.suffix;
@@ -293,15 +293,19 @@ function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
     if (!l_doc) {
         return;
     }
-    //
-    pDoChangeToOtherDocFormat(l_doc, l_suffix, true, true);
+    console.log(pShowPrompt)
+    if (typeof (pShowPrompt) == "undefined"){
+        pShowPrompt = true;//默认设置为弹出用户确认框
+    }
+    //默认设置为以当前文件的显示模式输出，即当前为修订则输出带有修订痕迹的
+    pDoChangeToOtherDocFormat(l_doc, l_suffix, pShowPrompt, true);
 }
 
 /**
- * 作用：把当前文档输出为另外的格式保存 ，主要是PDF格式和OFD格式
- * @param {*} p_Doc 
- * @param {*} p_Suffix 
- * @param {*} pShowPrompt 
+ * 作用：把当前文档输出为另外的格式保存
+ * @param {*} p_Doc 文档对象
+ * @param {*} p_Suffix 另存为的目标文件格式
+ * @param {*} pShowPrompt 是否弹出用户确认框
  * @param {*} p_ShowRevision :是否强制关闭修订，如果是False，则强制关闭痕迹显示。如果为true则不做控制输出。
  */
 function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision) {
@@ -569,15 +573,15 @@ function OnBtnSaveToServer() {
     //获取OA传入的 转其他格式上传属性
     var l_suffix = GetDocParamsValue(l_doc, constStrEnum.suffix);
     if (l_suffix == "") {
-        console.log("上传需转换的文件后缀名错误,无妨进行转换上传!");
+        console.log("上传需转换的文件后缀名错误，无法进行转换上传!");
         return;
     }
 
     //判断是否同时上传PDF等格式到OA后台
-    var l_uploadWithAppendPath = GetDocParamsValue(l_doc, constStrEnum.uploadWithAppendPath); //标识是否同时上传OFD、PDF等格式的文件
+    var l_uploadWithAppendPath = GetDocParamsValue(l_doc, constStrEnum.uploadWithAppendPath); //标识是否同时上传suffix格式的文档
     if (l_uploadWithAppendPath == "1") {
-        //调用转 pdf格式函数，强制关闭转换修订痕迹
-        pDoChangeToOtherDocFormat(l_doc, l_suffix, false, false); //
+        //调用转pdf格式函数，强制关闭转换修订痕迹，不弹出用户确认的对话框
+        pDoChangeToOtherDocFormat(l_doc, l_suffix, false, false);
     }
     return;
 }
