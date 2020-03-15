@@ -373,7 +373,7 @@ function OnDoChangeToUOF() {}
  *  打开WPS云文档的入口
  */
 function pDoOpenWPSCloundDoc() {
-    wps.TabPages.Add("http://docs.wps.cn/");
+    wps.TabPages.Add("https://www.kdocs.cn");    
 }
 
 /**

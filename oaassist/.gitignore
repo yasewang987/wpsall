@@ -1,2 +1,5 @@
 # JSAPI快速上手说明源文件忽略
 /WPS加载项快速上手说明/
+node_modules
+package-lock.json
+package.json
