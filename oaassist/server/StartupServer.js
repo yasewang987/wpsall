@@ -229,12 +229,16 @@ function configOem(callback) {
 							msg: "WPS未安装。"
 						})
 					}
-					var pos = val.indexOf("wps.exe");
-					if (pos < 0) {
-						return callback({ status: 1, msg: "WSP安装异常，请确认有没有正确的安装WPS2019。" })
-					}
-					oemPath = val.substring(0, pos) + 'cfgs\\oem.ini';
-					configOemFileInner(oemPath, callback);
+					fs.exists(val, function (exists) {
+						if(!exists){
+							return callback({
+								status: 1,
+								msg: "WSP安装异常，请确认有没有正确的安装WPS2019。"
+							})
+						}
+						oemPath = path.dirname(val) + '\\cfgs\\oem.ini';
+						configOemFileInner(oemPath, callback);
+					});					
 				} catch (e) {
 					oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
 					console.log(oemResult)
