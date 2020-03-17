@@ -9,4 +9,3 @@ document.write("<script language='javascript' src='js/common/func_oastarter.js'>
 document.write("<script language='javascript' src='js/common/func_docProcess.js'></script>");
 document.write("<script language='javascript' src='js/common/func_tabcontrol.js'></script>");
 document.write("<script language='javascript' src='js/common/func_docEvents.js'></script>");
-document.write("<script language='javascript' src='js/common/func_redheader.js'></script>");

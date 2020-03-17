@@ -18,7 +18,9 @@ var EnumDocLandMode = {
 //加载时会执行的方法
 function OnWPSWorkTabLoad(ribbonUI) {
     wps.ribbonUI = ribbonUI;
-
+    if (typeof (wps.Enum) == "undefined") { // 如果没有内置枚举值
+        wps.Enum = WPS_Enum;
+    }
     OnJSWorkInit(); //初始化文档事件(全局参数,挂载监听事件)
     activeTab(); // 激活OA助手菜单
     OpenTimerRun(OnDocSaveByAutoTimer); //启动定时备份过程
@@ -294,8 +296,8 @@ function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
         return;
     }
     console.log(pShowPrompt)
-    if (typeof (pShowPrompt) == "undefined"){
-        pShowPrompt = true;//默认设置为弹出用户确认框
+    if (typeof (pShowPrompt) == "undefined") {
+        pShowPrompt = true; //默认设置为弹出用户确认框
     }
     //默认设置为以当前文件的显示模式输出，即当前为修订则输出带有修订痕迹的
     pDoChangeToOtherDocFormat(l_doc, l_suffix, pShowPrompt, true);
@@ -373,7 +375,7 @@ function OnDoChangeToUOF() {}
  *  打开WPS云文档的入口
  */
 function pDoOpenWPSCloundDoc() {
-    wps.TabPages.Add("https://www.kdocs.cn");    
+    wps.TabPages.Add("https://www.kdocs.cn");
 }
 
 /**
@@ -600,7 +602,7 @@ function OnInsertRedHeaderClick() {
     var l_BkFile = GetDocParamsValue(l_Doc, constStrEnum.bkInsertFile);
     if (l_BkFile == "" || l_insertFileUrl == "") {
         var height = 250;
-        var width = 400;    
+        var width = 400;
         OnShowDialog("redhead.html", "OA助手", 400, height);
         return;
     }

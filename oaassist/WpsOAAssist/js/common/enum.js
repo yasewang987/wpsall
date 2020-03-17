@@ -105,7 +105,3 @@ var constStrEnum = {
     WPSInitUserName: "WPSInitUserName",
     taskpaneid: "taskpaneid"
 }
-
-if (typeof (wps.Enum) == "undefined") { // 如果没有内置枚举值
-    wps.Enum = WPS_Enum;
-}
