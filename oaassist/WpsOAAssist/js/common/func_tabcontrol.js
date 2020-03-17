@@ -231,7 +231,7 @@ function DoInsertPicToDoc() {
 
     var l_shape = l_doc.Shapes.AddPicture(l_picPath, false, true);
     l_shape.Select();
-    // l_shape.WrapFormat.Type = WPS_Enum_WdWrapType.wdWrapBehind; //图片的默认版式为浮于文字上方，可通过此设置图片环绕模式
+    // l_shape.WrapFormat.Type = wps.Enum.wdWrapBehind; //图片的默认版式为浮于文字上方，可通过此设置图片环绕模式
 }
 /**
  * 作用：模拟插入签章图片
