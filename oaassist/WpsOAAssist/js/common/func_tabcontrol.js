@@ -36,22 +36,24 @@ function OnJSWorkInit() {
 //初始化全局参数
 function pInitParameters() {
     wps.PluginStorage.setItem(constStrEnum.OADocUserSave, EnumDocSaveFlag.NoneOADocSave); //初始化，没有用户点击保存按钮
-
+    
     var l_wpsUserName = wps.WpsApplication().UserName;
     wps.PluginStorage.setItem(constStrEnum.WPSInitUserName, l_wpsUserName); //在OA助手加载前，先保存用户原有的WPS应用用户名称
-
+    
     wps.PluginStorage.setItem(constStrEnum.OADocCanSaveAs, false); //默认OA文档不能另存为本地
     wps.PluginStorage.setItem(constStrEnum.AllowOADocReOpen, false); //设置是否允许来自OA的文件再次被打开
     wps.PluginStorage.setItem(constStrEnum.ShowOATabDocActive, false); //设置新打开文档是否默认显示OA助手菜单Tab  默认为false
-
+    
     wps.PluginStorage.setItem(constStrEnum.DefaultUploadFieldName, "file"); //针对UploadFile方法设置上载字段名称
-
+    
     wps.PluginStorage.setItem(constStrEnum.AutoSaveToServerTime, "10"); //自动保存回OA服务端的时间间隔。如果设置0，则关闭，最小设置3分钟
     wps.PluginStorage.setItem(constStrEnum.TempTimerID, "0"); //临时值，用于保存计时器ID的临时值
-
+    
     // 以下是一些临时状态参数，用于打开文档等的状态判断
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocOpen, false); //用于执行来自OA端的新建或打开文档时的状态
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocSaveAs, false); //用于执行来自OA端的文档另存为本地的状态
+    wps.PluginStorage.setItem("EnableFlag", false)//按钮的标记控制
+    wps.PluginStorage.setItem("Save2OAShowConfirm", true); //弹出上传成功后的提示信息
 }
 
 //挂载WPS的文档事件
@@ -529,8 +531,11 @@ function OnBtnSaveToServer() {
         return;
     }
 
-    if (!wps.confirm("先保存文档，并开始上传到系统后台，请确认？")) {
-        return;
+    var l_showConfirm = wps.PluginStorage.getItem("Save2OAShowConfirm")
+    if (l_showConfirm) {
+        if (!wps.confirm("先保存文档，并开始上传到系统后台，请确认？")) {
+            return;
+        }
     }
 
     var l_FieldName = GetDocParamsValue(l_doc, constStrEnum.uploadFieldName); //上载到后台的字段名称
@@ -632,11 +637,14 @@ function OnInsertDateClicked() {
  */
 function OnUploadToServerSuccess(resp) {
     var l_doc = wps.WpsApplication().ActiveDocument;
-    if (wps.confirm("文件上传成功！继续编辑请确认，取消关闭文档。") == false) {
-        if (l_doc) {
-            console.log("OnUploadToServerSuccess: before Close");
-            l_doc.Close(-1); //保存文档后关闭
-            console.log("OnUploadToServerSuccess: after Close");
+    var l_showConfirm = wps.PluginStorage.getItem("Save2OAShowConfirm");
+    if (l_showConfirm) {
+        if (wps.confirm("文件上传成功！继续编辑请确认，取消关闭文档。") == false) {
+            if (l_doc) {
+                console.log("OnUploadToServerSuccess: before Close");
+                l_doc.Close(-1); //保存文档后关闭
+                console.log("OnUploadToServerSuccess: after Close");
+            }
         }
     }
 
@@ -900,8 +908,9 @@ function OnAction(control) {
             OnbtnTabClick();
             break;
         case "btnSaveToServer": //保存到OA服务器
+            wps.PluginStorage.setItem("Save2OAShowConfirm",true)
             OnBtnSaveToServer();
-            break;
+            break;       
         case "btnSaveAsFile": //另存为本地文件
             OnBtnSaveAsLocalFile();
             break;
@@ -930,10 +939,27 @@ function OnAction(control) {
             OnBtnClearRevDoc();
             break;
         case "btnOpenRevision": //打开修订
-            OnOpenRevisions(); //
-            break;
+            {
+                let bFlag = wps.PluginStorage.getItem("EnableFlag")
+                wps.PluginStorage.setItem("EnableFlag", !bFlag)
+
+                //通知wps刷新以下几个按饰的状态
+                wps.ribbonUI.InvalidateControl("btnOpenRevision")
+                wps.ribbonUI.InvalidateControl("btnCloseRevision")
+                OnOpenRevisions(); //
+                break;
+            }
         case "btnCloseRevision": //关闭修订
-            OnCloseRevisions();
+           {
+               let bFlag = wps.PluginStorage.getItem("EnableFlag")
+               wps.PluginStorage.setItem("EnableFlag", !bFlag)
+
+               //通知wps刷新以下几个按饰的状态
+               wps.ribbonUI.InvalidateControl("btnOpenRevision")
+               wps.ribbonUI.InvalidateControl("btnCloseRevision")
+               OnCloseRevisions();
+               break;
+           }
         case "btnShowRevision":
             break;
         case "btnAcceptAllRevisions": //接受所有修订功能
@@ -1163,6 +1189,14 @@ function OnGetEnabled(control) {
         case "btnChangeToUOT": //保存到UOT格式再上传
         case "btnChangeToOFD": //保存到OFD格式再上传
             return OnSetSaveToOAEnable();
+        case "btnCloseRevision": {
+            let bFlag = wps.PluginStorage.getItem("EnableFlag")
+            return bFlag
+        }
+        case "btnOpenRevision": {
+            let bFlag = wps.PluginStorage.getItem("EnableFlag")
+            return !bFlag
+        }
         default:
             ;
     }

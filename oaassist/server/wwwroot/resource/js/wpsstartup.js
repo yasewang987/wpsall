@@ -78,7 +78,10 @@
 				return;
 			}
 			var xmlReq = getHttpObj();
+			//WPS客户端提供的接收参数的本地服务，HTTP服务端口为58890，HTTPS服务端口为58891
+			//这俩配置，取一即可，不可同时启用
 			xmlReq.open('POST', "http://localhost:58890/" + clientType + "/runParams");
+			// xmlReq.open('POST', "https://localhost:58891/" + clientType + "/runParams");
 			xmlReq.onload = function (res) {
 				tryCount = 4;
 				bFinished = true;
