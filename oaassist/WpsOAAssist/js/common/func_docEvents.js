@@ -32,29 +32,44 @@ function OnDocumentBeforeSave(doc) {
     var l_IsOADocButtonSave = false;
     l_IsOADocButtonSave = wps.PluginStorage.getItem(constStrEnum.OADocUserSave);
 
-    //根据传入参数判断当前文档是否能另存为，默认不能另存为
-    if (pCheckCurrOADocCanSaveAs(doc) == false) { //先根据OA助手的默认设置判断是否允许OA文档另存为操作
-        //如果配置文件：OA文档不允许另存为，则再判断
-        //2、判断当前OA文档是否不落地文档
-        if (pIsOnlineOADoc(doc) == true) {
-            //如果是不落地文档，则判断是否是系统正在保存
-            if (l_IsOADocButtonSave == false) {
-                alert("来自OA的不落地文档，禁止另存为本地文档！");
-                //如果是OA文档，则禁止另存为
-                wps.ApiEvent.Cancel = true;
-            }
-        } else {
-            //这里要再判断OA文档是否被用户另存为
-            if (l_IsOADocButtonSave == false) {
-                //用户手动另存为操作时，在这里被屏蔽掉
-                doc.Save(); //直接保存本地就行
-                //如果是OA文档，则禁止另存为
-                wps.ApiEvent.Cancel = true;
-            } else {}
+    // //根据传入参数判断当前文档是否能另存为，默认不能另存为
+    if (pCheckCurrOADocCanSaveAs(doc) == false) { 
+        //先根据OA助手的默认设置判断是否允许OA文档另存为操作
+        //     //如果配置文件：OA文档不允许另存为，则再判断
+        //     //2、判断当前OA文档是否不落地文档
+        //     if (pIsOnlineOADoc(doc) == true) {
+        //         //如果是不落地文档，则判断是否是系统正在保存
+        //         if (l_IsOADocButtonSave == false) {
+        //             alert("来自OA的不落地文档，禁止另存为本地文档！");
+        //             //如果是OA文档，则禁止另存为
+        //             wps.ApiEvent.Cancel = true;
+        //         }
+        //     } else {
+        //         //这里要再判断OA文档是否被用户另存为
+        //         if (l_IsOADocButtonSave == false) {
+        //             //用户手动另存为操作时，在这里被屏蔽掉
+        //             doc.Save(); //直接保存本地就行
+        //             //如果是OA文档，则禁止另存为
+        //             wps.ApiEvent.Cancel = true;
+        //         } else {}
+        
+        //1.先判断是否是在线文档且是通过WPS自身按钮或快捷键保存，则取消弹出另存到本地的弹出框
+        if (pIsOnlineOADoc(doc) == true && l_IsOADocButtonSave == false) {
+            wps.ApiEvent.Cancel = true;
         }
-
+        //2.如果是落地打开的OA文档并且通过WPS自身按钮或者快捷键保存，则执行保存到本地临时目录，取消弹出对话框
+        if (pIsOnlineOADoc(doc) == true && l_IsOADocButtonSave == false){
+            doc.Save();
+            wps.ApiEvent.Cancel = true;
+        }
+        //3.只要是OA文档且通过WPS自身按钮或快捷键保存，都执行“保存文档到OA”的操作（依次操作来模拟idMso对于OnAction的支持）
+        if (l_IsOADocButtonSave == false && pCheckIfOADoc() == true) {
+            console.log("只有是OA文档就执行保存方法，还是没有弹出框的。")
+            //:FIXED：默认只要是OA的文档，执行Ctrl+S的时候都保存到OA
+            wps.PluginStorage.setItem("Save2OAShowConfirm", false);
+            OnBtnSaveToServer();
+        }
     }
-
     //保存文档后，也要刷新一下Ribbon按钮的状态
     showOATab();
     return;
