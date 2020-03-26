@@ -52,8 +52,8 @@ function pInitParameters() {
     // 以下是一些临时状态参数，用于打开文档等的状态判断
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocOpen, false); //用于执行来自OA端的新建或打开文档时的状态
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocSaveAs, false); //用于执行来自OA端的文档另存为本地的状态
-    wps.PluginStorage.setItem("EnableFlag", false)//按钮的标记控制
-    wps.PluginStorage.setItem("Save2OAShowConfirm", true); //弹出上传成功后的提示信息
+    wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, false)//按钮的标记控制
+    wps.PluginStorage.setItem(constStrEnum.Save2OAShowConfirm, true); //弹出上传成功后的提示信息
 }
 
 //挂载WPS的文档事件
@@ -531,7 +531,7 @@ function OnBtnSaveToServer() {
         return;
     }
 
-    var l_showConfirm = wps.PluginStorage.getItem("Save2OAShowConfirm")
+    var l_showConfirm = wps.PluginStorage.getItem(constStrEnum.Save2OAShowConfirm)
     if (l_showConfirm) {
         if (!wps.confirm("先保存文档，并开始上传到系统后台，请确认？")) {
             return;
@@ -637,7 +637,7 @@ function OnInsertDateClicked() {
  */
 function OnUploadToServerSuccess(resp) {
     var l_doc = wps.WpsApplication().ActiveDocument;
-    var l_showConfirm = wps.PluginStorage.getItem("Save2OAShowConfirm");
+    var l_showConfirm = wps.PluginStorage.getItem(constStrEnum.Save2OAShowConfirm);
     if (l_showConfirm) {
         if (wps.confirm("文件上传成功！继续编辑请确认，取消关闭文档。") == false) {
             if (l_doc) {
@@ -908,9 +908,9 @@ function OnAction(control) {
             OnbtnTabClick();
             break;
         case "btnSaveToServer": //保存到OA服务器
-            wps.PluginStorage.setItem("Save2OAShowConfirm",true)
+            wps.PluginStorage.setItem(constStrEnum.Save2OAShowConfirm, true)
             OnBtnSaveToServer();
-            break;       
+            break;
         case "btnSaveAsFile": //另存为本地文件
             OnBtnSaveAsLocalFile();
             break;
@@ -939,27 +939,25 @@ function OnAction(control) {
             OnBtnClearRevDoc();
             break;
         case "btnOpenRevision": //打开修订
-            {
-                let bFlag = wps.PluginStorage.getItem("EnableFlag")
-                wps.PluginStorage.setItem("EnableFlag", !bFlag)
-
-                //通知wps刷新以下几个按饰的状态
-                wps.ribbonUI.InvalidateControl("btnOpenRevision")
-                wps.ribbonUI.InvalidateControl("btnCloseRevision")
-                OnOpenRevisions(); //
-                break;
-            }
+        {
+            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
+            wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, !bFlag)
+            //通知wps刷新以下几个按钮的状态
+            wps.ribbonUI.InvalidateControl("btnOpenRevision")
+            wps.ribbonUI.InvalidateControl("btnCloseRevision")
+            OnOpenRevisions(); //
+            break;
+        }
         case "btnCloseRevision": //关闭修订
-           {
-               let bFlag = wps.PluginStorage.getItem("EnableFlag")
-               wps.PluginStorage.setItem("EnableFlag", !bFlag)
-
-               //通知wps刷新以下几个按饰的状态
-               wps.ribbonUI.InvalidateControl("btnOpenRevision")
-               wps.ribbonUI.InvalidateControl("btnCloseRevision")
-               OnCloseRevisions();
-               break;
-           }
+        {
+            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
+            wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, !bFlag)
+            //通知wps刷新以下几个按钮的状态
+            wps.ribbonUI.InvalidateControl("btnOpenRevision")
+            wps.ribbonUI.InvalidateControl("btnCloseRevision")
+            OnCloseRevisions();
+            break;
+        }
         case "btnShowRevision":
             break;
         case "btnAcceptAllRevisions": //接受所有修订功能
@@ -999,6 +997,20 @@ function OnAction(control) {
         case "btnImportTemplate": //导入模板
             OnImportTemplate();
             break;
+        case "ckbLanguageCHS": {
+            let ckbFlag = wps.PluginStorage.getItem("ckbFlag");
+            wps.PluginStorage.setItem("ckbFlag", !ckbFlag);
+            wps.ribbonUI.InvalidateControl("ckbLanguageCHS");
+            wps.ribbonUI.InvalidateControl("ckbLanguageENG");
+            break;
+        }
+        case "ckbLanguageENG": {
+            let ckbFlag = wps.PluginStorage.getItem("ckbFlag");
+            wps.PluginStorage.setItem("ckbFlag", !ckbFlag);
+            wps.ribbonUI.InvalidateControl("ckbLanguageCHS");
+            wps.ribbonUI.InvalidateControl("ckbLanguageENG");
+            break;
+        }
         default:
             break;
     }
@@ -1190,11 +1202,11 @@ function OnGetEnabled(control) {
         case "btnChangeToOFD": //保存到OFD格式再上传
             return OnSetSaveToOAEnable();
         case "btnCloseRevision": {
-            let bFlag = wps.PluginStorage.getItem("EnableFlag")
+            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
             return bFlag
         }
         case "btnOpenRevision": {
-            let bFlag = wps.PluginStorage.getItem("EnableFlag")
+            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
             return !bFlag
         }
         default:

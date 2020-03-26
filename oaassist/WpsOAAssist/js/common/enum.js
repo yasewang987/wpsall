@@ -103,5 +103,13 @@ var constStrEnum = {
     uploadWithAppendPath: "uploadWithAppendPath",
     userName: "userName",
     WPSInitUserName: "WPSInitUserName",
-    taskpaneid: "taskpaneid"
+    taskpaneid: "taskpaneid",
+    /**
+     * 是否弹出上传前确认和成功后的确认信息：true|弹出，false|不弹出
+     */
+    Save2OAShowConfirm: "Save2OAShowConfirm",
+    /**
+     * 修订状态标志位
+     */
+    RevisionEnableFlag: "RevisionEnableFlag"
 }
