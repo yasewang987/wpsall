@@ -70,8 +70,11 @@ app.post("/Upload", function (request, response) {
 			// 过滤空文件
 			if (file.size == 0 && file.name == '') continue
 
+			var fileName = file.name
+			if (!fileName)
+				fileName = request.headers.filename
 			let oldPath = file.path
-			let newPath = uploadDir + file.name
+			let newPath = uploadDir + fileName
 
 			fs.rename(oldPath, newPath, function (error) {
 				console.log(getNow() + "上传文件成功，路径：" + newPath)
