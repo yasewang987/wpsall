@@ -325,8 +325,7 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
     }
     var l_FieldName = GetDocParamsValue(p_Doc, constStrEnum.uploadFieldName);
     if (l_FieldName == "") {
-        l_FieldName = wps.WpsApplication().ActiveDocument.Name.split(".")[0] + l_suffix; //默认使用与当前打开文档相同的文件名
-        // l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName);
+        l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName);//默认是'file'
     }
 
     if (l_uploadPath == "" && pShowPrompt == true) {
@@ -538,10 +537,9 @@ function OnBtnSaveToServer() {
         }
     }
 
-    var l_FieldName = GetDocParamsValue(l_doc, constStrEnum.uploadFieldName); //上载到后台的字段名称
+    var l_FieldName = GetDocParamsValue(l_doc, constStrEnum.uploadFieldName); //上载到后台的业务方自定义的字段名称
     if (l_FieldName == "") {
-        //l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName); // 默认为‘file’
-        l_FieldName = wps.WpsApplication().ActiveDocument.Name;
+        l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName); // 默认为‘file’
     }
 
     var l_UploadName = GetDocParamsValue(l_doc, constStrEnum.uploadFileName); //设置OA传入的文件名称参数

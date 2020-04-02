@@ -321,10 +321,10 @@ function DownloadFile(url, callback) {
 }
 /**
  * WPS上传文件到服务端（业务系统可根据实际情况进行修改，为了兼容中文，服务端约定用UTF-8编码格式）
- * @param {*} strFileName 上传文件的文件名称
+ * @param {*} strFileName 上传到服务端的文件名称（包含文件后缀）
  * @param {*} strPath 上传文件的文件路径（文件在操作系统的绝对路径）
  * @param {*} uploadPath 上传文件的服务端地址
- * @param {*} strFieldName 上传到服务端的文件名称（包含文件后缀）
+ * @param {*} strFieldName 业务调用方自定义的一些内容可通过此字段传递，默认赋值'file'
  * @param {*} OnSuccess 上传成功后的回调
  * @param {*} OnFail 上传失败后的回调
  */
@@ -334,11 +334,11 @@ function UploadFile(strFileName, strPath, uploadPath, strFieldName, OnSuccess, O
 
     var fileData = wps.FileSystem.readAsBinaryString(strPath);
     var data = new FakeFormData();
-    if (strFieldName == ""){//默认采用用户自定义的上传到服务端的名称，如果未设置，将此配置置为活动文档的名称
-        strFieldName = strFileName;
+    if (strFieldName == "" || typeof strFieldName == "undefined"){//如果业务方没定义，默认设置为'file'
+        strFieldName = 'file';
     }
-    data.append('file', {
-        name: utf16ToUtf8(strFieldName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
+    data.append(strFieldName, {
+        name: utf16ToUtf8(strFileName), //主要是考虑中文名的情况，服务端约定用utf-8来解码。
         type: "application/octet-stream",
         getAsBinary: function () {
             return fileData;
