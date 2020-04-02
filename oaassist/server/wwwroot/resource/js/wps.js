@@ -111,12 +111,13 @@ _wps['openDoc'] = {
 function onlineEditDoc() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.docx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
-
+    var uploadFieldName = prompt("请输入文档上传到业务系统后的名称：", "样章不落地保存到服务端的新名称.docx")
     _WpsStartUp([{
         "OnlineEditDoc": {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
             "fileName": filePath,
+            "uploadFieldName": uploadFieldName,
             "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
             "userName":"东方不败"
         }
@@ -138,6 +139,7 @@ _wps['onlineEditDoc'] = {
             docId 文档ID\n\
             uploadPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
+            uploadFieldName 文件上传到服务端后的名称（ 需要包含后缀名）\ n\
             buttonGroups 屏蔽的OA助手功能按钮\n\
             userName 传给wps要显示的OA用户名\n\
 "
