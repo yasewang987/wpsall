@@ -114,6 +114,7 @@
         <command idMso="FileSaveAsMenu" label="另存为" getEnabled="OnGetEnabled"/>  
         <command idMso="FileSaveAs" label="另存为" getEnabled="OnGetEnabled"/>  
         <command idMso="FileSave" label="保存" getEnabled="OnGetEnabled"/>  
+        <command idMso="SaveAll" label="保存所有文档" getEnabled="OnGetEnabled"/>
         <command idMso="FilePrint" label="打印" getEnabled="OnGetEnabled"/>  
         <command idMso="FilePrintMenu" label="打印" getEnabled="OnGetEnabled"/>  
         <command idMso="FilePrintPreview" label="打印预览" getEnabled="OnGetEnabled"/>  

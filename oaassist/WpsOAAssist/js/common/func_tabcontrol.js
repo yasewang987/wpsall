@@ -1198,6 +1198,7 @@ function OnGetEnabled(control) {
         case "btnChangeToPDF": //保存到PDF格式再上传
         case "btnChangeToUOT": //保存到UOT格式再上传
         case "btnChangeToOFD": //保存到OFD格式再上传
+        case "SaveAll": //保存所有文档
             return OnSetSaveToOAEnable();
         case "btnCloseRevision": {
             let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
@@ -1206,7 +1207,7 @@ function OnGetEnabled(control) {
         case "btnOpenRevision": {
             let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
             return !bFlag
-        }
+        }        
         default:
             ;
     }
