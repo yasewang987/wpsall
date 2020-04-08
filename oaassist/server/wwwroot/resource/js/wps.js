@@ -421,6 +421,26 @@ _wps['taskPaneBookMark'] = {
         userName 传给wps要显示的OA用户名\n\
 "
 }
+function exitWPS() {
+    _WpsStartUp([{
+        "ExitWPS": {
+        }
+    }])
+}
+
+_wps['exitWPS'] = {
+    action: exitWPS,
+    code: _WpsStartUp.toString() + "\n\n" + exitWPS.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，关闭已打开的WPS\n\
+    \n\
+  方法使用：\n\
+    页面点击按钮，通过wps客户端协议通知WPS，调用oaassist插件，执行传输数据中的指令\n\
+    funcs参数信息说明:\n\
+    ExitWPS 方法对应于OA助手dispatcher支持的方法名\n\
+"
+}
 
 window.onload = function () {
     var btns = document.getElementsByClassName("btn");

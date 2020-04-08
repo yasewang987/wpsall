@@ -36,19 +36,19 @@ function OnJSWorkInit() {
 //初始化全局参数
 function pInitParameters() {
     wps.PluginStorage.setItem(constStrEnum.OADocUserSave, EnumDocSaveFlag.NoneOADocSave); //初始化，没有用户点击保存按钮
-    
+
     var l_wpsUserName = wps.WpsApplication().UserName;
     wps.PluginStorage.setItem(constStrEnum.WPSInitUserName, l_wpsUserName); //在OA助手加载前，先保存用户原有的WPS应用用户名称
-    
+
     wps.PluginStorage.setItem(constStrEnum.OADocCanSaveAs, false); //默认OA文档不能另存为本地
     wps.PluginStorage.setItem(constStrEnum.AllowOADocReOpen, false); //设置是否允许来自OA的文件再次被打开
     wps.PluginStorage.setItem(constStrEnum.ShowOATabDocActive, false); //设置新打开文档是否默认显示OA助手菜单Tab  默认为false
-    
+
     wps.PluginStorage.setItem(constStrEnum.DefaultUploadFieldName, "file"); //针对UploadFile方法设置上载字段名称
-    
+
     wps.PluginStorage.setItem(constStrEnum.AutoSaveToServerTime, "10"); //自动保存回OA服务端的时间间隔。如果设置0，则关闭，最小设置3分钟
     wps.PluginStorage.setItem(constStrEnum.TempTimerID, "0"); //临时值，用于保存计时器ID的临时值
-    
+
     // 以下是一些临时状态参数，用于打开文档等的状态判断
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocOpen, false); //用于执行来自OA端的新建或打开文档时的状态
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocSaveAs, false); //用于执行来自OA端的文档另存为本地的状态
@@ -894,7 +894,17 @@ function OnImportTemplate() {
 
 //自定义菜单按钮的点击执行事件
 function OnAction(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+        console.log(eleId)
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnOpenWPSYUN": //打开WPS云文档入口
             pDoOpenWPSCloundDoc();
@@ -1009,6 +1019,17 @@ function OnAction(control) {
             wps.ribbonUI.InvalidateControl("ckbLanguageENG");
             break;
         }
+        case "FileSaveAsMenu":
+        case "FileSaveAs": {
+            if (pCheckIfOADoc()) {
+                alert("这是OA文档，禁止另存。")
+            }
+            break;
+        }
+        case "ShowAlert_ContextMenuText":{
+            let selectText = wps.WpsApplication().Selection.Text;
+            alert("您选择的内容是：\n"+ selectText);
+        }
         default:
             break;
     }
@@ -1033,7 +1054,16 @@ function OnOADocInfo() {
  * 作用：自定义菜单按钮的图标
  */
 function GetImage(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnOpenWPSYUN":
             return "./icon/w_WPSCloud.png"; //打开WPS云文档
@@ -1101,7 +1131,16 @@ function pGetShowRevisionButtonLabel() {
 
 //xml文件中自定义按钮的文字处理函数
 function OnGetLabel(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnOpenWPSYUN": //打开WPS云文档
             return "WPS云文档";
@@ -1169,7 +1208,16 @@ function OnGetLabel(control) {
  * @param {*} control  ：Ribbon 的按钮控件
  */
 function OnGetVisible(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     var l_value = false;
 
     //关闭一些测试中的功能
@@ -1192,7 +1240,16 @@ function OnGetVisible(control) {
  * @param {*} control  ：Ribbon 的按钮控件
  */
 function OnGetEnabled(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnSaveToServer": //保存到OA服务器的相关按钮。判断，如果非OA文件，禁止点击
         case "btnChangeToPDF": //保存到PDF格式再上传
@@ -1207,7 +1264,7 @@ function OnGetEnabled(control) {
         case "btnOpenRevision": {
             let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
             return !bFlag
-        }        
+        }
         default:
             ;
     }

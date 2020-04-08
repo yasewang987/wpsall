@@ -33,8 +33,23 @@ function dispatcher(info) {
                 InsertRedHead(func[key]);
             } else if (key === "taskPaneBookMark"){
                 taskPaneBookMark(func[key])
+            } else if (key === "ExitWPS") {
+                ExitWPS(func[key])
             }
         }
+    }
+}
+
+/**
+ * 关闭WPS活动文档并退出WPS进程
+ */
+function ExitWPS() {
+    let l_doc = wps.WpsApplication().ActiveDocument
+    if (l_doc && pCheckIfOADoc()) {//此方法还可根据需要进行扩展
+        l_doc.Close();
+    }
+    if(wps.confirm("要关闭WPS软件，请确认文档都已保存。\n点击确定后关闭WPS，点击取消继续编辑。")){
+        wps.WpsApplication().Quit();
     }
 }
 
