@@ -362,3 +362,46 @@ function UploadFile(strFileName, strPath, uploadPath, strFieldName, OnSuccess, O
         xhr.send(data);
     }
 }
+
+/**
+ * 打开WPS后通知到业务系统，可根据需求扩展
+ * @param {*} p_Url 业务方接受请求的地址
+ */
+function NotifyToServer(p_Url) {
+    $.ajax({
+        url: p_Url, //   URL + '/wps/wpsCanOpen',
+        async: true,
+        method: "post",
+        dataType: 'json'
+    });
+}
+
+/**
+ * 更新编辑状态
+ * @param {*} p_Url 要传入OA端，通知业务系统，当前文档所处的编辑状态的URL地址路径
+ * @param {*} p_OpenUrl 当前文档从业务系统打开时的入口URL，这个URL包含业务系统开发者需要传入的ID等参数
+ * @param {*} docId 文档id
+ * @param {*} state 0-正在编辑中 1-文件保存 2-文件关闭  状态可根据需要进行自定义扩展
+ */
+function UpdateEditState(p_Url, p_OpenUrl, docId, state) {
+    var formData = {
+        "openUrl": p_OpenUrl,
+        "docId": docId,
+        "state": state
+    };
+    $.ajax({
+        url: p_Url, //URL + '/document/stateMonitor',
+        async: false,
+        data: formData,
+        method: "post",
+        dataType: 'json',
+        success: function (response) {
+            if (response == "success") {
+                console.log(response);
+            }
+        },
+        error: function (response) {
+            console.log(response);
+        }
+    });
+}

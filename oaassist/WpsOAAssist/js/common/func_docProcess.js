@@ -810,48 +810,7 @@ function OpenLocalFile() {
     }
 }
 
-/**
- * 打开wps后通知到后台
- * 参数：p_Url : 异步方式通知到OA后台
- */
-function NotifyToServer(p_Url) {
-    $.ajax({
-        url: p_Url, //   URL + '/wps/wpsCanOpen',
-        async: true,
-        method: "post",
-        dataType: 'json'
-    });
-}
 
-/**
- * 更新编辑状态
- * @param {*} p_Url 要传入OA端，通知OA后台，当前文档所处的编辑状态的URL地址路径
- * @param {*} p_OpenUrl 当前文档从OA打开时的入口URL，这个URL包含OA伙伴需要传入的ID等参数
- * @param {*} docId 文档id
- * @param {*} state 0-正在编辑中 1-文件保存 2-文件关闭
- */
-function UpdateEditState(p_Url, p_OpenUrl, docId, state) {
-    var formData = {
-        "openUrl": p_OpenUrl,
-        "docId": docId,
-        "state": state
-    };
-    $.ajax({
-        url: p_Url, //URL + '/document/stateMonitor',
-        async: false,
-        data: formData,
-        method: "post",
-        dataType: 'json',
-        success: function (response) {
-            if (response == "success") {
-                console.log(response);
-            }
-        },
-        error: function (response) {
-            console.log(response);
-        }
-    });
-}
 
 /**
  * 作用：OA的正文备份按钮操作功能，把OA文件备份一份到指定的OA后台copyUrl路径中
@@ -878,14 +837,14 @@ function OnUploadOABackupClicked() {
 }
 
 /**
- * 
+ * 备份成功后的回调
  */
 function OnBackupSuccess() {
     wps.alert("备份上传成功");
 }
 
 /**
- * 
+ * 备份失败后的回调
  */
 function OnBackupFail() {
     wps.alert("备份失败");
