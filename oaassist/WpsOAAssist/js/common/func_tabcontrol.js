@@ -1005,20 +1005,6 @@ function OnAction(control) {
         case "btnImportTemplate": //导入模板
             OnImportTemplate();
             break;
-        case "ckbLanguageCHS": {
-            let ckbFlag = wps.PluginStorage.getItem("ckbFlag");
-            wps.PluginStorage.setItem("ckbFlag", !ckbFlag);
-            wps.ribbonUI.InvalidateControl("ckbLanguageCHS");
-            wps.ribbonUI.InvalidateControl("ckbLanguageENG");
-            break;
-        }
-        case "ckbLanguageENG": {
-            let ckbFlag = wps.PluginStorage.getItem("ckbFlag");
-            wps.PluginStorage.setItem("ckbFlag", !ckbFlag);
-            wps.ribbonUI.InvalidateControl("ckbLanguageCHS");
-            wps.ribbonUI.InvalidateControl("ckbLanguageENG");
-            break;
-        }
         case "FileSaveAsMenu":
         case "FileSaveAs": {
             if (pCheckIfOADoc()) {
