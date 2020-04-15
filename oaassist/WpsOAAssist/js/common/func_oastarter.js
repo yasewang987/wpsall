@@ -38,6 +38,7 @@ function dispatcher(info) {
             }
         }
     }
+    return {message:"ok", app:wps.WpsApplication().Name}
 }
 
 /**

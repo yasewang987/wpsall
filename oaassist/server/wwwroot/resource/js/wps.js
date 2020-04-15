@@ -11,6 +11,8 @@ function _WpsStartUp(funcs) {
         function (result) { // 调用回调，status为0为成功，其他是错误
             if (result.status)
                 alert(result.message)
+            else
+                console.log(result.response)
         })
 }
 

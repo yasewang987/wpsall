@@ -3,17 +3,15 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ?
 		module.exports = factory(global) :
 		typeof define === 'function' && define.amd ?
-		define(factory) : factory(global)
+			define(factory) : factory(global)
 }((
 	typeof self !== 'undefined' ? self :
-	typeof window !== 'undefined' ? window :
-	typeof global !== 'undefined' ? global :
-	this
+		typeof window !== 'undefined' ? window :
+			typeof global !== 'undefined' ? global :
+				this
 ), function (global) {
 	global = global || {};
-	var tryCount = 0;
 	var bFinished = true;
-	var timeout = 2000;
 
 	function getHttpObj() {
 		var httpobj = null;
@@ -32,7 +30,7 @@
 	function createXHR() {
 		if (typeof XMLHttpRequest != 'undefined') { //兼容高版本浏览器
 			return new XMLHttpRequest();
-		} else if(typeof ActiveXObject != 'undefined') { //IE6 采用 ActiveXObject， 兼容IE6
+		} else if (typeof ActiveXObject != 'undefined') { //IE6 采用 ActiveXObject， 兼容IE6
 			var versions = [ //由于MSXML库有3个版本，因此都要考虑
 				'MSXML2.XMLHttp.6.0',
 				'MSXML2.XMLHttp.3.0',
@@ -51,27 +49,24 @@
 		}
 	}
 
-	function startWps(clientType, t, callback) {
+	function startWps(options) {
 		if (!bFinished) {
-			if (callback)
-				callback({
+			if (options.callback)
+				options.callback({
 					status: 1,
 					message: "上一次请求没有完成"
 				});
 			return;
 		}
-		tryCount = 0;
 		bFinished = false;
 
-		function startWpsInnder() {
-			++tryCount;
-			if (tryCount > 4) {
+		function startWpsInnder(tryCount) {
+			if (tryCount <= 0) {
 				if (bFinished)
 					return;
 				bFinished = true;
-				timeout = 2000;
-				if (callback)
-					callback({
+				if (options.callback)
+					options.callback({
 						status: 2,
 						message: "请允许浏览器打开WPS Office"
 					});
@@ -80,27 +75,23 @@
 			var xmlReq = getHttpObj();
 			//WPS客户端提供的接收参数的本地服务，HTTP服务端口为58890，HTTPS服务端口为58891
 			//这俩配置，取一即可，不可同时启用
-			xmlReq.open('POST', "http://localhost:58890/" + clientType + "/runParams");
-			// xmlReq.open('POST', "https://localhost:58891/" + clientType + "/runParams");
+			xmlReq.open('POST', options.url);
 			xmlReq.onload = function (res) {
-				tryCount = 4;
 				bFinished = true;
-				timeout = 2000;
-				if (callback)
-					callback({
-						status: 0
+				if (options.callback)
+					options.callback({
+						status: 0,
+						response: res.target.response
 					});
 			}
 			xmlReq.ontimeout = xmlReq.onerror = function (res) {
 				xmlReq.bTimeout = true;
-				if (tryCount == 1) { //打开wps并传参
+				if (tryCount == options.tryCount && options.bPop) { //打开wps并传参
 					window.location.href = "ksoWPSCloudSvr://start=RelayHttpServer" //是否启动wps弹框
-					timeout = 3000;
 				}
-				setTimeout(startWpsInnder, 1000);
+				setTimeout(function () { startWpsInnder(tryCount - 1) }, 1000);
 			}
 			if (IEVersion() < 10) {
-				timeout = 3000;
 				xmlReq.onreadystatechange = function () {
 					if (xmlReq.readyState != 4)
 						return;
@@ -113,10 +104,10 @@
 						xmlReq.onerror();
 				}
 			}
-			xmlReq.timeout = timeout;
-			xmlReq.send("ksowebstartup" + clientType + "://" + t)
+			xmlReq.timeout = options.timeout;
+			xmlReq.send(options.sendData)
 		}
-		startWpsInnder();
+		startWpsInnder(options.tryCount);
 		return;
 	}
 
@@ -128,9 +119,9 @@
 			return cc < 0x80 ? c :
 				cc < 0x800 ? (fromCharCode(0xc0 | (cc >>> 6)) +
 					fromCharCode(0x80 | (cc & 0x3f))) :
-				(fromCharCode(0xe0 | ((cc >>> 12) & 0x0f)) +
-					fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) +
-					fromCharCode(0x80 | (cc & 0x3f)));
+					(fromCharCode(0xe0 | ((cc >>> 12) & 0x0f)) +
+						fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) +
+						fromCharCode(0x80 | (cc & 0x3f)));
 		} else {
 			var cc = 0x10000 +
 				(c.charCodeAt(0) - 0xD800) * 0x400 +
@@ -214,25 +205,97 @@
 		}
 	}
 
-	function WpsStart(clientType, startInfo, callback) {
-		var strData = JSON.stringify(startInfo);
-		if (IEVersion() < 10)
-			eval("strData = '" + JSON.stringify(startInfo) + "';");
-		var baseData = encode(strData);
-		startWps(clientType, baseData, callback);
-	}
-
-	function WpsStartWrap(clientType, name, func, param, callback) {
+	function WpsStart(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
 		var startInfo = {
 			"name": name,
 			"function": func,
 			"info": param
 		};
-		WpsStart(clientType, startInfo, callback);
+		var strData = JSON.stringify(startInfo);
+		if (IEVersion() < 10)
+			eval("strData = '" + JSON.stringify(startInfo) + "';");
+		var baseData = encode(strData);
+		var url = "http://127.0.0.1:58890/" + clientType + "/runParams";
+		if (useHttps)
+			url = "https://127.0.0.1:58891/" + clientType + "/runParams";
+		var data = "ksowebstartup" + clientType + "://" + baseData;
+		startWps({url:url, sendData:data, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 5000});
+	}
+
+	function WpsStartWrap(clientType, name, func, param, callback) {
+		WpsStart(clientType, name, func, param, false, callback, 4, true)
+	}
+
+	function WpsStartWrapHttps(clientType, name, func, param, callback) {
+		WpsStart(clientType, name, func, param, true, callback, 4, true)
+	}
+
+	var exId = 0;
+	function WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
+		var rspUrl = "http://127.0.0.1:58890/transferEcho/runParams";
+		if (useHttps)
+			rspUrl = "https://127.0.0.1:58891/transferEcho/runParams";
+		var time = new Date();
+		var cmdId = "js" + time.getTime() + "_" + exId;
+		var infocontent = JSON.stringify(param);
+		var funcEx = "var res = " + func;
+		var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));"//res 为func执行返回值
+		var infoEx = infocontent + ");" + cbCode + "void(0";
+		var startInfo = {
+			"name": name,
+			"function": funcEx,
+			"info": infoEx
+		};
+		var strData = JSON.stringify(startInfo);
+		if (IEVersion() < 10)
+			eval("strData = '" + JSON.stringify(startInfo) + "';");
+		var baseData = encode(strData);
+		var url = "http://127.0.0.1:58890/transfer/runParams";
+		if (useHttps)
+			url = "https://127.0.0.1:58891/transfer/runParams";
+		var data = "ksowebstartup" + clientType + "://" + baseData;
+		var wrapper = { id: cmdId, app: clientType, data: data };
+		wrapper = JSON.stringify(wrapper);
+		startWps({url:url, sendData:wrapper, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 0});
+	}
+
+	var serverVersion = "wait"
+	function WpsStartWrapVersionInner(clientType, name, func, param, useHttps, callback) {
+		if (serverVersion == "wait") {
+			var url = "http://127.0.0.1:58890/version";
+			if (useHttps)
+				url = "https://127.0.0.1:58891/version";
+			startWps({url:url, data:"", callback: function(res) {
+				if (res.status !== 0) {
+					callback(res)
+					return;
+				}
+				serverVersion = res.response;
+				if (serverVersion === "") {
+					WpsStart(clientType, name, func, param, useHttps, callback, 1, false);
+				} else {
+					WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, false);
+				}
+			}, tryCount: 4, bPop: true, timeout: 5000});
+		} else {
+			if (serverVersion === "") {
+				WpsStartWrap(clientType, name, func, param, useHttps, callback);
+			} else {
+				WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 4, true);
+			}
+		}
+	}
+	function WpsStartWrapVersion(clientType, name, func, param, callback) {
+		WpsStartWrapVersionInner(clientType, name, func, param, false, callback);
+	}
+
+	function WpsStartWrapHttpsVersion(clientType, name, func, param, callback) {
+		WpsStartWrapVersionInner(clientType, name, func, param, true, callback);
 	}
 
 	global.WpsStartUp = {
-		StartUp: WpsStartWrap,
+		StartUp: WpsStartWrapVersion,
+		StartUpHttps: WpsStartWrapHttpsVersion,
 		ClientType: {
 			wps: "wps",
 			et: "et",
