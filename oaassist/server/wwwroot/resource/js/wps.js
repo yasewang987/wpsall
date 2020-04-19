@@ -444,7 +444,7 @@ _wps['exitWPS'] = {
 "
 }
 
-window.onload = function () {
+window.onload = function () {//这是HTML页面上的按钮赋予事件的实现，开发者无需关心，使用自己习惯的方式做开发即可
     var btns = document.getElementsByClassName("btn");
 
     for (var i = 0; i < btns.length; i++) {
