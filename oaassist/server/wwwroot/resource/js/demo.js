@@ -1,4 +1,32 @@
 // 切换到相应 tab. 0: wps  1: wpp  2: et
+let isServerOk = false
+let isSetupOk = false
+function envTest(){
+    //1.服务端检测
+    
+    let xhr = new XMLHttpRequest()
+    xhr.onload=e=>{
+        isServerOk = true
+        //2.安装包检测
+        let xhr1 = new XMLHttpRequest()
+        xhr1.onload=e=>{
+            isSetupOk = true
+            window.location.href.indexOf("file://")>-1?window.location.href="http://127.0.0.1:3888/index.html":''
+        }
+        xhr1.onerror=e=>{
+            isServerOk = false
+            window.location.href="./demo.html"
+        }
+        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest', true)
+        xhr1.send()
+    }
+    xhr.onerror=e=>{
+        isServerOk = false
+        window.location.href="./demo.html"
+    }
+    xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
+    xhr.send();
+}
 function SwitchTab(crtTabIndex) {
     var iframe_wps = document.getElementById("iframe_wps");
     var iframe_wpp = document.getElementById("iframe_wpp");
