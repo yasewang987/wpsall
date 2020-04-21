@@ -1,4 +1,3 @@
-// 切换到相应 tab. 0: wps  1: wpp  2: et
 let isServerOk = false
 let isSetupOk = false
 function envTest(){
@@ -10,6 +9,10 @@ function envTest(){
         //2.安装包检测
         let xhr1 = new XMLHttpRequest()
         xhr1.onload=e=>{
+            if(xhr1.responseText.indexOf('异常')>-1||xhr1.responseText.indexOf('未安装')>-1||xhr1.responseText.indexOf('失败')>-1){
+                window.location.href="./demo.html"
+                return ;
+            }
             isSetupOk = true
             window.location.href.indexOf("file://")>-1?window.location.href="http://127.0.0.1:3888/index.html":''
         }
@@ -27,6 +30,7 @@ function envTest(){
     xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
     xhr.send();
 }
+// 切换到相应 tab. 0: wps  1: wpp  2: et
 function SwitchTab(crtTabIndex) {
     var iframe_wps = document.getElementById("iframe_wps");
     var iframe_wpp = document.getElementById("iframe_wpp");
@@ -69,4 +73,5 @@ window.onload = function () {
     var app = document.getElementById("app");
     var opts = app.getElementsByTagName("option"); //得到数组option
     opts[0].selected = true;
+    envTest()
 }
