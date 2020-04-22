@@ -1,4 +1,10 @@
-﻿;
+﻿/**
+ * 这是通过前端页面启动WPS的方法封装，是WPS提供的SDK
+ * 无需修改
+ * 直接引用到业务系统前端调用即可
+ */
+
+;
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ?
 		module.exports = factory(global) :
@@ -231,6 +237,18 @@
 	}
 
 	var exId = 0;
+	/**
+	 * 支持浏览器触发，WPS有返回值的启动
+	 *
+	 * @param {*} clientType	组件类型
+	 * @param {*} name			WPS加载项名称
+	 * @param {*} func			WPS加载项入口方法
+	 * @param {*} param			参数：包括WPS加载项内部定义的方法，参数等
+	 * @param {*} useHttps		是否使用https协议
+	 * @param {*} callback		回调函数
+	 * @param {*} tryCount		重试次数
+	 * @param {*} bPop			是否弹出浏览器提示对话框
+	 */
 	function WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
 		var rspUrl = "http://127.0.0.1:58890/transferEcho/runParams";
 		if (useHttps)
@@ -241,6 +259,7 @@
 		var funcEx = "var res = " + func;
 		var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));"//res 为func执行返回值
 		var infoEx = infocontent + ");" + cbCode + "void(0";
+		//固定格式，无需修改
 		var startInfo = {
 			"name": name,
 			"function": funcEx,

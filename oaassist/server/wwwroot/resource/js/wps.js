@@ -1,5 +1,8 @@
-var _wps = {}
-
+/**
+ * 此方法是根据页面调起WPS的SDK做的调用方法封装
+ * 可参照此定义
+ * @param {*} funcs     这是在WPS加载项内部定义的方法，采用JSON格式（先方法名，再参数）
+ */
 function _WpsStartUp(funcs) {
     var info = {};
 
@@ -15,6 +18,10 @@ function _WpsStartUp(funcs) {
                 console.log(result.response)
         })
 }
+/**
+ * 这是页面中针对代码显示的变量定义，开发者无需关心
+ */
+var _wps = {}
 
 function newDoc() {
     _WpsStartUp([{
@@ -39,12 +46,12 @@ _wps['newDoc'] = {
 function GetDemoPath(fileName) {
 
     var url = document.location.host;
-    return document.location.protocol + "//" +  url + "/file/" + fileName;
+    return document.location.protocol + "//" + url + "/file/" + fileName;
 }
 
 function GetUploadPath() {
     var url = document.location.host;
-    return document.location.protocol + "//" +  url + "/Upload";
+    return document.location.protocol + "//" + url + "/Upload";
 }
 
 function GetDemoPngPath() {
@@ -72,7 +79,7 @@ function openDoc() {
 
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.docx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
-    var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：","自定义字段")
+    var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：", "自定义字段")
     var backupPath = prompt("请输入文档备份路径:")
 
     _WpsStartUp([{
@@ -83,7 +90,7 @@ function openDoc() {
             "uploadFieldName": uploadFieldName,
             "picPath": GetDemoPngPath(),
             "copyUrl": backupPath,
-            "userName":"东方不败"
+            "userName": "东方不败"
         }
     }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -121,7 +128,7 @@ function onlineEditDoc() {
             "fileName": filePath,
             "uploadFieldName": uploadFieldName,
             "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
-            "userName":"东方不败"
+            "userName": "东方不败"
         }
     }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -402,7 +409,7 @@ function taskPaneBookMark() {
     _WpsStartUp([{
         "taskPaneBookMark": {
             "fileName": filePath,
-            "userName":"东方不败"
+            "userName": "东方不败"
         }
     }]) // taskPaneBookMark方法对应于OA助手dispatcher支持的方法名
 }
@@ -423,10 +430,10 @@ _wps['taskPaneBookMark'] = {
         userName 传给wps要显示的OA用户名\n\
 "
 }
+
 function exitWPS() {
     _WpsStartUp([{
-        "ExitWPS": {
-        }
+        "ExitWPS": {}
     }])
 }
 
@@ -444,7 +451,10 @@ _wps['exitWPS'] = {
 "
 }
 
-window.onload = function () {//这是HTML页面上的按钮赋予事件的实现，开发者无需关心，使用自己习惯的方式做开发即可
+/** 
+ * 这是HTML页面上的按钮赋予事件的实现，开发者无需关心，使用自己习惯的方式做开发即可
+ */
+window.onload = function () { 
     var btns = document.getElementsByClassName("btn");
 
     for (var i = 0; i < btns.length; i++) {
@@ -455,8 +465,8 @@ window.onload = function () {//这是HTML页面上的按钮赋予事件的实现
             document.getElementById("codeDes").innerText = _wps[this.id].detail.toString()
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             var onBtnAction = _wps[this.id].action
-            
-            document.getElementById("demoBtn").onclick = function () {//IE不支持箭头函数，改为通用写法
+
+            document.getElementById("demoBtn").onclick = function () { //IE不支持箭头函数，改为通用写法
                 var xhr = new WpsStartUp.CreateXHR();
                 xhr.onload = function () {
                     onBtnAction()
