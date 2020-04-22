@@ -220,7 +220,7 @@ function closeWpsIfNoDocument() {
 }
 
 function activeTab() {
-    // 默认显示OA助手页签
+    //启动WPS程序后，默认显示的工具栏选项卡为ribbon.xml中某一tab
     if (wps.ribbonUI)
         wps.ribbonUI.ActivateTab('WPSWorkExtTab');
 }
