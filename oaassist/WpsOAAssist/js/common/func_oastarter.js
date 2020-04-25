@@ -35,10 +35,30 @@ function dispatcher(info) {
                 taskPaneBookMark(func[key])
             } else if (key === "ExitWPS") {
                 ExitWPS(func[key])
+            } else if (key === "GetDocStatus") {
+                return GetDocStatus(func[key])
             }
         }
     }
     return {message:"ok", app:wps.WpsApplication().Name}
+}
+
+
+/**
+ * 获取活动文档的状态
+ */
+function GetDocStatus() {
+    let l_doc = wps.WpsApplication().ActiveDocument
+    if (l_doc && pCheckIfOADoc()) {//此方法还可根据需要进行扩展
+        return{
+            message: "GetDocStatus",
+            docstatus:{
+                words: l_doc.Words.Count,
+                saved: l_doc.Saved,
+                pages: l_doc.ActiveWindow.Panes.Item(1).Pages.Count
+            }
+        }
+    }    
 }
 
 /**

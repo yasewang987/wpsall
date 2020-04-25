@@ -12,16 +12,41 @@ function _WpsStartUp(funcs) {
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据
         function (result) { // 调用回调，status为0为成功，其他是错误
-            if (result.status)
+            if (result.status) {
                 alert(result.message)
-            else
+            } else {
                 console.log(result.response)
+                showresult(result.response)
+            }
         })
+}
+/**
+ * 处理WPS加载项的方法返回值
+ *
+ * @param {*} resultData
+ */
+function showresult(resultData) {
+    let json = eval('(' + resultData + ')')
+    switch (json.message) {
+        case "GetDocStatus": {
+            let docstatus = json.docstatus
+            if (typeof docstatus != "undefined") {
+                let str = "文档保存状态：" +
+                    docstatus.saved +
+                    "\n文档字数：" +
+                    docstatus.words +
+                    "\n文档页数：" + docstatus.pages
+                alert(str)
+            }
+        }
+    }
 }
 /**
  * 这是页面中针对代码显示的变量定义，开发者无需关心
  */
 var _wps = {}
+
+// 此处往下，都是对于前端页面如何调用WPS加载项方法的样例，开发者请参考
 
 function newDoc() {
     _WpsStartUp([{
@@ -110,7 +135,7 @@ _wps['openDoc'] = {
             docId 文档ID，OA助手用以标记文档的信息，以区分其他文档\n\
             uploadPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
-            uploadFieldName 文档上传到业务系统时自定义字段\ n\
+            uploadFieldName 文档上传到业务系统时自定义字段\n\
             picPath 插入图片的路径\n\
             copyUrl 备份的服务器路径\n\
             userName 传给wps要显示的OA用户名\n\
@@ -148,7 +173,7 @@ _wps['onlineEditDoc'] = {
             docId 文档ID\n\
             uploadPath 保存文档上传路径\n\
             fileName 打开的文档路径\n\
-            uploadFieldName 文档上传到业务系统时自定义字段\ n\
+            uploadFieldName 文档上传到业务系统时自定义字段\n\
             buttonGroups 屏蔽的OA助手功能按钮\n\
             userName 传给wps要显示的OA用户名\n\
 "
@@ -448,6 +473,26 @@ _wps['exitWPS'] = {
     页面点击按钮，通过wps客户端协议通知WPS，调用oaassist插件，执行传输数据中的指令\n\
     funcs参数信息说明:\n\
     ExitWPS 方法对应于OA助手dispatcher支持的方法名\n\
+"
+}
+
+function getDocStatus() {
+    _WpsStartUp([{
+        "GetDocStatus": {}
+    }])
+}
+
+_wps['getDocStatus'] = {
+    action: getDocStatus,
+    code: _WpsStartUp.toString() + "\n\n" + getDocStatus.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，获取活动文档的状态\n\
+    \n\
+  方法使用：\n\
+    页面点击按钮，通过wps客户端协议通知WPS，调用oaassist插件，执行传输数据中的指令\n\
+    funcs参数信息说明:\n\
+    GetDocStatus 方法对应于OA助手dispatcher支持的方法名\n\
 "
 }
 
