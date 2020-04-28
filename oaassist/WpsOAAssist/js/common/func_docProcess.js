@@ -166,9 +166,10 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
         dataType: 'json',
         success: function (res) {
             var data = res;
+            let Bookmarks=template.Bookmarks;
             data.forEach(function (it) {
 
-                var bookmark = template.Bookmarks.Item(it.name);
+                var bookmark = Bookmarks.Item(it.name);
                 if (bookmark) {
                     if (!it.type || it.type === "text") {
                         bookmark.Range.Text = it.text;
@@ -178,6 +179,8 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                         bookmark.Range.InlineShapes.AddPicture(it.text);
                     }
                 }
+                if(!Bookmarks.Exists(bookmark.Name))
+                Bookmarks.Add(bookmark.Name,bookmark.Range)
             })
         }
     });
