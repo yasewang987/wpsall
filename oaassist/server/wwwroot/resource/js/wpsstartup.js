@@ -312,6 +312,10 @@
 		WpsStartWrapVersionInner(clientType, name, func, param, true, callback);
 	}
 
+	function AuthHttpesCert(msg) {
+		if (confirm(msg))
+			window.open("https://127.0.0.1:58891/isInstalled", "_top")
+	}
 	global.WpsStartUp = {
 		StartUp: WpsStartWrapVersion,
 		StartUpHttps: WpsStartWrapHttpsVersion,
@@ -320,7 +324,8 @@
 			et: "et",
 			wpp: "wpp"
 		},
-		CreateXHR: createXHR
+		CreateXHR: createXHR,
+		AuthHttpesCert: AuthHttpesCert
 	}
 
 	return {

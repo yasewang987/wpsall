@@ -35,7 +35,7 @@ function OnlineEditDoc(OaParams) {
     if (OaParams.fileName == "") {
         NewFile(OaParams);
     } else {
-        //OA传来下载文件的URL地址，调用openFile 方法打开
+        //OA传来下载文件的URL地址，调用不落地方法打开
         OpenOnLineFile(OaParams);
     }
 }

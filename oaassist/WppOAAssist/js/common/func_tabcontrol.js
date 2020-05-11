@@ -49,10 +49,11 @@ function pInitParameters() {
     wps.PluginStorage.setItem("IsInCurrOADocSaveAs", false); //用于执行来自OA端的文档另存为本地的状态
 }
 
-//挂载WPS的表格事件
+//挂载WPS的演示事件
 function AddPresentationEvent() {
     wps.ApiEvent.AddApiEventListener("WindowActivate", OnWindowActivate);
     wps.ApiEvent.AddApiEventListener("PresentationBeforeClose", OnPresentationBeforeClose);
+    wps.ApiEvent.AddApiEventListener("DocumentRightsInfo", OnDocumentRightsInfo);
 
     console.log("AddPresentationEvent");
 }
@@ -150,6 +151,7 @@ function OnUploadToServerFail(resp) {
 //判断当前文档是否是OA文档
 function pCheckIfOADoc() {
     var doc = wps.WppApplication().ActivePresentation;
+    console.log("先判断是否有doc对象")
     if (!doc)
         return false;
     return CheckIfDocIsOADoc(doc);
@@ -164,7 +166,7 @@ function CheckIfDocIsOADoc(doc) {
     var l_isOA = GetDocParamsValue(doc, "isOA");
     if (l_isOA == "") {
         return false
-    };
+    }
 
     return l_isOA == EnumOAFlag.DocFromOA ? true : false;
 }
@@ -333,12 +335,39 @@ function OnAction(control) {
     }
     return true;
 }
-
+/**
+ * 设置功能的可用性
+ *
+ * @param {*} control
+ * @returns
+ */
 function OnGetEnabled(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+        console.log(eleId)
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnSaveToServer": //保存到OA服务器的相关按钮。判断，如果非OA文件，禁止点击
+        case "btnChangeToPDF": //保存到PDF格式再上传
+        case "btnChangeToUOT": //保存到UOT格式再上传
+        case "btnChangeToOFD": //保存到OFD格式再上传
             return OnSetSaveToOAEnable();
+        case "SaveAsPDF":
+        case "SaveAsOfd":
+        case "SaveAsPicture":
+        case "FileMenuSendMail":
+        case "FileSaveAsPicture":
+        case "FileSaveAsPdfOrXps":
+        case "VisualBasic":
+        case "MacroPlay":
+            return OnSetSaveAsRightsEnable();
         default:
             ;
     }

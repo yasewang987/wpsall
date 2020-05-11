@@ -3,17 +3,22 @@
  * 可参照此定义
  * @param {*} funcs     这是在WPS加载项内部定义的方法，采用JSON格式（先方法名，再参数）
  */
+
+var bUseHttps = true;
 function _WpsStartUp(funcs) {
     var info = {};
 
     info.funcs = funcs;
-    WpsStartUp.StartUp(WpsStartUp.ClientType.wps, // 组件类型
+    var func = bUseHttps ? WpsStartUp.StartUpHttps : WpsStartUp.StartUp
+    func(WpsStartUp.ClientType.wps, // 组件类型
         "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据
         function (result) { // 调用回调，status为0为成功，其他是错误
             if (result.status) {
                 alert(result.message)
+                if (bUseHttps)
+                    WpsStartUp.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
             } else {
                 console.log(result.response)
                 showresult(result.response)

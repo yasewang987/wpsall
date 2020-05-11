@@ -122,11 +122,13 @@ function pOpenFile(doc, params, isOnlineDoc){
     pDoResetRibbonGroups();
     // 触发切换窗口事件
     OnWindowActivate();
+    // 把WPS对象置前
+    wps.WppApplication().Activate();
     return doc;
 }
 
 /**
- * 文档打开服务器上的文件
+ * 不落地打开服务端的文档
  * @param {*} fileUrl 文件url路径
  */
 function OpenOnLineFile(OAParams) {
@@ -139,16 +141,22 @@ function OpenOnLineFile(OAParams) {
     if (l_OAFileUrl) {
         //下载文档不落地
         wps.WppApplication().Presentations.OpenFromUrl(l_OAFileUrl, "OnOpenOnLineDocSuccess", "OnOpenOnLineDocDownFail");
-        l_doc = wps.WppApplication().ActiveDocument;
+        //设置文档的权限，模拟保护模式打开
+        setDocumentRights(ksoRightsInfo.ksoNoneRight)
+        l_doc = wps.WppApplication().ActivePresentation;
     }
 
-    //Office文件打开后，设置该文件属性：从服务端来的OA文件
-    pSetOADocumentFlag(l_doc, OAParams);
-    //设置当前文档为 本地磁盘落地模式
-    DoSetOADocLandMode(l_doc, EnumDocLandMode.DLM_OnlineDoc);
-    // 强制执行一次Activate事件
-    OnWindowActivate();
+    //执行文档打开后的方法
+    pOpenFile(l_doc, OAParams, true);
     return l_doc;
+
+    // //Office文件打开后，设置该文件属性：从服务端来的OA文件
+    // pSetOADocumentFlag(l_doc, OAParams);
+    // //设置当前文档为 不落地打开模式
+    // DoSetOADocLandMode(l_doc, EnumDocLandMode.DLM_OnlineDoc);
+    // // 强制执行一次Activate事件
+    // OnWindowActivate();
+    // return l_doc;
 }
 
 /**
@@ -178,6 +186,7 @@ function pDoOpenOADocProcess(params, TempLocalFile) {
         }
     }
 
+    //可设置ReadOnly?: Kso.KsoMsoTriState属性设置：-1是只读，其他值都是非只读
     var l_Doc = wps.WppApplication().Presentations.Open(TempLocalFile);
     return l_Doc;
 }
@@ -237,15 +246,11 @@ function pSetOADocumentFlag(doc, params) {
     if (!doc) {
         return;
     }
-
     var l_Param = params;
     l_Param.isOA = EnumOAFlag.DocFromOA; //设置OA打开文档的标志
-
     l_Param.SourcePath = doc.FullName; //保存OA的原始文件路径，用于保存时分析，是否进行了另存为操作
-
     if (doc) {
         var l_p = JSON.stringify(l_Param);
-
         //将OA文档标志存入系统变量对象保存
         wps.PluginStorage.setItem(doc.FullName, l_p);
     }

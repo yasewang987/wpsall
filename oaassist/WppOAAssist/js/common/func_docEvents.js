@@ -48,3 +48,56 @@ function pSetNoneOADocFlag(fullName) {
     l_objParams.isOA = EnumOAFlag.DocFromNoOA; // 新增非OA打开文档属性
     wps.PluginStorage.setItem(fullName, JSON.stringify(l_objParams)); // 存入内存中
 }
+/**
+ * 权限点集合
+ */
+var ksoRightsInfo = {
+    ksoNoneRight: 0x0000,
+    ksoModifyRight: 0x0001,
+    ksoCopyRight: 0x0002,
+    ksoPrintRight: 0x0004,
+    ksoSaveRight: 0x0008,
+    ksoBackupRight: 0x0010,
+    ksoVbaRight: 0x0020,
+    ksoSaveAsRight: 0x0040,
+    ksoFullRight: -1
+}
+var gRightsInfo = ksoRightsInfo.ksoFullRight;
+/**
+ * 设置文档的权限
+ *
+ * @param {*} rightsInfo
+ * 所有权限： ksoRightsInfo.ksoFullRight
+ * 备份权限： ksoRightsInfo.ksoFullRight & ~ksoRightsInfo.ksoBackupRight
+ * 另存权限： ksoRightsInfo.ksoFullRight & ~ksoRightsInfo.ksoSaveAsRight
+ * 类似保护模式： ksoRightsInfo.ksoFullRight & ~ksoRightsInfo.ksoBackupRight & ~ksoRightsInfo.ksoSaveAsRight & ~ksoRightsInfo.ksoSaveRight & ~ksoRightsInfo.ksoPrintRight & ~ksoRightsInfo.ksoCopyRight
+ */
+function setDocumentRights(rightsInfo) {
+    gRightsInfo = rightsInfo;
+    var l_doc = wps.WppApplication().ActivePresentation;
+    if (l_doc) {
+        l_doc.InvalidateRightsInfo();
+        wps.ribbonUI.Invalidate();
+    }
+}
+/**
+ * 设置权限的事件实现
+ *
+ * @param {*} doc
+ */
+function OnDocumentRightsInfo(doc) {
+    var curRightsInfo = wps.ApiEvent.RightsInfo;
+    wps.ApiEvent.RightsInfo = gRightsInfo;
+
+}
+/**
+ * 针对权限的功能可用状态判断
+ *
+ * @returns
+ */
+function OnSetSaveAsRightsEnable() {
+    if (gRightsInfo & ksoRightsInfo.ksoSaveAsRight)
+        return true;
+    else
+        return false;
+}
