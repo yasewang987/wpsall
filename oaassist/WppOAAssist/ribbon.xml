@@ -11,4 +11,23 @@
       </tab>
     </tabs>
   </ribbon>
+  <commands>
+    <command idMso="ReviewTrackChangesMenu" label="修订" getEnabled="OnGetEnabled"/>
+    <command idMso="FileSaveAsMenu" label="另存为" getEnabled="OnGetEnabled"/>
+    <command idMso="FileSaveAs" label="另存为" getEnabled="OnGetEnabled"/>
+    <command idMso="FileSave" label="保存" getEnabled="OnGetEnabled"/>
+    <command idMso="FilePrint" label="打印" getEnabled="OnGetEnabled"/>
+    <command idMso="FilePrintMenu" label="打印" getEnabled="OnGetEnabled"/>
+    <command idMso="FilePrintPreview" label="打印预览" getEnabled="OnGetEnabled"/>
+    <command idMso="ReviewRejectChangeMenu" getEnabled="OnGetEnabled"/>
+    <command idMso="ReviewAcceptChangeMenu" getEnabled="OnGetEnabled"/>
+    <command idMso="FileSaveAsPdfOrXps" getEnabled="OnGetEnabled"/>
+    <command idMso="FileSaveAsPicture" getEnabled="OnGetEnabled" />
+    <command idMso="SaveAsPicture" getEnabled="OnGetEnabled" />
+    <command idMso="FileMenuSendMail" getEnabled="OnGetEnabled" />
+    <command idMso="SaveAsOfd" getEnabled="OnGetEnabled"/>
+    <command idMso="SaveAsPDF" getEnabled="OnGetEnabled"/>
+    <command idMso="MacroPlay" getEnabled="OnGetEnabled"/>
+    <command idMso="VisualBasic" getEnabled="OnGetEnabled"/>
+  </commands>
 </customUI>
