@@ -283,7 +283,7 @@
 		if (serverVersion == "wait") {
 			var url = "http://127.0.0.1:58890/version";
 			if (useHttps)
-				url = "https://127.0.0.1:58891/version";
+				url = "https://localhost:58891/version";
 			startWps({url:url, data:"", callback: function(res) {
 				if (res.status !== 0) {
 					callback(res)
@@ -312,6 +312,10 @@
 		WpsStartWrapVersionInner(clientType, name, func, param, true, callback);
 	}
 
+	function AuthHttpesCert(msg) {
+		if (confirm(msg))
+			window.open("https://localhost:58891/isInstalled", "_top")
+	}
 	global.WpsStartUp = {
 		StartUp: WpsStartWrapVersion,
 		StartUpHttps: WpsStartWrapHttpsVersion,
@@ -320,7 +324,8 @@
 			et: "et",
 			wpp: "wpp"
 		},
-		CreateXHR: createXHR
+		CreateXHR: createXHR,
+		AuthHttpesCert: AuthHttpesCert
 	}
 
 	return {
