@@ -26,8 +26,10 @@ public class HelloServlet extends HttpServlet {
     private static String s_fileName = "";
 
     ByteArrayOutputStream output;
+
     /**
      * 下载文件
+     * 
      * @param request
      * @param response
      * @throws ServletException
@@ -35,25 +37,43 @@ public class HelloServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("--------doGet--------");
-        Cookie[] cookies = request.getCookies();
-        String name = "";
-        String value = "";
-        if (cookies == null || cookies.length == 0) {
-
-            response.sendError(404, "no ssison");
+        String filename = request.getParameter("name");
+        if (filename == null || filename.isEmpty()) {
+            out.print("please set file name ");
         } else {
-
-            Cookie cookie = cookies[0];
-            name = cookie.getName();
-            value = cookie.getValue();
-            System.out.println(request.getRequestURL());
+            // 假设文件都在服务的根目录下
+            String realFileName = request.getServletContext().getRealPath("/") + filename;
+            System.out.println(realFileName);
+            // 实例化一个向客户端输出文件流
+            OutputStream outputStream = response.getOutputStream();
+            // 输出文件用的字节数组，每次向输出流发送600个字节
+            byte b[] = new byte[600];
+            // 要向客户端输出的文件
+            File fileload = new File(realFileName);
+            System.out.println(filename);
+            String utf8filename = URLEncoder.encode(filename, "UTF-8");
+            System.out.println(utf8filename);
+            response.setHeader("Content-disposition", "attachment; filename=" + utf8filename);
+            // 通知客户端：文件的MIME类型
+            response.setContentType("application/msword");
+            // 通知客户端：文件的长度
+            long fileLength = fileload.length();
+            String length = String.valueOf(fileLength);
+            response.setHeader("Content-length", length);
+            // 读取文件，并发送给客户端下载
+            FileInputStream inputStream = new FileInputStream(fileload);
+            int n = 0;
+            while ((n = inputStream.read(b)) != -1) {
+                outputStream.write(b, 0, n);
+            }
+            inputStream.close();
+            outputStream.close();
         }
-        System.out.println("JSESSIONID=" + value);
-        response.getWriter().write(name + "=" + value);
     }
+
     /**
      * 上传文件
+     * 
      * @param request
      * @param response
      * @throws ServletException
@@ -85,9 +105,10 @@ public class HelloServlet extends HttpServlet {
                     continue;
                 }
                 String fieldName = fileItem.getFieldName();
+                // 必须要有文件名，需要客户端传参时注意
                 String fileName = fileItem.getName();
                 if (fileName.equals("blob"))
-                    if (param.containsKey("filename")) {//关键就是要在前端传来的数据中有这个字段
+                    if (param.containsKey("filename")) {
                         fileName = param.get("filename").toString();
                     } else if (param.containsKey("fileName")) {
                         fileName = param.get("fileName").toString();
