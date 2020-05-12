@@ -62,7 +62,6 @@ function AddWorkbookEvent() {
     wps.ApiEvent.AddApiEventListener("WorkbookBeforePrint", OnWorkbookBeforePrint);
     wps.ApiEvent.AddApiEventListener("WorkbookOpen", OnWorkbookOpen);
     wps.ApiEvent.AddApiEventListener("WorkbookNew", OnWorkbookNew);
-
     console.log("AddWorkbookEvent");
 }
 
@@ -107,8 +106,6 @@ function pShowRibbonGroupByOADocParam(CtrlID) {
     //获取OA传入的按钮组参数组
     var l_grpButtonParams = GetDocParamsValue(l_Doc, "buttonGroups"); //disableBtns
     l_grpButtonParams = l_grpButtonParams + "," + GetDocParamsValue(l_Doc, "disableBtns");
-
-
     // 要求OA传入控制自定义按钮显示的参数为字符串 中间用 , 分隔开
     if (typeof (l_grpButtonParams) == "string") {
         var l_arrayGroup = new Array();
@@ -174,12 +171,10 @@ function CheckIfDocIsOADoc(doc) {
     if (!doc) {
         return false;
     }
-
     var l_isOA = GetDocParamsValue(doc, "isOA");
     if (l_isOA == "") {
         return false
     };
-
     return l_isOA == EnumOAFlag.DocFromOA ? true : false;
 }
 
@@ -359,6 +354,11 @@ function OnGetEnabled(control) {
     switch (eleId) {
         case "btnSaveToServer": //保存到OA服务器的相关按钮。判断，如果非OA文件，禁止点击
             return OnSetSaveToOAEnable();
+        case "btnSaveAsFile":
+            let doc=wps.EtApplication().ActiveWorkbook;
+            let l_Params=wps.PluginStorage.getItem(doc.FullName);
+            let OADocLandMode=JSON.parse(l_Params).OADocLandMode
+            return !OADocLandMode
         default:
             ;
     }

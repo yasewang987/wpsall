@@ -100,11 +100,12 @@ function OpenFile(params) {
     }
 
     pOpenFile(doc, params, l_IsOnlineDoc);
+    return doc
 }
 
 function pOpenFile(doc, params, isOnlineDoc) {
     var l_IsOnlineDoc = isOnlineDoc
-
+    console.log(doc)
     //Office文件打开后，设置该文件属性：从服务端来的OA文件
     pSetOADocumentFlag(doc, params);
     //设置当前文档为 本地磁盘落地模式
@@ -139,16 +140,14 @@ function OpenOnLineFile(OAParams) {
     var l_doc;
     if (l_OAFileUrl) {
         //下载文档不落地（16版WPS的925后支持）
+        wps.PluginStorage.setItem("IsInCurrOADocOpen", true);
         wps.EtApplication().Workbooks.OpenFromUrl(l_OAFileUrl, "OnOpenOnLineDocSuccess", "OnOpenOnLineDocDownFail");
-        l_doc = wps.EtApplication().ActiveDocument;
+        wps.PluginStorage.setItem("IsInCurrOADocOpen", false);
+        l_doc = wps.EtApplication().ActiveWorkbook;
     }
 
     //Office文件打开后，设置该文件属性：从服务端来的OA文件
-    pSetOADocumentFlag(l_doc, OAParams);
-    //设置当前文档为 本地磁盘落地模式
-    DoSetOADocLandMode(l_doc, EnumDocLandMode.DLM_OnlineDoc);
-    // 强制执行一次Activate事件
-    OnWindowActivate();
+    pOpenFile(l_doc, OAParams, true);
     return l_doc;
 }
 
@@ -282,7 +281,6 @@ function pSetOADocumentFlag(doc, params) {
     if (!doc) {
         return;
     }
-
     var l_Param = params;
     l_Param.isOA = EnumOAFlag.DocFromOA; //设置OA打开文档的标志
     l_Param.SourcePath = doc.FullName; //保存OA的原始文件路径，用于保存时分析，是否进行了另存为操作
