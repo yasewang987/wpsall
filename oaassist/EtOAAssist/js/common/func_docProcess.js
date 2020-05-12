@@ -100,6 +100,7 @@ function OpenFile(params) {
     }
 
     pOpenFile(doc, params, l_IsOnlineDoc);
+    
     return doc
 }
 
