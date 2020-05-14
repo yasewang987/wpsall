@@ -4,7 +4,7 @@
  * @param {*} funcs     这是在WPS加载项内部定义的方法，采用JSON格式（先方法名，再参数）
  */
 
-var bUseHttps = true;
+var bUseHttps = false;
 function _WpsStartUp(funcs) {
     var info = {};
 
