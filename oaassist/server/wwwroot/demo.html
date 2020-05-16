@@ -22,14 +22,14 @@
         //1.服务端检测
         
         var xhr =getHttpObj()
-        xhr.onload=e=>{
+        xhr.onload=function(e){
             isServerOk = true
-            let result = "1.检测本地服务端(http://127.0.0.1:3888)是否连通："
+            var result = "1.检测本地服务端(http://127.0.0.1:3888)是否连通："
             window.document.getElementById("serverTest").innerHTML = result + "检测成功，服务端地址为http://127.0.0.1:3888"
         }
-        xhr.onerror=e=>{
+        xhr.onerror=function(e){
             isServerOk = false
-            let result = "1.检测本地服务端(http://127.0.0.1:3888)是否连通："
+            var result = "1.检测本地服务端(http://127.0.0.1:3888)是否连通："
             window.document.getElementById("serverTest").innerHTML = result + "检测失败, 请先通过node启动StartupServer.js"
         }
         xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
@@ -37,9 +37,9 @@
 
         //2.安装包检测
         var xhr1 =getHttpObj()
-        xhr1.onload=e=>{
+        xhr1.onload=function(e){
             isSetupOk = true
-            let result = "2.检测wps安装是否正确："
+            var result = "2.检测wps安装是否正确："
             window.document.getElementById("setupTest").innerHTML = result + xhr1.responseText
         }
         xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest', true)

@@ -16,9 +16,12 @@ function _WpsStartUp(funcs) {
         info, // 传递给插件的数据
         function (result) { // 调用回调，status为0为成功，其他是错误
             if (result.status) {
-                alert(result.message)
-                if (bUseHttps)
+                if (bUseHttps&&result.status==100){
                     WpsStartUp.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
+                    return ;
+                }
+                alert(result.message)
+                
             } else {
                 console.log(result.response)
                 showresult(result.response)

@@ -17,6 +17,16 @@ var cp = require('child_process');
  * 支持jsplugins.xml中，在线模式下，WPS加载项的请求地址
  * 开发者可在业务系统部署时，将WPS加载项合并部署到服务端，提供jsplugins.xml中对应的请求地址即可
  */
+app.all('*', function (req, res, next) {
+	res.header('Access-Control-Allow-Origin', '*');
+	console.log(getNow()+req.originalUrl)
+	// res.setHeader('Content-Type','text/plain;charset=gbk');
+	//Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
+	// res.header('Access-Control-Allow-Headers', 'Content-Type');
+	// res.header('Access-Control-Allow-Methods', '*');
+	// res.header('Content-Type', 'text/html;charset=utf-8');
+	next();
+});
 app.use(express.static(path.join(__dirname, "wwwroot"))); //wwwroot代表http服务器根目录
 app.use('/plugin/et', express.static(path.join(__dirname, "../EtOAAssist")));
 app.use('/plugin/wps', express.static(path.join(__dirname, "../WpsOAAssist")));
@@ -106,21 +116,9 @@ app.get('/getTemplateData', function (request, response) {
 //----开发者将WPS加载项集成到业务系统中时，需要实现的功能 End--------
 
 
-//----模拟服务端的特有功能，开发者无需关心 Start--------
-//设置允许跨域访问该服务.
-app.all('*', function (req, res, next) {
-	res.header('Access-Control-Allow-Origin', '*');
-	//Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
-	//res.header('Access-Control-Allow-Headers', 'Content-Type');
-	//res.header('Access-Control-Allow-Methods', '*');
-	//res.header('Content-Type', 'text/html;charset=utf-8');
-	next();
-});
-
 //获取file目录下文件列表
 app.use("/FileList", function (request, response) {
 	var filePath = path.join(__dirname, './wwwroot/file');
-	console.log(getNow() + filePath)
 	fs.readdir(filePath, function (err, results) {
 		if (err) {
 			response.writeHead(200, "OK", { "Content-Type": "text/html; charset=utf-8" });

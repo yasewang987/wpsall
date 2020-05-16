@@ -1,14 +1,14 @@
-let isServerOk = false
-let isSetupOk = false
+var isServerOk = false
+var isSetupOk = false
 function envTest(){
     //1.服务端检测
     
-    let xhr = getHttpObj()
-    xhr.onload=e=>{
+    var xhr = getHttpObj()
+    xhr.onload=function(e){
         isServerOk = true
         //2.安装包检测
-        let xhr1 = getHttpObj()
-        xhr1.onload=e=>{
+        var xhr1 = getHttpObj()
+        xhr1.onload=function(e){
             if(xhr1.responseText.indexOf('异常')>-1||xhr1.responseText.indexOf('未安装')>-1||xhr1.responseText.indexOf('失败')>-1){
                 window.location.href="./demo.html"
                 return ;
@@ -16,14 +16,14 @@ function envTest(){
             isSetupOk = true
             window.location.href.indexOf("file://")>-1?window.location.href="http://127.0.0.1:3888/index.html":''
         }
-        xhr1.onerror=e=>{
+        xhr1.onerror=function(e){
             isServerOk = false
             window.location.href="./demo.html"
         }
         xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest', true)
         xhr1.send()
     }
-    xhr.onerror=e=>{
+    xhr.onerror=function(e){
         isServerOk = false
         window.location.href="./demo.html"
     }

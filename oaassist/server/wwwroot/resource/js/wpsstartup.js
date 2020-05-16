@@ -3,7 +3,6 @@
  * 无需修改
  * 直接引用到业务系统前端调用即可
  */
-
 ;
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ?
@@ -18,7 +17,6 @@
 ), function (global) {
 	global = global || {};
 	var bFinished = true;
-
 	function getHttpObj() {
 		var httpobj = null;
 		if (IEVersion() < 10) {
@@ -72,10 +70,19 @@
 					return;
 				bFinished = true;
 				if (options.callback)
-					options.callback({
-						status: 2,
-						message: "请允许浏览器打开WPS Office"
-					});
+				{
+					if(options.url=="https://127.0.0.1:58891/version"){
+						options.callback({
+							status: 100,
+							message: "请允许浏览器打开WPS Office"
+						});
+					}else if(options.url!="https://127.0.0.1:58891/transfer/runParams"){
+						options.callback({
+							status: 2,
+							message: "请允许浏览器打开WPS Office"
+						});
+					}
+				}
 				return;
 			}
 			var xmlReq = getHttpObj();
@@ -275,7 +282,7 @@
 		var data = "ksowebstartup" + clientType + "://" + baseData;
 		var wrapper = { id: cmdId, app: clientType, data: data };
 		wrapper = JSON.stringify(wrapper);
-		startWps({url:url, sendData:wrapper, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 0});
+		startWps({url:url, sendData:wrapper, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 5000});
 	}
 
 	var serverVersion = "wait"
