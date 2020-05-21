@@ -226,7 +226,8 @@ function configOemFileInner(oemPath, callback) {
 	ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
 	if (needUpdate) {
 		fs.writeFileSync(oemPath, ini.stringify(config))
-		cp.exec("quickstartoffice restart");
+		if (os.platform() != 'win32')
+			cp.exec("quickstartoffice restart");
 	}
 
 	callback({ status: 0, msg: "wps安装正常，" + oemPath + "文件设置正常。" })
