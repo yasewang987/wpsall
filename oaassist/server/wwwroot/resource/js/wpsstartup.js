@@ -282,7 +282,7 @@
 		var data = "ksowebstartup" + clientType + "://" + baseData;
 		var wrapper = { id: cmdId, app: clientType, data: data };
 		wrapper = JSON.stringify(wrapper);
-		startWps({url:url, sendData:wrapper, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 5000});
+		startWps({url:url, sendData:wrapper, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 0});
 	}
 
 	var serverVersion = "wait"
@@ -307,7 +307,7 @@
 			if (serverVersion === "") {
 				WpsStartWrap(clientType, name, func, param, useHttps, callback);
 			} else {
-				WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 4, true);
+				WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, true);
 			}
 		}
 	}
