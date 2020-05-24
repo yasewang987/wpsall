@@ -1,16 +1,26 @@
 var _wpp = {}
 
-function _WppStartUp(funcs) {
-    var info = {};
+var bUseHttps = false;
 
+function _WppInvoke(funcs) {
+    var info = {};
     info.funcs = funcs;
-    WpsStartUp.StartUp(WpsStartUp.ClientType.wpp, // 组件类型
+    var func = bUseHttps ? WpsInvoke.InvokeAsHttps : WpsInvoke.InvokeAsHttp
+    func(WpsInvoke.ClientType.wpp, // 组件类型
         "WppOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据
         function (result) { // 调用回调，status为0为成功，其他是错误
-            if (result.status)
+            if (result.status) {
+                if (bUseHttps && result.status == 100) {
+                    WpsInvoke.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
+                    return;
+                }
                 alert(result.message)
+
+            } else {
+                console.log(result.response)
+            }
         })
 }
 
@@ -26,7 +36,7 @@ function GetUploadPath() {
 }
 
 function newDoc() {
-    _WppStartUp([{
+    _WppInvoke([{
         "OpenDoc": {
             showButton: "btnSaveFile;btnSaveAsLocal"
         }
@@ -35,7 +45,7 @@ function newDoc() {
 
 _wpp['newDoc'] = {
     action: newDoc,
-    code: _WppStartUp.toString() + "\n\n" + newDoc.toString(),
+    code: _WppInvoke.toString() + "\n\n" + newDoc.toString(),
     detail: "\n\
   说明：\n\
     点击按钮，打开演示组件后,新建一个空白演示文档\n\
@@ -52,7 +62,7 @@ function openDoc() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.pptx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
 
-    _WppStartUp([{
+    _WppInvoke([{
         "OpenDoc": {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
@@ -64,7 +74,7 @@ function openDoc() {
 
 _wpp['openDoc'] = {
     action: openDoc,
-    code: _WppStartUp.toString() + "\n\n" + openDoc.toString(),
+    code: _WppInvoke.toString() + "\n\n" + openDoc.toString(),
     detail: "\n\
   说明：\n\
     点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\
@@ -85,7 +95,7 @@ function onlineEditDoc() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.pptx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
 
-    _WppStartUp([{
+    _WppInvoke([{
         "OnlineEditDoc": {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
@@ -97,7 +107,7 @@ function onlineEditDoc() {
 
 _wpp['onlineEditDoc'] = {
     action: onlineEditDoc,
-    code: _WppStartUp.toString() + "\n\n" + onlineEditDoc.toString(),
+    code: _WppInvoke.toString() + "\n\n" + onlineEditDoc.toString(),
     detail: "\n\
   说明：\n\
     点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\

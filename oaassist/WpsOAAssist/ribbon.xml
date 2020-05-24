@@ -52,7 +52,6 @@
                         <button id="btnOpenScan" label="打开扫描仪" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                         <button id="btnQRCode" label="二维码" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                         <button id="btnPrintDOC" label="打印设置" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
-                        <button id="btnSendMessage" label="给业务系统发送消息" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                     </box>
                     <separator id="sepWPSFreqUsed" getVisible="OnGetVisible" />
                 </group>
@@ -67,6 +66,9 @@
                         <button id="btnUserName" label="用户" onAction="OnAction" getLabel="OnGetLabel" />
                     </box>
                 </group>
+                <group id="grpNotice" label="通知消息" getVisible="OnGetVisible">
+                    <button id="btnSendMessage" label="给业务系统前端发送消息" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                </group>
             </tab>
         </tabs>
     </ribbon>
@@ -76,7 +78,8 @@
         <command idMso="ReviewRejectChangeMenu" getEnabled="OnGetEnabled"/>
         <command idMso="ReviewAcceptChangeMenu" getEnabled="OnGetEnabled"/>
         <command idMso="FileSaveAsMenu" label="另存为" getEnabled="OnGetEnabled" onAction="OnAction"/>
-        <command idMso="FileSaveAs" label="另存为" getEnabled="OnGetEnabled" onAction="OnAction"/><!--注册另存为（F12）的自定义事件覆盖原有功能-->
+        <command idMso="FileSaveAs" label="另存为" getEnabled="OnGetEnabled" onAction="OnAction"/>
+        <!--注册另存为（F12）的自定义事件覆盖原有功能-->
         <command idMso="FileSave" label="保存" getEnabled="OnGetEnabled"/>
         <command idMso="SaveAll" label="保存所有文档" getEnabled="OnGetEnabled"/>
         <command idMso="FilePrint" label="打印" getEnabled="OnGetEnabled"/>

@@ -1,16 +1,26 @@
 var _et = {}
 
-function _EtStartUp(funcs) {
-    var info = {};
+var bUseHttps = false;
 
+function _EtInvoke(funcs) {
+    var info = {};
     info.funcs = funcs;
-    WpsStartUp.StartUp(WpsStartUp.ClientType.et, // 组件类型
+    var func = bUseHttps ? WpsInvoke.InvokeAsHttps : WpsInvoke.InvokeAsHttp
+    func(WpsInvoke.ClientType.et, // 组件类型
         "EtOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据
-        function(result) { // 调用回调，status为0为成功，其他是错误
-            if (result.status)
+        function (result) { // 调用回调，status为0为成功，其他是错误
+            if (result.status) {
+                if (bUseHttps && result.status == 100) {
+                    WpsInvoke.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
+                    return;
+                }
                 alert(result.message)
+
+            } else {
+                console.log(result.response)
+            }
         })
 }
 
@@ -24,8 +34,9 @@ function GetDemoPath(fileName) {
     var url = document.location.host;
     return document.location.protocol + "//" + url + "/file/" + fileName;
 }
+
 function newDoc() {
-    _EtStartUp([{
+    _EtInvoke([{
         "OpenDoc": {
             showButton: "btnSaveFile;btnSaveAsLocal"
         }
@@ -34,7 +45,7 @@ function newDoc() {
 
 _et['newDoc'] = {
     action: newDoc,
-    code: _EtStartUp.toString() + "\n\n" + newDoc.toString(),
+    code: _EtInvoke.toString() + "\n\n" + newDoc.toString(),
     detail: "\n\
   说明：\n\
     点击按钮，打开表格组件后,新建一个空白表格文档\n\
@@ -48,10 +59,10 @@ _et['newDoc'] = {
 }
 
 function openDoc() {
-    var filePath = prompt("请输入打开文件路径（本地或是url）：")
-    var uploadPath = prompt("请输入文档上传路径:")
+    var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.xlsx"))
+    var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
 
-    _EtStartUp([{
+    _EtInvoke([{
         "OpenDoc": {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
@@ -63,7 +74,7 @@ function openDoc() {
 
 _et['openDoc'] = {
     action: openDoc,
-    code: _EtStartUp.toString() + "\n\n" + openDoc.toString(),
+    code: _EtInvoke.toString() + "\n\n" + openDoc.toString(),
     detail: "\n\
   说明：\n\
     点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\
@@ -84,7 +95,7 @@ function onlineEditDoc() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.xlsx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
 
-    _EtStartUp([{
+    _EtInvoke([{
         "OnlineEditDoc": {
             "docId": "123", // 文档ID
             "uploadPath": uploadPath, // 保存文档上传路径
@@ -96,7 +107,7 @@ function onlineEditDoc() {
 
 _et['onlineEditDoc'] = {
     action: onlineEditDoc,
-    code: _EtStartUp.toString() + "\n\n" + onlineEditDoc.toString(),
+    code: _EtInvoke.toString() + "\n\n" + onlineEditDoc.toString(),
     detail: "\n\
   说明：\n\
     点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\
@@ -113,10 +124,10 @@ _et['onlineEditDoc'] = {
 "
 }
 
-window.onload = function() {
+window.onload = function () {
     var btns = document.getElementsByClassName("btn");
     for (var i = 0; i < btns.length; i++) {
-        btns[i].onclick = function(event) {
+        btns[i].onclick = function (event) {
             document.getElementById("blockFunc").style.visibility = "visible";
             var btn2 = document.getElementById("demoBtn");
             btn2.innerText = this.innerText;
