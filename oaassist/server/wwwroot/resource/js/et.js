@@ -81,7 +81,7 @@ _et['openDoc'] = {
 }
 
 function onlineEditDoc() {
-    var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("工作簿.xlsx"))
+    var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章.xlsx"))
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
 
     _EtStartUp([{
