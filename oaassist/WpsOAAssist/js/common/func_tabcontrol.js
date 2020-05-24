@@ -52,7 +52,7 @@ function pInitParameters() {
     // 以下是一些临时状态参数，用于打开文档等的状态判断
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocOpen, false); //用于执行来自OA端的新建或打开文档时的状态
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocSaveAs, false); //用于执行来自OA端的文档另存为本地的状态
-    wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, false)//按钮的标记控制
+    wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, false) //按钮的标记控制
     wps.PluginStorage.setItem(constStrEnum.Save2OAShowConfirm, true); //弹出上传成功后的提示信息
 }
 
@@ -325,7 +325,7 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
     }
     var l_FieldName = GetDocParamsValue(p_Doc, constStrEnum.uploadFieldName);
     if (l_FieldName == "") {
-        l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName);//默认是'file'
+        l_FieldName = wps.PluginStorage.getItem(constStrEnum.DefaultUploadFieldName); //默认是'file'
     }
 
     if (l_uploadPath == "" && pShowPrompt == true) {
@@ -634,6 +634,8 @@ function OnInsertDateClicked() {
  * @param {*} resp 
  */
 function OnUploadToServerSuccess(resp) {
+    console.log("成功上传服务端后的回调：" + resp)
+    console.log(resp)
     var l_doc = wps.WpsApplication().ActiveDocument;
     var l_showConfirm = wps.PluginStorage.getItem(constStrEnum.Save2OAShowConfirm);
     if (l_showConfirm) {
@@ -1005,20 +1007,19 @@ function OnAction(control) {
         case "btnImportTemplate": //导入模板
             OnImportTemplate();
             break;
-        case "FileSaveAsMenu"://通过idMso进行「另存为」功能的自定义
-        case "FileSaveAs": 
-        {
-            if (pCheckIfOADoc()) {//文档来源是业务系统的，做自定义
+        case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
+        case "FileSaveAs": {
+            if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
                 alert("这是OA文档，禁止另存。")
-            }else{//本地的文档，期望不做自定义，通过转调idMso的方法实现
-                wps.WpsApplication().CommandBars.ExecuteMso("FileSave"); 
-                //此处一定不能去调用与重写idMso相同的ID，否则就是个无线递归了，即在这个场景下不可调用FileSaveAs和FileSaveAsMenu这两个方法
+            } else { //本地的文档，期望不做自定义，通过转调idMso的方法实现
+                wps.WpsApplication().CommandBars.ExecuteMso("FileSave");
+                //此处一定不能去调用与重写idMso相同的ID，否则就是个无限递归了，即在这个场景下不可调用FileSaveAs和FileSaveAsMenu这两个方法
             }
             break;
         }
-        case "ShowAlert_ContextMenuText":{
+        case "ShowAlert_ContextMenuText": {
             let selectText = wps.WpsApplication().Selection.Text;
-            alert("您选择的内容是：\n"+ selectText);
+            alert("您选择的内容是：\n" + selectText);
             break;
         }
         default:

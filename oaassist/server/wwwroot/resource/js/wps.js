@@ -5,6 +5,7 @@
  */
 
 var bUseHttps = false;
+
 function _WpsStartUp(funcs) {
     var info = {};
 
@@ -16,12 +17,12 @@ function _WpsStartUp(funcs) {
         info, // 传递给插件的数据
         function (result) { // 调用回调，status为0为成功，其他是错误
             if (result.status) {
-                if (bUseHttps&&result.status==100){
+                if (bUseHttps && result.status == 100) {
                     WpsStartUp.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
-                    return ;
+                    return;
                 }
                 alert(result.message)
-                
+
             } else {
                 console.log(result.response)
                 showresult(result.response)
@@ -504,10 +505,136 @@ _wps['getDocStatus'] = {
 "
 }
 
+//----公文写作的相关方法 这些都必须是在有「公文写作」组件的版本中运行 Start--------
+/**
+ * 判断当前OS是否是Linux系统
+ *
+ * @returns
+ */
+function checkOSisLinux() {
+    if (detectOS() == "Linux") {
+        return true
+    } else {
+        alert("此方法仅在WPS Linux特定版本支持")
+    }
+}
+/**
+ * 新建一个使用公文写作打开的公文
+ *
+ */
+function newOfficialDocument() {
+    if (checkOSisLinux()) {
+        _WpsStartUp([{
+            "NewOfficialDocument": {
+                "isOfficialDocument": true
+            }
+        }]) // NewOfficialDocument方法对应于OA助手dispatcher支持的方法名
+    }
+}
+
+_wps['newOfficialDocument'] = {
+    action: newOfficialDocument,
+    code: _WpsStartUp.toString() + "\n\n" + newOfficialDocument.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，打开WPS公文写作后,新建一个公文\n\
+\n\
+  方法使用：\n\
+    页面点击按钮， 通过wps客户端协议来启动WPS， 调用oaassist插件， 执行插件中的js函数NewOfficialDocument, 新建一个默认模板的公文\ n\
+    funcs参数说明:\n\
+        NewOfficialDocument方法对应于OA助手dispatcher支持的方法名\ n\
+"
+}
+
+/**
+ * 打开一个使用公文写作打开的公文
+ */
+function openOfficialDocument() {
+    if (checkOSisLinux()) {
+        var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("公文样章.wps"))
+        var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
+        var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：", "自定义字段")
+        var backupPath = prompt("请输入文档备份路径:")
+        _WpsStartUp([{
+            "OpenDoc": {
+                "docId": "123", // 文档ID
+                "uploadPath": uploadPath, // 保存文档上传路径
+                "fileName": filePath,
+                "uploadFieldName": uploadFieldName,
+                "picPath": GetDemoPngPath(),
+                "copyUrl": backupPath,
+                "userName": "东方不败"
+            }
+        }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
+    }
+}
+_wps['openOfficialDocument'] = {
+    action: openOfficialDocument,
+    code: _WpsStartUp.toString() + "\n\n" + openOfficialDocument.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\
+    打开WPS文字后,将根据文档路径下载并打开对应的文档，保存将自动上传指定服务器地址\n\
+\n\
+  方法使用：\n\
+    页面点击按钮，通过wps客户端协议来启动WPS，调用oaassist插件，执行传输数据中的指令\n\
+    funcs参数信息说明:\n\
+        OpenDoc方法对应于OA助手dispatcher支持的方法名\n\
+            docId 文档ID，OA助手用以标记文档的信息，以区分其他文档\n\
+            uploadPath 保存文档上传路径\n\
+            fileName 打开的文档路径\n\
+            uploadFieldName 文档上传到业务系统时自定义字段\n\
+            picPath 插入图片的路径\n\
+            copyUrl 备份的服务器路径\n\
+            userName 传给wps要显示的OA用户名\n\
+"
+}
+/**
+ * 在线不落地打开一个使用公文写作打开的公文
+ */
+function onlineEditOfficialDocument() {
+    if (checkOSisLinux()) {
+        var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("公文样章.wps"))
+        var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
+        var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：", "自定义字段")
+        _WpsStartUp([{
+            "OnlineEditDoc": {
+                "docId": "123", // 文档ID
+                "uploadPath": uploadPath, // 保存文档上传路径
+                "fileName": filePath,
+                "uploadFieldName": uploadFieldName,
+                "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
+                "userName": "东方不败"
+            }
+        }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
+    }
+}
+
+_wps['onlineEditOfficialDocument'] = {
+    action: onlineEditOfficialDocument,
+    code: _WpsStartUp.toString() + "\n\n" + onlineEditOfficialDocument.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\
+    打开WPS文字后,将根据文档路径在线打开对应的文档，保存将自动上传指定服务器地址\n\
+    \n\
+  方法使用：\n\
+    页面点击按钮，通过wps客户端协议来启动WPS，调用oaassist插件，执行传输数据中的指令\n\
+    funcs参数信息说明:\n\
+        OnlineEditDoc方法对应于OA助手dispatcher支持的方法名\n\
+            docId 文档ID\n\
+            uploadPath 保存文档上传路径\n\
+            fileName 打开的文档路径\n\
+            uploadFieldName 文档上传到业务系统时自定义字段\n\
+            buttonGroups 屏蔽的OA助手功能按钮\n\
+            userName 传给wps要显示的OA用户名\n\
+"
+}
+
 /** 
  * 这是HTML页面上的按钮赋予事件的实现，开发者无需关心，使用自己习惯的方式做开发即可
  */
-window.onload = function () { 
+window.onload = function () {
     var btns = document.getElementsByClassName("btn");
 
     for (var i = 0; i < btns.length; i++) {
@@ -535,4 +662,34 @@ window.onload = function () {
             hljs.highlightBlock(document.getElementById("code"));
         }
     }
+}
+/**
+ * 检查操作系统
+ *
+ * @returns Win10 | Win7 | WinVista | Win2003 | WinXP | Win2000 | Linux | Unix | Mac
+ */
+function detectOS() {
+    var sUserAgent = navigator.userAgent;
+    var isWin = (navigator.platform == "Win32") || (navigator.platform == "Windows");
+    var isMac = (navigator.platform == "Mac68K") || (navigator.platform == "MacPPC") || (navigator.platform == "Macintosh") || (navigator.platform == "MacIntel");
+    if (isMac) return "Mac";
+    var isUnix = (navigator.platform == "X11") && !isWin && !isMac;
+    if (isUnix) return "Unix";
+    var isLinux = (String(navigator.platform).indexOf("Linux") > -1);
+    if (isLinux) return "Linux";
+    if (isWin) {
+        var isWin2K = sUserAgent.indexOf("Windows NT 5.0") > -1 || sUserAgent.indexOf("Windows 2000") > -1;
+        if (isWin2K) return "Win2000";
+        var isWinXP = sUserAgent.indexOf("Windows NT 5.1") > -1 || sUserAgent.indexOf("Windows XP") > -1;
+        if (isWinXP) return "WinXP";
+        var isWin2003 = sUserAgent.indexOf("Windows NT 5.2") > -1 || sUserAgent.indexOf("Windows 2003") > -1;
+        if (isWin2003) return "Win2003";
+        var isWinVista = sUserAgent.indexOf("Windows NT 6.0") > -1 || sUserAgent.indexOf("Windows Vista") > -1;
+        if (isWinVista) return "WinVista";
+        var isWin7 = sUserAgent.indexOf("Windows NT 6.1") > -1 || sUserAgent.indexOf("Windows 7") > -1;
+        if (isWin7) return "Win7";
+        var isWin10 = sUserAgent.indexOf("Windows NT 6.1") > -1 || sUserAgent.indexOf("Windows 10") > -1;
+        if (isWin10) return "Win10";
+    }
+    return "other";
 }

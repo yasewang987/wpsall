@@ -6,7 +6,14 @@ function NewFile(params) {
     //获取WPS Application 对象
     var wpsApp = wps.WpsApplication();
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocOpen, true); //设置OA打开文档的临时状态
-    var doc = wpsApp.Documents.Add(); //新增OA端文档
+    //判断一下isOfficialDocument是否通过公文写作打开
+    var doc;
+    if (params.isOfficialDocument) {
+        wps.Application.GetApplicationEx().NewOfficialDocument(); //新增使用公文写作打开的公文
+        doc = wpsApp.ActiveDocument;
+    } else {
+        doc = wpsApp.Documents.Add(); //新增OA端文档
+    }
     wps.PluginStorage.setItem(constStrEnum.IsInCurrOADocOpen, false);
 
     //检查系统临时文件目录是否能访问
@@ -16,7 +23,11 @@ function NewFile(params) {
             doc.SaveAs2($FileName = wps.Env.GetTempPath() + "/" + params.newFileName, undefined, undefined, undefined, false);
         } else {
             //OA传入空文件名称，则保存成系统时间文件
-            doc.SaveAs2($FileName = wps.Env.GetTempPath() + "/OA_" + currentTime(), undefined, undefined, undefined, false);
+            if (params.isOfficialDocument) {
+                doc.SaveAs2($FileName = wps.Env.GetTempPath() + "/OA_" + currentTime(), 0, undefined, undefined, false);
+            } else {
+                doc.SaveAs2($FileName = wps.Env.GetTempPath() + "/OA_" + currentTime(), undefined, undefined, undefined, false);
+            }
         }
     } else {
         alert("文档保存临时目录出错！不能保存新建文档！请联系系统开发商。");
@@ -166,7 +177,7 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
         dataType: 'json',
         success: function (res) {
             var data = res;
-            let Bookmarks=template.Bookmarks;
+            let Bookmarks = template.Bookmarks;
             data.forEach(function (it) {
 
                 var bookmark = Bookmarks.Item(it.name);
@@ -179,8 +190,8 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                         bookmark.Range.InlineShapes.AddPicture(it.text);
                     }
                 }
-                if(!Bookmarks.Exists(bookmark.Name))
-                Bookmarks.Add(bookmark.Name,bookmark.Range)
+                if (!Bookmarks.Exists(bookmark.Name))
+                    Bookmarks.Add(bookmark.Name, bookmark.Range)
             })
         }
     });
@@ -203,7 +214,7 @@ function OpenOnLineFile(OAParams) {
         l_doc = wps.WpsApplication().ActiveDocument;
     }
     //执行文档打开后的方法
-    pOpenFile(l_doc,OAParams,true);
+    pOpenFile(l_doc, OAParams, true);
     return l_doc;
 }
 
@@ -480,7 +491,7 @@ function handleFileAndUpload(suffix, doc, uploadPath, FieldName) {
         case '.uof':
             l_strPath = pGetValidDocTempPath(doc) + suffix;
             wps.FileSystem.Remove(l_strPath); //先删除之前可能存在的临时文件
-            doc.ExportAsFixedFormat(l_strPath, wps.Enum.wdFormatOpenDocumentText, true);//转换文件格式
+            doc.ExportAsFixedFormat(l_strPath, wps.Enum.wdFormatOpenDocumentText, true); //转换文件格式
             doc.SaveAs2(l_strPath);
             l_strChangeFileName = doc.Name.split(".")[0] + suffix;
             UploadFile(l_strChangeFileName, l_strPath, uploadPath, l_FieldName, OnChangeSuffixUploadSuccess, OnChangeSuffixUploadFail);
