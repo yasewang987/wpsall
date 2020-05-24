@@ -1026,6 +1026,9 @@ function OnAction(control) {
             }
         case "btnSendMessage":
             {
+                /**
+                 * 内部封装了主动响应前端发送的请求的方法
+                 */
                 wps.OAAssist.WebNotify("我是主动发送的消息"); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 break;
             }

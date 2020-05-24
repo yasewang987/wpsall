@@ -84,7 +84,7 @@ function OpenFile(params) {
         } else {
             //如果当前没有打开文档，则另存为本地文件，再打开
             if (l_strFileUrl.startWith("http")) { // 网络文档
-                DownloadFile(l_strFileUrl, function (path) {
+                DownloadFile(l_strFileUrl, function(path) {
                     if (path == "") {
                         alert("从服务端下载路径：" + l_strFileUrl + "\n" + "获取文件下载失败！");
                         return null;
@@ -120,9 +120,9 @@ function OpenFile(params) {
  */
 function pOpenFile(doc, params, isOnlineDoc) {
     var l_IsOnlineDoc = isOnlineDoc
-    //Office文件打开后，设置该文件属性：从服务端来的OA文件
+        //Office文件打开后，设置该文件属性：从服务端来的OA文件
     pSetOADocumentFlag(doc, params)
-    //设置当前文档为 本地磁盘落地模式
+        //设置当前文档为 本地磁盘落地模式
     if (l_IsOnlineDoc == true) {
         DoSetOADocLandMode(doc, EnumDocLandMode.DLM_OnlineDoc);
     } else {
@@ -175,15 +175,10 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
         async: false,
         method: "get",
         dataType: 'json',
-        success: function (res) {
+        success: function(res) {
             var data = res;
-<<<<<<< HEAD
-            let Bookmarks=template.Bookmarks;
-            data.forEach(function(it) {
-=======
             let Bookmarks = template.Bookmarks;
-            data.forEach(function (it) {
->>>>>>> 0a3c0cc1aa2ec150dae100da3a0416c5078f8e4c
+            data.forEach(function(it) {
 
                 var bookmark = Bookmarks.Item(it.name);
                 let bookStart = bookmark.Range.Start;
@@ -198,14 +193,9 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                         bookmark.Range.InlineShapes.AddPicture(it.text);
                     }
                 }
-<<<<<<< HEAD
                 let end = template.Range().End
                 if (!Bookmarks.Exists(bookmark.Name))
                     Bookmarks.Add(bookmark.Name, bookmark.Range.SetRange(bookStart, bookEnd + (end - start)))
-=======
-                if (!Bookmarks.Exists(bookmark.Name))
-                    Bookmarks.Add(bookmark.Name, bookmark.Range)
->>>>>>> 0a3c0cc1aa2ec150dae100da3a0416c5078f8e4c
             })
         }
     });
@@ -707,7 +697,7 @@ function OpenTimerRun(funcCallBack) {
         l_AutoSaveToServerTime = 3;
     }
 
-    l_timeID = setInterval(function () {
+    l_timeID = setInterval(function() {
         l_mCount = l_mCount + 1;
         if (l_mCount > l_AutoSaveToServerTime) { //l_AutoSaveToServerTime 值由系统配置时设定，见pInitParameters()函数
             l_mCount = 0;

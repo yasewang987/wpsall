@@ -30,13 +30,28 @@ function _WpsStartUp(funcs) {
         })
 }
 /**
+ * 该方法封装了发送给WPS客户端的请求，不需要用户去实现
+ * 接收消息：WpsStartUp.RegWebNotify（type，name,callback）
+ * WPS客户端返回消息： wps.OAAssist.WebNotify（message）
+ * @param {*} type 加载项对应的插件类型
+ * @param {*} name 加载项对应的名字
+ * @param {func} callback 接收到WPS客户端的消息后的回调函数
+ */
+WpsStartUp.RegWebNotify(
+    WpsStartUp.ClientType.wps,
+    "WpsOAAssist",
+    function(message) {
+        alert(message)
+    }
+)
+
+
+/**
  * 处理WPS加载项的方法返回值
  *
  * @param {*} resultData
  */
-WpsStartUp.RegWebNotify(WpsStartUp.ClientType.wps, "WpsOAAssist", function(data) {
-    alert(data)
-})
+
 
 function showresult(resultData) {
     let json = eval('(' + resultData + ')')
@@ -530,10 +545,10 @@ function checkOSisLinux() {
 function newOfficialDocument() {
     if (checkOSisLinux()) {
         _WpsStartUp([{
-            "NewOfficialDocument": {
-                "isOfficialDocument": true
-            }
-        }]) // NewOfficialDocument方法对应于OA助手dispatcher支持的方法名
+                "NewOfficialDocument": {
+                    "isOfficialDocument": true
+                }
+            }]) // NewOfficialDocument方法对应于OA助手dispatcher支持的方法名
     }
 }
 
@@ -561,22 +576,22 @@ function openOfficialDocument() {
         var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：", "自定义字段")
         var backupPath = prompt("请输入文档备份路径:")
         _WpsStartUp([{
-            "OpenDoc": {
-                "docId": "123", // 文档ID
-                "uploadPath": uploadPath, // 保存文档上传路径
-                "fileName": filePath,
-                "uploadFieldName": uploadFieldName,
-                "picPath": GetDemoPngPath(),
-                "copyUrl": backupPath,
-                "userName": "东方不败"
-            }
-        }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
+                "OpenDoc": {
+                    "docId": "123", // 文档ID
+                    "uploadPath": uploadPath, // 保存文档上传路径
+                    "fileName": filePath,
+                    "uploadFieldName": uploadFieldName,
+                    "picPath": GetDemoPngPath(),
+                    "copyUrl": backupPath,
+                    "userName": "东方不败"
+                }
+            }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
     }
 }
 _wps['openOfficialDocument'] = {
-    action: openOfficialDocument,
-    code: _WpsStartUp.toString() + "\n\n" + openOfficialDocument.toString(),
-    detail: "\n\
+        action: openOfficialDocument,
+        code: _WpsStartUp.toString() + "\n\n" + openOfficialDocument.toString(),
+        detail: "\n\
   说明：\n\
     点击按钮，输入要打开的文档路径，输入文档上传路径，如果传的不是有效的服务端地址，将无法使用保存上传功能。\n\
     打开WPS文字后,将根据文档路径下载并打开对应的文档，保存将自动上传指定服务器地址\n\
@@ -593,25 +608,25 @@ _wps['openOfficialDocument'] = {
             copyUrl 备份的服务器路径\n\
             userName 传给wps要显示的OA用户名\n\
 "
-}
-/**
- * 在线不落地打开一个使用公文写作打开的公文
- */
+    }
+    /**
+     * 在线不落地打开一个使用公文写作打开的公文
+     */
 function onlineEditOfficialDocument() {
     if (checkOSisLinux()) {
         var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("公文样章.wps"))
         var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
         var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：", "自定义字段")
         _WpsStartUp([{
-            "OnlineEditDoc": {
-                "docId": "123", // 文档ID
-                "uploadPath": uploadPath, // 保存文档上传路径
-                "fileName": filePath,
-                "uploadFieldName": uploadFieldName,
-                "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
-                "userName": "东方不败"
-            }
-        }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
+                "OnlineEditDoc": {
+                    "docId": "123", // 文档ID
+                    "uploadPath": uploadPath, // 保存文档上传路径
+                    "fileName": filePath,
+                    "uploadFieldName": uploadFieldName,
+                    "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
+                    "userName": "东方不败"
+                }
+            }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
     }
 }
 
@@ -639,44 +654,40 @@ _wps['onlineEditOfficialDocument'] = {
 /** 
  * 这是HTML页面上的按钮赋予事件的实现，开发者无需关心，使用自己习惯的方式做开发即可
  */
-<<<<<<< HEAD
 window.onload = function() {
-=======
-window.onload = function () {
->>>>>>> 0a3c0cc1aa2ec150dae100da3a0416c5078f8e4c
-    var btns = document.getElementsByClassName("btn");
+        var btns = document.getElementsByClassName("btn");
 
-    for (var i = 0; i < btns.length; i++) {
-        btns[i].onclick = function(event) {
-            document.getElementById("blockFunc").style.visibility = "visible";
-            var btn2 = document.getElementById("demoBtn");
-            btn2.innerText = this.innerText;
-            document.getElementById("codeDes").innerText = _wps[this.id].detail.toString()
-            document.getElementById("code").innerText = _wps[this.id].code.toString()
-            var onBtnAction = _wps[this.id].action
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].onclick = function(event) {
+                document.getElementById("blockFunc").style.visibility = "visible";
+                var btn2 = document.getElementById("demoBtn");
+                btn2.innerText = this.innerText;
+                document.getElementById("codeDes").innerText = _wps[this.id].detail.toString()
+                document.getElementById("code").innerText = _wps[this.id].code.toString()
+                var onBtnAction = _wps[this.id].action
 
-            document.getElementById("demoBtn").onclick = function() { //IE不支持箭头函数，改为通用写法
-                var xhr = new WpsStartUp.CreateXHR();
-                xhr.onload = function() {
-                    onBtnAction()
+                document.getElementById("demoBtn").onclick = function() { //IE不支持箭头函数，改为通用写法
+                    var xhr = new WpsStartUp.CreateXHR();
+                    xhr.onload = function() {
+                        onBtnAction()
+                    }
+                    xhr.onerror = function() {
+                        alert("请确认本地服务端(StartupServer.js)是启动状态")
+                        return
+                    }
+                    xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
+                    xhr.send()
                 }
-                xhr.onerror = function() {
-                    alert("请确认本地服务端(StartupServer.js)是启动状态")
-                    return
-                }
-                xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
-                xhr.send()
+
+                hljs.highlightBlock(document.getElementById("code"));
             }
-
-            hljs.highlightBlock(document.getElementById("code"));
         }
     }
-}
-/**
- * 检查操作系统
- *
- * @returns Win10 | Win7 | WinVista | Win2003 | WinXP | Win2000 | Linux | Unix | Mac
- */
+    /**
+     * 检查操作系统
+     *
+     * @returns Win10 | Win7 | WinVista | Win2003 | WinXP | Win2000 | Linux | Unix | Mac
+     */
 function detectOS() {
     var sUserAgent = navigator.userAgent;
     var isWin = (navigator.platform == "Win32") || (navigator.platform == "Windows");

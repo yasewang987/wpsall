@@ -339,86 +339,12 @@
             xhr.send(JSON.stringify(paramStr))
         }
 
-<<<<<<< HEAD
         window.setTimeout(askItem, 2000)
     }
 
     function WpsStartWrapVersion(clientType, name, func, param, callback) {
         WpsStartWrapVersionInner(clientType, name, func, param, false, callback);
     }
-=======
-	var exId = 0;
-	/**
-	 * 支持浏览器触发，WPS有返回值的启动
-	 *
-	 * @param {*} clientType	组件类型
-	 * @param {*} name			WPS加载项名称
-	 * @param {*} func			WPS加载项入口方法
-	 * @param {*} param			参数：包括WPS加载项内部定义的方法，参数等
-	 * @param {*} useHttps		是否使用https协议
-	 * @param {*} callback		回调函数
-	 * @param {*} tryCount		重试次数
-	 * @param {*} bPop			是否弹出浏览器提示对话框
-	 */
-	function WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
-		var rspUrl = "http://127.0.0.1:58890/transferEcho/runParams";
-		if (useHttps)
-			rspUrl = "https://127.0.0.1:58891/transferEcho/runParams";
-		var time = new Date();
-		var cmdId = "js" + time.getTime() + "_" + exId;
-		var infocontent = JSON.stringify(param);
-		var funcEx = "var res = " + func;
-		var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));"//res 为func执行返回值
-		var infoEx = infocontent + ");" + cbCode + "void(0";
-		//固定格式，无需修改
-		var startInfo = {
-			"name": name,
-			"function": funcEx,
-			"info": infoEx
-		};
-		var strData = JSON.stringify(startInfo);
-		if (IEVersion() < 10)
-			eval("strData = '" + JSON.stringify(startInfo) + "';");
-		var baseData = encode(strData);
-		var url = "http://127.0.0.1:58890/transfer/runParams";
-		if (useHttps)
-			url = "https://127.0.0.1:58891/transfer/runParams";
-		var data = "ksowebstartup" + clientType + "://" + baseData;
-		var wrapper = { id: cmdId, app: clientType, data: data };
-		wrapper = JSON.stringify(wrapper);
-		startWps({url:url, sendData:wrapper, callback:callback, tryCount: tryCount, bPop: bPop, timeout: 0});
-	}
-
-	var serverVersion = "wait"
-	function WpsStartWrapVersionInner(clientType, name, func, param, useHttps, callback) {
-		if (serverVersion == "wait") {
-			var url = "http://127.0.0.1:58890/version";
-			if (useHttps)
-				url = "https://127.0.0.1:58891/version";
-			startWps({url:url, data:"", callback: function(res) {
-				if (res.status !== 0) {
-					callback(res)
-					return;
-				}
-				serverVersion = res.response;
-				if (serverVersion === "") {
-					WpsStart(clientType, name, func, param, useHttps, callback, 1, false);
-				} else {
-					WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, false);
-				}
-			}, tryCount: 4, bPop: true, timeout: 5000});
-		} else {
-			if (serverVersion === "") {
-				WpsStartWrap(clientType, name, func, param, useHttps, callback);
-			} else {
-				WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, true);
-			}
-		}
-	}
-	function WpsStartWrapVersion(clientType, name, func, param, callback) {
-		WpsStartWrapVersionInner(clientType, name, func, param, false, callback);
-	}
->>>>>>> 0a3c0cc1aa2ec150dae100da3a0416c5078f8e4c
 
     function WpsStartWrapHttpsVersion(clientType, name, func, param, callback) {
         WpsStartWrapVersionInner(clientType, name, func, param, true, callback);
