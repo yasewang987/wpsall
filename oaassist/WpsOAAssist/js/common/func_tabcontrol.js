@@ -18,7 +18,7 @@ var EnumDocLandMode = {
 //加载时会执行的方法
 function OnWPSWorkTabLoad(ribbonUI) {
     wps.ribbonUI = ribbonUI;
-    if (typeof (wps.Enum) == "undefined") { // 如果没有内置枚举值
+    if (typeof(wps.Enum) == "undefined") { // 如果没有内置枚举值
         wps.Enum = WPS_Enum;
     }
     OnJSWorkInit(); //初始化文档事件(全局参数,挂载监听事件)
@@ -298,7 +298,7 @@ function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
         return;
     }
     console.log(pShowPrompt)
-    if (typeof (pShowPrompt) == "undefined") {
+    if (typeof(pShowPrompt) == "undefined") {
         pShowPrompt = true; //默认设置为弹出用户确认框
     }
     //默认设置为以当前文件的显示模式输出，即当前为修订则输出带有修订痕迹的
@@ -772,7 +772,7 @@ function pShowRibbonGroupByOADocParam(CtrlID) {
 
 
     // 要求OA传入控制自定义按钮显示的参数为字符串 中间用 , 分隔开
-    if (typeof (l_grpButtonParams) == "string") {
+    if (typeof(l_grpButtonParams) == "string") {
         var l_arrayGroup = new Array();
         l_arrayGroup = l_grpButtonParams.split(",");
         //console.log(l_grpButtonParams);
@@ -812,12 +812,12 @@ function GetDocParamsValue(Doc, Key) {
     }
 
     var l_objParams = JSON.parse(l_Params);
-    if (typeof (l_objParams) == "undefined") {
+    if (typeof(l_objParams) == "undefined") {
         return "";
     }
 
     var l_rtnValue = l_objParams[Key];
-    if (typeof (l_rtnValue) == "undefined" || l_rtnValue == null) {
+    if (typeof(l_rtnValue) == "undefined" || l_rtnValue == null) {
         return "";
     }
     return l_rtnValue;
@@ -829,7 +829,7 @@ function GetDocParamsValue(Doc, Key) {
  * @param {*} Key 
  */
 function GetParamsValue(Params, Key) {
-    if (typeof (Params) == "undefined") {
+    if (typeof(Params) == "undefined") {
         return "";
     }
 
@@ -854,7 +854,7 @@ function SetDocParamsValue(Doc, Key, Value) {
     }
 
     var l_objParams = JSON.parse(l_Params);
-    if (!(typeof (l_objParams) == "undefined")) {
+    if (!(typeof(l_objParams) == "undefined")) {
         l_objParams[Key] = Value;
     }
 
@@ -949,25 +949,25 @@ function OnAction(control) {
             OnBtnClearRevDoc();
             break;
         case "btnOpenRevision": //打开修订
-        {
-            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
-            wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, !bFlag)
-            //通知wps刷新以下几个按钮的状态
-            wps.ribbonUI.InvalidateControl("btnOpenRevision")
-            wps.ribbonUI.InvalidateControl("btnCloseRevision")
-            OnOpenRevisions(); //
-            break;
-        }
+            {
+                let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
+                wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, !bFlag)
+                //通知wps刷新以下几个按钮的状态
+                wps.ribbonUI.InvalidateControl("btnOpenRevision")
+                wps.ribbonUI.InvalidateControl("btnCloseRevision")
+                OnOpenRevisions(); //
+                break;
+            }
         case "btnCloseRevision": //关闭修订
-        {
-            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
-            wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, !bFlag)
-            //通知wps刷新以下几个按钮的状态
-            wps.ribbonUI.InvalidateControl("btnOpenRevision")
-            wps.ribbonUI.InvalidateControl("btnCloseRevision")
-            OnCloseRevisions();
-            break;
-        }
+            {
+                let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
+                wps.PluginStorage.setItem(constStrEnum.RevisionEnableFlag, !bFlag)
+                //通知wps刷新以下几个按钮的状态
+                wps.ribbonUI.InvalidateControl("btnOpenRevision")
+                wps.ribbonUI.InvalidateControl("btnCloseRevision")
+                OnCloseRevisions();
+                break;
+            }
         case "btnShowRevision":
             break;
         case "btnAcceptAllRevisions": //接受所有修订功能
@@ -1008,20 +1008,27 @@ function OnAction(control) {
             OnImportTemplate();
             break;
         case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
-        case "FileSaveAs": {
-            if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
-                alert("这是OA文档，禁止另存。")
-            } else { //本地的文档，期望不做自定义，通过转调idMso的方法实现
-                wps.WpsApplication().CommandBars.ExecuteMso("FileSave");
-                //此处一定不能去调用与重写idMso相同的ID，否则就是个无限递归了，即在这个场景下不可调用FileSaveAs和FileSaveAsMenu这两个方法
+        case "FileSaveAs":
+            {
+                if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
+                    alert("这是OA文档，禁止另存。")
+                } else { //本地的文档，期望不做自定义，通过转调idMso的方法实现
+                    wps.WpsApplication().CommandBars.ExecuteMso("FileSave");
+                    //此处一定不能去调用与重写idMso相同的ID，否则就是个无线递归了，即在这个场景下不可调用FileSaveAs和FileSaveAsMenu这两个方法
+                }
+                break;
             }
-            break;
-        }
-        case "ShowAlert_ContextMenuText": {
-            let selectText = wps.WpsApplication().Selection.Text;
-            alert("您选择的内容是：\n" + selectText);
-            break;
-        }
+        case "ShowAlert_ContextMenuText":
+            {
+                let selectText = wps.WpsApplication().Selection.Text;
+                alert("您选择的内容是：\n" + selectText);
+                break;
+            }
+        case "btnSendMessage":
+            {
+                wps.OAAssist.WebNotify("我是主动发送的消息"); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                break;
+            }
         default:
             break;
     }
@@ -1106,6 +1113,8 @@ function GetImage(control) {
             return "./icon/c_bookmark.png";
         case "btnImportTemplate":
             return "./icon/w_ImportDoc.png";
+        case "btnSendMessage":
+            return "./icon/3.svg"
         default:
             ;
     }
@@ -1189,6 +1198,8 @@ function OnGetLabel(control) {
             return "导入书签";
         case "btnImportTemplate":
             return "导入模板";
+        case "btnSendMessage":
+            return "发消息"
         default:
             ;
     }
@@ -1249,14 +1260,16 @@ function OnGetEnabled(control) {
         case "btnChangeToOFD": //保存到OFD格式再上传
         case "SaveAll": //保存所有文档
             return OnSetSaveToOAEnable();
-        case "btnCloseRevision": {
-            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
-            return bFlag
-        }
-        case "btnOpenRevision": {
-            let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
-            return !bFlag
-        }
+        case "btnCloseRevision":
+            {
+                let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
+                return bFlag
+            }
+        case "btnOpenRevision":
+            {
+                let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
+                return !bFlag
+            }
         default:
             ;
     }

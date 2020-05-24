@@ -177,10 +177,18 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
         dataType: 'json',
         success: function (res) {
             var data = res;
+<<<<<<< HEAD
+            let Bookmarks=template.Bookmarks;
+            data.forEach(function(it) {
+=======
             let Bookmarks = template.Bookmarks;
             data.forEach(function (it) {
+>>>>>>> 0a3c0cc1aa2ec150dae100da3a0416c5078f8e4c
 
                 var bookmark = Bookmarks.Item(it.name);
+                let bookStart = bookmark.Range.Start;
+                let bookEnd = bookmark.Range.End;
+                let start = template.Range().End
                 if (bookmark) {
                     if (!it.type || it.type === "text") {
                         bookmark.Range.Text = it.text;
@@ -190,8 +198,14 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                         bookmark.Range.InlineShapes.AddPicture(it.text);
                     }
                 }
+<<<<<<< HEAD
+                let end = template.Range().End
+                if (!Bookmarks.Exists(bookmark.Name))
+                    Bookmarks.Add(bookmark.Name, bookmark.Range.SetRange(bookStart, bookEnd + (end - start)))
+=======
                 if (!Bookmarks.Exists(bookmark.Name))
                     Bookmarks.Add(bookmark.Name, bookmark.Range)
+>>>>>>> 0a3c0cc1aa2ec150dae100da3a0416c5078f8e4c
             })
         }
     });

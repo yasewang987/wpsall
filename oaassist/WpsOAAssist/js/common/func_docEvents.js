@@ -106,7 +106,7 @@ function OnDocumentOpen(doc) {
         //如果是用户自己在WPS环境打开文档，则设置非OA文档标识
         pSetNoneOADocFlag(doc);
     }
-
+    console.log(testFuncs);
     OnWindowActivate();
     ChangeOATabOnDocOpen(); //打开文档后，默认打开Tab页
 }
