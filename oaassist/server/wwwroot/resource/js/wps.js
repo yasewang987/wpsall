@@ -5,6 +5,7 @@
  */
 
 var bUseHttps = false;
+
 function _WpsStartUp(funcs) {
     var info = {};
 
@@ -14,14 +15,14 @@ function _WpsStartUp(funcs) {
         "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据
-        function (result) { // 调用回调，status为0为成功，其他是错误
+        function(result) { // 调用回调，status为0为成功，其他是错误
             if (result.status) {
-                if (bUseHttps&&result.status==100){
+                if (bUseHttps && result.status == 100) {
                     WpsStartUp.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
-                    return ;
+                    return;
                 }
                 alert(result.message)
-                
+
             } else {
                 console.log(result.response)
                 showresult(result.response)
@@ -33,20 +34,25 @@ function _WpsStartUp(funcs) {
  *
  * @param {*} resultData
  */
+WpsStartUp.RegWebNotify(WpsStartUp.ClientType.wps, "WpsOAAssist", function(data) {
+    alert(data)
+})
+
 function showresult(resultData) {
     let json = eval('(' + resultData + ')')
     switch (json.message) {
-        case "GetDocStatus": {
-            let docstatus = json.docstatus
-            if (typeof docstatus != "undefined") {
-                let str = "文档保存状态：" +
-                    docstatus.saved +
-                    "\n文档字数：" +
-                    docstatus.words +
-                    "\n文档页数：" + docstatus.pages
-                alert(str)
+        case "GetDocStatus":
+            {
+                let docstatus = json.docstatus
+                if (typeof docstatus != "undefined") {
+                    let str = "文档保存状态：" +
+                        docstatus.saved +
+                        "\n文档字数：" +
+                        docstatus.words +
+                        "\n文档页数：" + docstatus.pages
+                    alert(str)
+                }
             }
-        }
     }
 }
 /**
@@ -58,8 +64,8 @@ var _wps = {}
 
 function newDoc() {
     _WpsStartUp([{
-        "NewDoc": {}
-    }]) // NewDoc方法对应于OA助手dispatcher支持的方法名
+            "NewDoc": {}
+        }]) // NewDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['newDoc'] = {
@@ -97,7 +103,7 @@ function GetDemoPngPath() {
         url = url.concat("/WPS.png");
 
     if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function (searchString, position) {
+        String.prototype.startsWith = function(searchString, position) {
             position = position || 0;
             return this.indexOf(searchString, position) === position;
         };
@@ -116,16 +122,16 @@ function openDoc() {
     var backupPath = prompt("请输入文档备份路径:")
 
     _WpsStartUp([{
-        "OpenDoc": {
-            "docId": "123", // 文档ID
-            "uploadPath": uploadPath, // 保存文档上传路径
-            "fileName": filePath,
-            "uploadFieldName": uploadFieldName,
-            "picPath": GetDemoPngPath(),
-            "copyUrl": backupPath,
-            "userName": "东方不败"
-        }
-    }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
+            "OpenDoc": {
+                "docId": "123", // 文档ID
+                "uploadPath": uploadPath, // 保存文档上传路径
+                "fileName": filePath,
+                "uploadFieldName": uploadFieldName,
+                "picPath": GetDemoPngPath(),
+                "copyUrl": backupPath,
+                "userName": "东方不败"
+            }
+        }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['openDoc'] = {
@@ -155,15 +161,15 @@ function onlineEditDoc() {
     var uploadPath = prompt("请输入文档上传路径:", GetUploadPath())
     var uploadFieldName = prompt("请输入文档上传到业务系统时自定义字段：", "自定义字段")
     _WpsStartUp([{
-        "OnlineEditDoc": {
-            "docId": "123", // 文档ID
-            "uploadPath": uploadPath, // 保存文档上传路径
-            "fileName": filePath,
-            "uploadFieldName": uploadFieldName,
-            "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
-            "userName": "东方不败"
-        }
-    }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
+            "OnlineEditDoc": {
+                "docId": "123", // 文档ID
+                "uploadPath": uploadPath, // 保存文档上传路径
+                "fileName": filePath,
+                "uploadFieldName": uploadFieldName,
+                "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
+                "userName": "东方不败"
+            }
+        }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['onlineEditDoc'] = {
@@ -376,12 +382,12 @@ function fillTemplate() {
     var templatePath = prompt("请输入需要填充的数据的请求地址:", "http://127.0.0.1:3888/getTemplateData")
 
     _WpsStartUp([{
-        "OpenDoc": {
-            "docId": "c2de1fcd1d3e4ac0b3cda1392c36c9", // 文档ID
-            "fileName": filePath,
-            "templateDataUrl": templatePath
-        }
-    }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
+            "OpenDoc": {
+                "docId": "c2de1fcd1d3e4ac0b3cda1392c36c9", // 文档ID
+                "fileName": filePath,
+                "templateDataUrl": templatePath
+            }
+        }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['fillTemplate'] = {
@@ -407,14 +413,14 @@ function convertDoc() {
     var uploadPath = prompt("请输入文档转换后上传路径:", GetUploadPath())
 
     _WpsStartUp([{
-        "OpenDoc": {
-            "docId": "123", // 文档ID
-            "uploadPath": uploadPath, // 保存文档上传路径
-            "fileName": filePath,
-            "suffix": ".pdf",
-            "uploadWithAppendPath": "1" //与suffix配置使用，传入标志位即可
-        }
-    }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
+            "OpenDoc": {
+                "docId": "123", // 文档ID
+                "uploadPath": uploadPath, // 保存文档上传路径
+                "fileName": filePath,
+                "suffix": ".pdf",
+                "uploadWithAppendPath": "1" //与suffix配置使用，传入标志位即可
+            }
+        }]) // OpenDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['convertDoc'] = {
@@ -440,11 +446,11 @@ _wps['convertDoc'] = {
 function taskPaneBookMark() {
     var filePath = prompt("请输入打开带书签文件路径（本地或是url）：", GetDemoPath("样章.docx"))
     _WpsStartUp([{
-        "taskPaneBookMark": {
-            "fileName": filePath,
-            "userName": "东方不败"
-        }
-    }]) // taskPaneBookMark方法对应于OA助手dispatcher支持的方法名
+            "taskPaneBookMark": {
+                "fileName": filePath,
+                "userName": "东方不败"
+            }
+        }]) // taskPaneBookMark方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['taskPaneBookMark'] = {
@@ -507,11 +513,11 @@ _wps['getDocStatus'] = {
 /** 
  * 这是HTML页面上的按钮赋予事件的实现，开发者无需关心，使用自己习惯的方式做开发即可
  */
-window.onload = function () { 
+window.onload = function() {
     var btns = document.getElementsByClassName("btn");
 
     for (var i = 0; i < btns.length; i++) {
-        btns[i].onclick = function (event) {
+        btns[i].onclick = function(event) {
             document.getElementById("blockFunc").style.visibility = "visible";
             var btn2 = document.getElementById("demoBtn");
             btn2.innerText = this.innerText;
@@ -519,12 +525,12 @@ window.onload = function () {
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             var onBtnAction = _wps[this.id].action
 
-            document.getElementById("demoBtn").onclick = function () { //IE不支持箭头函数，改为通用写法
+            document.getElementById("demoBtn").onclick = function() { //IE不支持箭头函数，改为通用写法
                 var xhr = new WpsStartUp.CreateXHR();
-                xhr.onload = function () {
+                xhr.onload = function() {
                     onBtnAction()
                 }
-                xhr.onerror = function () {
+                xhr.onerror = function() {
                     alert("请确认本地服务端(StartupServer.js)是启动状态")
                     return
                 }

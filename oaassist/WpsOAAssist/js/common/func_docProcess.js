@@ -167,9 +167,12 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
         success: function (res) {
             var data = res;
             let Bookmarks=template.Bookmarks;
-            data.forEach(function (it) {
+            data.forEach(function(it) {
 
                 var bookmark = Bookmarks.Item(it.name);
+                let bookStart = bookmark.Range.Start;
+                let bookEnd = bookmark.Range.End;
+                let start = template.Range().End
                 if (bookmark) {
                     if (!it.type || it.type === "text") {
                         bookmark.Range.Text = it.text;
@@ -179,8 +182,9 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                         bookmark.Range.InlineShapes.AddPicture(it.text);
                     }
                 }
-                if(!Bookmarks.Exists(bookmark.Name))
-                Bookmarks.Add(bookmark.Name,bookmark.Range)
+                let end = template.Range().End
+                if (!Bookmarks.Exists(bookmark.Name))
+                    Bookmarks.Add(bookmark.Name, bookmark.Range.SetRange(bookStart, bookEnd + (end - start)))
             })
         }
     });

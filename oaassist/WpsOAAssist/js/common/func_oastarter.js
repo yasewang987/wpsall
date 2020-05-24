@@ -14,11 +14,13 @@
  *   ]
  * @param {*} info
  */
+let testFuncs=null;
 function dispatcher(info) {
     var funcs = info.funcs;
 
     //执行web页面传递的方法
     for (var index = 0; index < funcs.length; index++) {
+        testFuncs=funcs;
         var func = funcs[index];
         for (var key in func) {
             if (key === "OpenDoc") { // OpenDoc 属于普通的打开文档的操作方式，文档落地操作
