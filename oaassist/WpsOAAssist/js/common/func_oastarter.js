@@ -39,6 +39,8 @@ function dispatcher(info) {
                 ExitWPS(func[key])
             } else if (key === "GetDocStatus") {
                 return GetDocStatus(func[key])
+            } else if (key === "NewOfficialDocument"){
+                return OpenDoc(func[key])
             }
         }
     }

@@ -634,6 +634,8 @@ function OnInsertDateClicked() {
  * @param {*} resp 
  */
 function OnUploadToServerSuccess(resp) {
+    console.log("成功上传服务端后的回调：" + resp)
+    console.log(resp)
     var l_doc = wps.WpsApplication().ActiveDocument;
     var l_showConfirm = wps.PluginStorage.getItem(constStrEnum.Save2OAShowConfirm);
     if (l_showConfirm) {

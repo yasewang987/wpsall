@@ -224,8 +224,11 @@ function configOemFileInner(oemPath, callback) {
 	sup.JsApiPlugin = true
 	sup.JsApiShowWebDebugger = true
 	ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
-	if (needUpdate)
+	if (needUpdate) {
 		fs.writeFileSync(oemPath, ini.stringify(config))
+		if (os.platform() != 'win32')
+			cp.exec("quickstartoffice restart");
+	}
 
 	callback({ status: 0, msg: "wps安装正常，" + oemPath + "文件设置正常。" })
 }
@@ -263,7 +266,6 @@ function configOem(callback) {
 		} else {
 			oemPath = "/opt/kingsoft/wps-office/office6/cfgs/oem.ini";
 			configOemFileInner(oemPath, callback);
-			cp.exec("quickstartoffice restart");
 		}
 	} catch (e) {
 		oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
