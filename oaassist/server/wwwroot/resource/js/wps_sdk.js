@@ -297,7 +297,7 @@
             callback: callback,
             tryCount: tryCount,
             bPop: bPop,
-            timeout: 0
+            timeout: 5000
         });
     }
 
