@@ -87,10 +87,10 @@
             xmlReq.open('POST', options.url);
             xmlReq.onload = function (res) {
                 bFinished = true;
-                if (options.callback)
+                if (options.callback){}
                     options.callback({
                         status: 0,
-                        response: res.target.response
+                        response: IEVersion() < 10?xmlReq.responseText:res.target.response
                     });
             }
             xmlReq.ontimeout = xmlReq.onerror = function (res) {
@@ -223,8 +223,14 @@
             "info": param
         };
         var strData = JSON.stringify(startInfo);
-        if (IEVersion() < 10)
-            eval("strData = '" + JSON.stringify(startInfo) + "';");
+        if (IEVersion() < 10){
+            try{
+                eval("strData = '" + JSON.stringify(startInfo) + "';");
+            }catch(err){
+
+            }
+        }
+            
         var baseData = encode(strData);
         var url = "http://127.0.0.1:58890/" + clientType + "/runParams";
         if (useHttps)
@@ -278,8 +284,14 @@
             "info": infoEx
         };
         var strData = JSON.stringify(startInfo);
-        if (IEVersion() < 10)
-            eval("strData = '" + JSON.stringify(startInfo) + "';");
+        if (IEVersion() < 10){
+            try{
+                eval("strData = '" + JSON.stringify(startInfo) + "';");
+            }catch(err){
+
+            }
+        }
+            
         var baseData = encode(strData);
         var url = "http://127.0.0.1:58890/transfer/runParams";
         if (useHttps)
@@ -297,7 +309,7 @@
             callback: callback,
             tryCount: tryCount,
             bPop: bPop,
-            timeout: 5000
+            timeout: 8000
         });
     }
 
@@ -355,18 +367,30 @@
             type: clientType
         }
         var askItem = function () {
-            let xhr = WpsInvoke.CreateXHR()
-            xhr.onload = e => {
+            var xhr = WpsInvoke.CreateXHR()
+            xhr.onload = function(e) {
                 callback(xhr.responseText)
                 window.setTimeout(askItem, 300)
             }
-            xhr.onerror = e => {
+            xhr.onerror = function(e) {
                 window.setTimeout(askItem, 10000)
             }
-            xhr.ontimeout = e => {
+            xhr.ontimeout = function(e) {
                 window.setTimeout(askItem, 10000)
             }
-
+            if (IEVersion() < 10) {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState != 4)
+                        return;
+                    if (xhr.bTimeout) {
+                        return;
+                    }
+                    if (xhr.status === 200)
+                        xhr.onload();
+                    else
+                        xhr.onerror();
+                }
+            }
             xhr.open('POST', 'http://127.0.0.1:58890/askwebnotify', true)
             xhr.send(JSON.stringify(paramStr))
         }

@@ -19,31 +19,33 @@ function dispatcher(info) {
     var funcs = info.funcs;
 
     //执行web页面传递的方法
-    for (var index = 0; index < funcs.length; index++) {
-        testFuncs=funcs;
-        var func = funcs[index];
-        for (var key in func) {
-            if (key === "OpenDoc") { // OpenDoc 属于普通的打开文档的操作方式，文档落地操作
-                OpenDoc(func[key]); //进入打开文档处理函数
-            } else if (key === "OnlineEditDoc") { //在线方式打开文档，属于文档不落地的方式打开
-                OnlineEditDoc(func[key]);
-            } else if (key === "NewDoc") {
-                OpenDoc(func[key]);
-            } else if (key === "UseTemplate") {
-                OpenDoc(func[key]);
-            } else if (key === "InsertRedHead") {
-                InsertRedHead(func[key]);
-            } else if (key === "taskPaneBookMark"){
-                taskPaneBookMark(func[key])
-            } else if (key === "ExitWPS") {
-                ExitWPS(func[key])
-            } else if (key === "GetDocStatus") {
-                return GetDocStatus(func[key])
-            } else if (key === "NewOfficialDocument"){
-                return OpenDoc(func[key])
+    setTimeout(function(){
+        for (var index = 0; index < funcs.length; index++) {
+            testFuncs=funcs;
+            var func = funcs[index];
+            for (var key in func) {
+                if (key === "OpenDoc") { // OpenDoc 属于普通的打开文档的操作方式，文档落地操作
+                    OpenDoc(func[key]); //进入打开文档处理函数
+                } else if (key === "OnlineEditDoc") { //在线方式打开文档，属于文档不落地的方式打开
+                    OnlineEditDoc(func[key]);
+                } else if (key === "NewDoc") {
+                    OpenDoc(func[key]);
+                } else if (key === "UseTemplate") {
+                    OpenDoc(func[key]);
+                } else if (key === "InsertRedHead") {
+                    InsertRedHead(func[key]);
+                } else if (key === "taskPaneBookMark"){
+                    taskPaneBookMark(func[key])
+                } else if (key === "ExitWPS") {
+                    ExitWPS(func[key])
+                } else if (key === "GetDocStatus") {
+                    return GetDocStatus(func[key])
+                } else if (key === "NewOfficialDocument"){
+                    return OpenDoc(func[key])
+                }
             }
         }
-    }
+    },100)
     return {message:"ok", app:wps.WpsApplication().Name}
 }
 
