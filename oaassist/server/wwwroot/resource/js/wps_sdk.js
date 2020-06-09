@@ -59,7 +59,7 @@
     }
 
     function startWps(options) {
-        if (!bFinished) {
+        if (!bFinished && !options.concurrent) {
             if (options.callback)
                 options.callback({
                     status: 1,
@@ -242,7 +242,8 @@
             callback: callback,
             tryCount: tryCount,
             bPop: bPop,
-            timeout: 5000
+            timeout: 5000,
+            concurrent: false
         });
     }
 
@@ -309,7 +310,8 @@
             callback: callback,
             tryCount: tryCount,
             bPop: bPop,
-            timeout: 8000
+            timeout: 0,
+            concurrent: true
         });
     }
 
@@ -343,7 +345,7 @@
             if (serverVersion === "") {
                 WpsStartWrap(clientType, name, func, param, useHttps, callback);
             } else {
-                WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 4, true);
+                WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, true);
             }
         }
     }
