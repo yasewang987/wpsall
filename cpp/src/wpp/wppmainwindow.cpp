@@ -541,6 +541,383 @@ void WPPMainWindow::startPlay()
 	m_mainArea->setFocus();
 }
 
+void WPPMainWindow::slideSize()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<wppapi::_Presentation> spPresentation;
+		HRESULT hr = m_spApplication->get_ActivePresentation((wppapi::Presentation**)&spPresentation);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Presentation对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::PageSetup> spPageSetup;
+		hr = spPresentation->get_PageSetup(&spPageSetup);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取PageSetup对象失败"));
+			message.exec();
+			return;
+		}
+
+		hr = spPageSetup->put_SlideSize(wppapi::ppSlideSize35MM);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("设置幻灯片大小失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+void WPPMainWindow::addTable()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<wppapi::_Presentation> spPresentation;
+		HRESULT hr = m_spApplication->get_ActivePresentation((wppapi::Presentation**)&spPresentation);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Presentation对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Slides> spSlides;
+		hr = spPresentation->get_Slides(&spSlides);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Slides对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant index(1);
+		ks_stdptr<wppapi::_Slide> spSlide;
+		hr = spSlides->Item(index, (wppapi::Slide**)&spSlide);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Slide对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Shapes> spShapes;
+		hr = spSlide->get_Shapes(&spShapes);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Shapes对象失败"));
+			message.exec();
+			return;
+		}
+
+		int NumRows = 4;
+		int NumColumns = 5;
+		single Left = 10;
+		single Top = 10;
+		single Width = 500;
+		single Height = 200;
+		ks_stdptr<wppapi::Shape> spShape;
+		hr = spShapes->AddTable(NumRows, NumColumns, Left, Top, Width, Height, &spShape);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("添加表格对象失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void WPPMainWindow::newSection()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<wppapi::_Presentation> spPresentation;
+		HRESULT hr = m_spApplication->get_ActivePresentation((wppapi::Presentation**)&spPresentation);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Rpesentation对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::SectionProperties> spSectionProperties;
+		hr = spPresentation->get_SectionProperties(&spSectionProperties);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("回球SectionProperties对象失败"));
+			message.exec();
+			return;
+		}
+
+		long count = 0;
+		hr = spSectionProperties->get_Count(&count);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取节数量失败"));
+			message.exec();
+			return;
+		}
+
+		count++;
+		QString qstrName(QString::fromUtf8("新增节 %1").arg(count));
+		KComVariant name(qstrName.utf16());
+
+		int section= 0;
+		hr = spSectionProperties->AddSection(count, name, &section);
+	}
+	m_mainArea->setFocus();
+}
+void WPPMainWindow::addAudio()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<wppapi::DocumentWindow> spDocumentWindow;
+		HRESULT hr = m_spApplication->get_ActiveWindow(&spDocumentWindow);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取DocumentWind对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Selection> spSelection;
+		hr = spDocumentWindow->get_Selection(&spSelection);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Selection对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::SlideRange> spSlideRange;
+		hr = spSelection->get_SlideRange(&spSlideRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取SlideRange对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Shapes> spShapes;
+		hr = spSlideRange->get_Shapes(&spShapes);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Shapes对象失败"));
+			message.exec();
+			return;
+		}
+
+		QString name = QFileDialog::getOpenFileName(this, QString::fromUtf8("选择一个音频文件"));
+		ks_bstr FileName(name.utf16());
+		single Left = 300;
+		single Top = 300;
+		single Width = 50;
+		single Height = 50;
+		ks_stdptr<wppapi::Shape> spShape;
+		hr = spShapes->AddMediaObject(FileName, Left, Top, Width, Height, &spShape);
+
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("添加音频文件失败"));
+			message.exec();
+			return;
+		}
+
+		hr = spShape->Select();
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("选中对象失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void WPPMainWindow::hyperlink()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<wppapi::DocumentWindow> spDocumentWindow;
+		HRESULT hr = m_spApplication->get_ActiveWindow(&spDocumentWindow);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取DocumentWindow对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Selection> spSelection;
+		hr = spDocumentWindow->get_Selection(&spSelection);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Selection对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::TextRange> spTextRange;
+		hr = spSelection->get_TextRange(&spTextRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取TextRange对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::ActionSettings> spActionSettings;
+		hr = spTextRange->get_ActionSettings(&spActionSettings);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取ActionSettings对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::ActionSetting> spActionSetting;
+		hr = spActionSettings->Item(wppapi::ppMouseClick, &spActionSetting);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取ActionSetting对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Hyperlink> spHyperlink;
+		hr = spActionSetting->get_Hyperlink(&spHyperlink);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Hyperlink对象失败"));
+			message.exec();
+			return;
+		}
+
+		QString name = QFileDialog::getOpenFileName(this, QString::fromUtf8("选择一个文件"));
+		ks_bstr Address(name.utf16());
+		hr = spHyperlink->put_Address(Address);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("设置链接路径失败"));
+			message.exec();
+			return;
+		}
+
+		hr = spHyperlink->put_TextToDisplay(Address);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("设置显示文本失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::TextRange> spCharacters;
+		hr = spTextRange->Characters(1, 0, &spCharacters);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Characters对象失败"));
+			message.exec();
+			return;
+		}
+
+		hr = spTextRange->put_Text(Address);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("输入文字失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void WPPMainWindow::insertTextbox()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<wppapi::DocumentWindow> spDocumentWindow;
+		HRESULT hr = m_spApplication->get_ActiveWindow(&spDocumentWindow);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取DocumentWindow对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Selection> spSelection;
+		hr = spDocumentWindow->get_Selection(&spSelection);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Selection对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::SlideRange> spSlideRange;
+		hr = spSelection->get_SlideRange(&spSlideRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取SlideRange对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::Shapes> spShapes;
+		hr = spSlideRange->get_Shapes(&spShapes);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Shapes对象失败"));
+			message.exec();
+			return;
+		}
+
+		double Left = 100;
+		double Top = 100;
+		double Width = 480;
+		double Height = 320;
+		ks_stdptr<wppapi::Shape> spShape;
+		hr = spShapes->AddTextbox(msoTextOrientationHorizontal, Left, Top, Width, Height, &spShape);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("添加文本框对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::TextFrame> spTextFrame;
+		hr = spShape->get_TextFrame(&spTextFrame);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取TextFrame对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<wppapi::TextRange> spTextRange;
+		hr = spTextFrame->get_TextRange(&spTextRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取TextRange对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_bstr text(__X("插入文本框"));
+		hr = spTextRange->put_Text(text);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("输入文字失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
 void WPPMainWindow::slotButtonClick(const QString& name)
 {
 	typedef void (WPPMainWindow::*WppOperationFun)(void);
@@ -560,6 +937,12 @@ void WPPMainWindow::slotButtonClick(const QString& name)
 		s_operationFunMap.insert(QString::fromUtf8("插入图片"), &WPPMainWindow::insertPicture);
 		s_operationFunMap.insert(QString::fromUtf8("添加幻灯片"), &WPPMainWindow::insertSlide);
 		s_operationFunMap.insert(QString::fromUtf8("开始播放"), &WPPMainWindow::startPlay);
+		s_operationFunMap.insert(QString::fromUtf8("新增节"), &WPPMainWindow::newSection);
+		s_operationFunMap.insert(QString::fromUtf8("插入超链接"), &WPPMainWindow::hyperlink);
+		s_operationFunMap.insert(QString::fromUtf8("插入音频"), &WPPMainWindow::addAudio);
+		s_operationFunMap.insert(QString::fromUtf8("设置幻灯片大小"), &WPPMainWindow::slideSize);
+		s_operationFunMap.insert(QString::fromUtf8("插入文本框"), &WPPMainWindow::insertTextbox);
+		s_operationFunMap.insert(QString::fromUtf8("插入表格"), &WPPMainWindow::addTable);
 	}
 	if (s_operationFunMap.contains(name))
 		(this->*s_operationFunMap.value(name))();

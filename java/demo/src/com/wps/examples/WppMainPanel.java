@@ -100,5 +100,73 @@ public class WppMainPanel extends JPanel {
                 JOptionPane.showMessageDialog(null, version);
             }
         });
+
+        menuPanel.addButton("常用", "设置幻灯片大小", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActivePresentation().get_PageSetup().put_SlideSize(PpSlideSizeType.ppSlideSizeOnScreen16x10);
+            }
+        });
+
+        menuPanel.addButton("常用", "插入文本框", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                float Left = 100;
+                float Top = 100;
+                float Width = 300;
+                float Height = 200;
+                MsoTextOrientation Orientation = MsoTextOrientation.msoTextOrientationHorizontal;
+                com.wps.api.tree.wpp.Shape shape = app.get_ActiveWindow().get_Selection().get_SlideRange().get_Shapes().AddTextbox(Orientation, Left, Top, Width, Height);
+                shape.get_TextFrame().get_TextRange().put_Text("插入文本框");
+            }
+        });
+
+        menuPanel.addButton("常用", "文本框居中对齐", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Selection selection = app.get_ActiveWindow().get_Selection();
+                float Left = 100;
+                float Top = 100;
+                float Width = 300;
+                float Height = 200;
+                MsoTextOrientation Orientation = MsoTextOrientation.msoTextOrientationHorizontal;
+                com.wps.api.tree.wpp.Shape shape = selection.get_SlideRange().get_Shapes().AddTextbox(Orientation, Left, Top, Width, Height);
+                TextRange textRange = shape.get_TextFrame().get_TextRange();
+                textRange.put_Text("文本框居中对齐");
+                textRange.Paragraphs(-1, -1).get_ParagraphFormat().put_Alignment(PpParagraphAlignment.ppAlignCenter);
+            }
+        });
+
+        menuPanel.addButton("常用", "添加页脚", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                HeaderFooter footer = app.get_ActiveWindow().get_Selection().get_SlideRange().get_HeadersFooters().get_Footer();
+                if (footer != null)
+                {
+                    footer.put_Visible(MsoTriState.msoTrue);
+                    footer.put_Text("插入页脚");
+                }
+            }
+        });
+
+        menuPanel.addButton("常用", "插入自选图形", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                float Left = 50;
+                float Top = 50;
+                float Width = 300;
+                float Height = 200;
+                app.get_ActiveWindow().get_Selection().get_SlideRange().get_Shapes().AddShape(MsoAutoShapeType.msoShape5pointStar, Left, Top, Width, Height);
+            }
+        });
+        menuPanel.addButton("常用", "新增节", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SectionProperties SectionProperties = app.get_ActivePresentation().get_SectionProperties();
+                int count = SectionProperties.get_Count() + 1;
+                SectionProperties.AddSection(count,"新增节" + count);
+            }
+        });
     }
 }

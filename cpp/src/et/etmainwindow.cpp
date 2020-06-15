@@ -571,6 +571,367 @@ void EtMainWindow::hideToolBtn()
 	m_mainArea->setFocus();
 }
 
+void EtMainWindow::FontSize()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<etapi::_Workbook> spWorkbook;
+		HRESULT hr = m_spApplication->get_ActiveWorkbook((etapi::Workbook**)&spWorkbook);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取workbook对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<etapi::_Worksheet> spWorksheet;
+		hr = spWorkbook->get_ActiveSheet((IDispatch**)&spWorksheet);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Worksheet对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant cell(__X("A1"));
+		ks_stdptr<etapi::IRange> spRange;
+		hr = spWorksheet->get_Range(cell, cell, (etapi::Range**)&spRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<etapi::IFont> spFont;
+		hr = spRange->get_Font((etapi::Font**)&spFont);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Font对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant size(36);
+		hr = spFont->put_Size(size);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("设置字体大小失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void EtMainWindow::AddSheet()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<etapi::Sheets> spSheets;
+		HRESULT hr = m_spApplication->get_Sheets(&spSheets);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Sheets对象失败"));
+			message.exec();
+			return;
+		}
+
+		long count = 0;
+		hr = spSheets->get_Count(&count);
+
+		KComVariant varCount(count);
+		ks_stdptr<etapi::_Worksheet> spWorksheet;
+		hr = spSheets->get_Item(varCount, (IDispatch**)&spWorksheet);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Worksheet对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant Before;
+		KComVariant After(spWorksheet);
+		KComVariant Type((long)etapi::xlWorksheet);
+		KComVariant newSheetCount(1);
+		ks_stdptr<IDispatch> spDsp;
+		hr = spSheets->Add(Before, After, newSheetCount, Type, 0, (IDispatch**) &spDsp);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("新建工作表失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void EtMainWindow::AddComment()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<etapi::IRange> spRange;
+		HRESULT hr = m_spApplication->get_ActiveCell((etapi::Range**)&spRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant text(__X("新建批注"));
+		ks_stdptr<etapi::Comment> spFont;
+		hr = spRange->AddComment(text, &spFont);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("新建批注失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void EtMainWindow::PrintArea()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<etapi::_Workbook> spWorkbook;
+		HRESULT hr = m_spApplication->get_ActiveWorkbook((etapi::Workbook**)&spWorkbook);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Workbook对象失败"));
+			message.exec();
+			return;
+		}
+		ks_stdptr<etapi::_Worksheet> spWorksheet;
+		hr = spWorkbook->get_ActiveSheet((IDispatch**)&spWorksheet);
+
+		KComVariant cell1(__X("A1"));
+		KComVariant cell2(__X("G12"));
+		ks_stdptr<etapi::IRange> spRange;
+		hr = spWorksheet->get_Range(cell1, cell2, (etapi::Range**)&spRange);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant rhs;
+		hr = spRange->Select(&rhs);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("选中对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<etapi::IPageSetup> spPageSetup;
+		hr = spWorksheet->get_PageSetup((etapi::PageSetup**)&spPageSetup);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取PageSetup对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_bstr area(__X("$A$1:$G$12"));
+		hr = spPageSetup->put_PrintArea(area);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("设置打印区域失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void EtMainWindow::InsertPic()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<etapi::_Workbook> spWorkbook;
+		HRESULT hr = m_spApplication->get_ActiveWorkbook((etapi::Workbook**)&spWorkbook);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Workbook对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<etapi::_Worksheet> spWorksheet;
+		hr = spWorkbook->get_ActiveSheet((IDispatch**)&spWorksheet);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Worksheet对象失败"));
+			message.exec();
+			return;
+		}
+
+		ks_stdptr<etapi::IShapes> spShapes;
+		hr = spWorksheet->get_Shapes((etapi::Shapes**)&spShapes);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Shapes对象失败"));
+			message.exec();
+			return;
+		}
+
+		QString path = QFileDialog::getOpenFileName(this, QString::fromUtf8("选择一个文件"));
+		ks_bstr Filename(path.utf16());
+		ks_stdptr<etapi::Shape> spShape;
+		MsoTriState LinkToFile = etapi::msoCTrue;
+		MsoTriState SaveWithDocument = etapi::msoCTrue;
+		single Left = 0;
+		single Top = 0;
+		single Width = 100;
+		single Height = 100;
+		hr = spShapes->AddPicture(Filename, LinkToFile, SaveWithDocument, Left, Top, Width, Height, &spShape);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("插入图片失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
+void EtMainWindow::InsertHistogram()
+{
+	if (m_spApplication)
+	{
+		ks_stdptr<etapi::_Worksheet> spWorksheet;
+		HRESULT hr = m_spApplication->get_ActiveSheet((IDispatch**)&spWorksheet);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Worksheet对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant defCell;
+		KComVariant varO3(__X("O3"));
+		ks_stdptr<etapi::IRange>spRangeO3;
+		hr = spWorksheet->get_Range(varO3, defCell, (etapi::Range**)&spRangeO3);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant o3Val(__X("Item1"));
+		KComVariant RangeValueDataType(etapi::xlRangeValueDefault);
+		hr = spRangeO3->put_Value(RangeValueDataType, 0, o3Val);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("O3单元格设置值失败"));
+			message.exec();
+			return;
+		}
+
+
+		KComVariant varN4(__X("N4"));
+		ks_stdptr<etapi::IRange>spRangeN4;
+		hr = spWorksheet->get_Range(varN4, defCell, (etapi::Range**)&spRangeN4);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range失败"));
+			message.exec();
+			return;
+		}
+		KComVariant n4Val(3);
+		hr = spRangeN4->put_Value(RangeValueDataType, 0, n4Val);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("N4单元格设置值失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant varN3(__X("N3"));
+		ks_stdptr<etapi::IRange>spRangeN3;
+		hr = spWorksheet->get_Range(varN3, defCell, (etapi::Range**)&spRangeN3);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant n3Val(__X("Item2"));
+		hr = spRangeN3->put_Value(RangeValueDataType, 0, n3Val);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("N3单元格设置值失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant varO4(__X("O4"));
+		ks_stdptr<etapi::IRange>spRangeO4;
+		hr = spWorksheet->get_Range(varO4, defCell, (etapi::Range**)&spRangeO4);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant O4Val(4);
+		hr = spRangeO4->put_Value(RangeValueDataType, 0, O4Val);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("O4单元格设置值失败"));
+			message.exec();
+			return;
+		}
+		KComVariant varN3O4(__X("N3:O4"));
+		ks_stdptr<etapi::IRange>spRangeN3O4;
+		hr = spWorksheet->get_Range(varN3O4, defCell, (etapi::Range**)&spRangeN3O4);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Range对象失败"));
+			message.exec();
+			return;
+		}
+
+		KComVariant selectRhs;
+		hr = spRangeN3O4->Select(&selectRhs);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("选择对象失败"));
+			message.exec();
+			return;
+		}
+		ks_stdptr<etapi::IShapes> spShapes;
+		spWorksheet->get_Shapes((etapi::Shapes**)&spShapes);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Shapes对象失败"));
+			message.exec();
+			return;
+		}
+		KComVariant Top(0);
+		KComVariant Left(0);
+		KComVariant Width(480);
+		KComVariant Height(320);
+		KComVariant XlChartType(51);
+		ks_stdptr<etapi::IShape> spShape;
+		hr = spShapes->AddChart(XlChartType, Left, Top, Width, Height, (etapi::Shape**)&spShape);
+		if (FAILED(hr))
+		{
+			QMessageBox message(QMessageBox::NoIcon, QString::fromUtf8("提示"), QString::fromUtf8("获取Spape对象失败"));
+			message.exec();
+			return;
+		}
+	}
+	m_mainArea->setFocus();
+}
+
 void EtMainWindow::setRangeValue()
 {
 	if (m_spApplication)
@@ -716,6 +1077,12 @@ void EtMainWindow::slotButtonClick(const QString&  name)
 		s_operationFunMap.insert(QString::fromUtf8("单元格设值"), &EtMainWindow::setRangeValue);
 		s_operationFunMap.insert(QString::fromUtf8("合并取消单元格"), &EtMainWindow::rangeMerge);
 		s_operationFunMap.insert(QString::fromUtf8("设置行高列宽"), &EtMainWindow::setHeigthWidth);
+		s_operationFunMap.insert(QString::fromUtf8("设置字号"), &EtMainWindow::FontSize);
+		s_operationFunMap.insert(QString::fromUtf8("添加工作表"), &EtMainWindow::AddSheet);
+		s_operationFunMap.insert(QString::fromUtf8("新建批注"), &EtMainWindow::AddComment);
+		s_operationFunMap.insert(QString::fromUtf8("设置打印区域"), &EtMainWindow::PrintArea);
+		s_operationFunMap.insert(QString::fromUtf8("插入图片"), &EtMainWindow::InsertPic);
+		s_operationFunMap.insert(QString::fromUtf8("插入图表"), &EtMainWindow::InsertHistogram);
 	}
 	if (s_operationFunMap.contains(name))
 		(this->*s_operationFunMap.value(name))();

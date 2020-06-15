@@ -102,5 +102,49 @@ public class EtMainPanel extends JPanel {
                 JOptionPane.showMessageDialog(null, version);
             }
         });
+
+        menuPanel.addButton("常用", "字体加粗", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Workbook workbook = app.get_ActiveWorkbook();
+                Worksheet sheet = (Worksheet)workbook.get_ActiveSheet();
+                sheet.get_Range("A1", "B5").get_Font().put_Bold(true);
+            }
+        });
+
+        menuPanel.addButton("常用", "设置字号", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Workbook workbook = app.get_ActiveWorkbook();
+                Worksheet sheet = (Worksheet)workbook.get_ActiveSheet();
+                sheet.get_Range("A1", "A1").get_Font().put_Size(20);
+            }
+        });
+
+        menuPanel.addButton("常用", "单元格边框", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Workbook workbook = app.get_ActiveWorkbook();
+                Worksheet sheet = (Worksheet)workbook.get_ActiveSheet();
+                sheet.get_Range("B2", "C9")._BorderAround(5, XlBorderWeight.xlThin, XlColorIndex.xlColorIndexAutomatic, Variant.getMissing());
+            }
+        });
+
+        menuPanel.addButton("常用", "单元格水平居中", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Workbook workbook = app.get_ActiveWorkbook();
+                Worksheet sheet = (Worksheet)workbook.get_ActiveSheet();
+                sheet.get_Range("B2", "C9").put_HorizontalAlignment(-4108);
+            }
+        });
+
+        menuPanel.addButton("常用", "合并单元格", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               Worksheet sheet = (Worksheet)app.get_ActiveSheet();
+               sheet.get_Range("A1", "B4").Merge(Variant.getMissing());
+            }
+        });
     }
 }

@@ -91,6 +91,14 @@ public:
 	void protect();
 	void unProtect();
 	void hideToolBtn();
+
+	void FontSize();
+	void AddSheet();
+	void AddComment();
+	void PrintArea();
+	void InsertPic();
+	void InsertHistogram();
+
 	//单元格设值
 	void setRangeValue();
 	void rangeMerge();

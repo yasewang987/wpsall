@@ -76,6 +76,13 @@ public:
 	void forceBackUpEnabled();
 	void regiestPrintAfterEvent();
 	void printOut();
+
+	void slideSize();
+	void addTable();
+	void newSection();
+	void addAudio();
+	void hyperlink();
+	void insertTextbox();
 	//隐藏菜单按钮
 	void hideToolBar();
 	void hideToolBtn();
