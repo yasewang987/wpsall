@@ -60,3 +60,8 @@
 ## 想给我们建议？
 
 请通过[issues](https://code.aliyun.com/zouyingfeng/wps/issues)页面向我们提建议，我们会认真查看，并通过此仓库更新发布。
+
+## 想获取WPS的开发资料？
+
+- 所有资料统一发布平台————[WPS开放平台](https://open.wps.cn)
+- WPS客户端API资料————[WPS客户端二次开发](https://open.wps.cn/docs/office)
