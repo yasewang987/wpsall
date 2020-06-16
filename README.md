@@ -24,7 +24,7 @@
 ---
 
 **以下集成方式需要联系我们的项目经理获取专业版**
-- [ ] 嵌入浏览器——ActiveX，IE，Windows环境
+- [ ] 嵌入浏览器——ActiveX，IE，Windows环境【待入库】
 - [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Windows环境](np-example/browser-integration-wps/README.md)【已入库】
 - [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Linux环境](np-example/browser-integration-wps/README.md)【已入库】
 - [x] [嵌入Java客户端——Windows环境](https://kdocs.cn/l/sJyOAdMPn)【待入库】
@@ -42,11 +42,14 @@
 - [x] [WebOffice集成（在线预览、编辑、协同）——WPS开发平台，公网](https://open.wps.cn/docs/wwo/join/platform-overview)
   - [各种Demo](https://open.wps.cn/docs/wwo/access/sdk-demo)
   - [API手册](https://wwo.wps.cn/docs-js-sdk/#/)
+- [x] [WPS云服务（存储、管理、利用）——WPS开放平台，公网](https://open.wps.cn/docs/cloud)
 
 ---
 
 - **联系我们的项目经理获取服务**
 - [ ] WebOffice集成（在线预览、编辑、协同）——私有化部署
+- [ ] WPS云服务（存储、管理、利用）——私有化部署
+- [ ] 安全文档——私有化部署
 
 ---
 
