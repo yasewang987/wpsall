@@ -1007,13 +1007,15 @@ function OnAction(control) {
         case "btnImportTemplate": //导入模板
             OnImportTemplate();
             break;
-        case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
-        case "FileSaveAs":
+        // case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
+        // case "FileSaveAs":
+        case "FileSave": //通过idMso进行「保存」功能的自定义
             {
                 if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
-                    alert("这是OA文档，禁止另存。")
+                    alert("这是OA文档，将Ctrl+S动作做了重定义，可以调用OA的保存文件流到业务系统的接口。")
                 } else { //本地的文档，期望不做自定义，通过转调idMso的方法实现
-                    wps.WpsApplication().CommandBars.ExecuteMso("FileSave");
+                    // wps.WpsApplication().CommandBars.ExecuteMso("FileSave");
+                    wps.WpsApplication().CommandBars.ExecuteMso("SaveAll");
                     //此处一定不能去调用与重写idMso相同的ID，否则就是个无线递归了，即在这个场景下不可调用FileSaveAs和FileSaveAsMenu这两个方法
                 }
                 break;
