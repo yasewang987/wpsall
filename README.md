@@ -7,7 +7,7 @@
 [邀你填写「WPS端二次开发支持基本信息调查」](https://f.wps.cn/form-write/4aTnaSY3/)
 完成填写后，可以加`3253920855`这个QQ，明确告知需求。
 
-## 如果您想了解现在WPS的最佳实践
+## 如果您想了解现在WPS集成的最佳实践
 
 请参看[WPS产品矩阵集成解决方案-WPS二次开发集成篇V1.1.pptx](https://kdocs.cn/l/cyKkDebda)
 
@@ -69,5 +69,5 @@
 
 ## 想获取WPS的开发资料？
 
-- 所有资料统一发布平台————[WPS开放平台](https://open.wps.cn)
-- WPS客户端API资料————[WPS客户端二次开发](https://open.wps.cn/docs/office)
+- 所有资料统一发布平台——[WPS开放平台](https://open.wps.cn)
+- WPS客户端API资料——[WPS客户端二次开发](https://open.wps.cn/docs/office)
