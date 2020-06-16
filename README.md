@@ -7,6 +7,9 @@
 [邀你填写「WPS端二次开发支持基本信息调查」](https://f.wps.cn/form-write/4aTnaSY3/)
 完成填写后，可以加`3253920855`这个QQ，明确告知需求。
 
+## 如果您想了解现在WPS的最佳实践
+
+请参看[WPS产品矩阵集成解决方案-WPS二次开发集成篇V1.1.pptx](https://kdocs.cn/l/cyKkDebda)
 
 ## WPS二次开发场景与本仓库代码对应关系
 
@@ -16,22 +19,22 @@
 
 - WPS加载项的示例——OA辅助，基本覆盖了业务系统集成WPS的常用场景，**这就是个Demo**，我们希望业务厂商基于此结合自己的使用场景，产出自己的XX助手，将WPS变成自己业务必须的「**超级编辑器**」，共同服务好用户。
 
-- [x] [WPS加载项（jsapi）](oaassist/README.md)
+- [x] [WPS加载项（jsapi）](oaassist/README.md)【已入库】
 
 ---
 
 **以下集成方式需要联系我们的项目经理获取专业版**
 - [ ] 嵌入浏览器——ActiveX，IE，Windows环境
-- [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Windows环境](np-example/browser-integration-wps/README.md)
-- [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Linux环境](np-example/browser-integration-wps/README.md)
-- [x] [嵌入Java客户端——Windows环境](https://kdocs.cn/l/sJyOAdMPn)
-- [x] [嵌入Java客户端——Linux环境](java/README.md)
-- [x] [嵌入C++客户端——Windows环境](https://kdocs.cn/l/c7jl7x76T)
-- [x] [嵌入C++客户端——Linux环境，QT](cpp/README.md)
-- [x] [嵌入WPF客户端——Windwos环境，C#](https://kdocs.cn/l/ce4rXtmFS)
-- [x] [开发Com加载项——Windwos环境，VB/C++](https://kdocs.cn/l/c7jl7x76T)
-- [x] [开发VSTO加载项——Windows环境，C#](https://kdocs.cn/l/ce4rXtmFS)
-- [x] [开发加载项——Linxu环境，C++](https://kdocs.cn/l/c1cSaydPa)
+- [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Windows环境](np-example/browser-integration-wps/README.md)【已入库】
+- [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Linux环境](np-example/browser-integration-wps/README.md)【已入库】
+- [x] [嵌入Java客户端——Windows环境](https://kdocs.cn/l/sJyOAdMPn)【待入库】
+- [x] [嵌入Java客户端——Linux环境](java/README.md)【已入库】
+- [x] [嵌入C++客户端——Windows环境](https://kdocs.cn/l/c7jl7x76T)【待入库】
+- [x] [嵌入C++客户端——Linux环境，QT](cpp/README.md)【已入库】
+- [x] [嵌入WPF客户端——Windwos环境，C#](https://kdocs.cn/l/ce4rXtmFS)【待入库】
+- [x] [开发Com加载项——Windwos环境，VB/C++](https://kdocs.cn/l/c7jl7x76T)【待入库】
+- [x] [开发VSTO加载项——Windows环境，C#](https://kdocs.cn/l/ce4rXtmFS)【待入库】
+- [x] [开发加载项——Linxu环境，C++](https://kdocs.cn/l/c1cSaydPa)【待入库】
 
 ---
 
