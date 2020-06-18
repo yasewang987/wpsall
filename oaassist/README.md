@@ -21,4 +21,4 @@
 
 ### 使用此demo的步骤(以windows平台wps为例):
 
-参考[WPS加载项快速上手说明.pdf](WPS加载项快速上手说明.pdf)
+参考本Demo目录下的「WPS加载项快速上手说明.pdf」

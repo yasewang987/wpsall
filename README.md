@@ -57,7 +57,7 @@
 - [x] [WPS Office移动专业版集成（AIDL）](http://mo.wps.cn/pc-app/office-pro.html)
 - [ ] WPS Office移动预览SDK（仅安卓）
 
-## 怎么用这个仓库
+## 怎么用这个仓库呢？
 
 `git clone https://code.aliyun.com/zouyingfeng/wps.git`
 
@@ -71,11 +71,20 @@
 
 - 所有资料统一发布平台——[WPS开放平台](https://open.wps.cn)
 - WPS客户端API资料——[WPS客户端二次开发](https://open.wps.cn/docs/office)
+- WPS学院的视频资料
+  - [WPS加载项的原理和应用](https://www.wps.cn/learning/enterprise/detail/id/13573.html?sid=370)
+  - [WPS二次开发能力总结](https://www.wps.cn/learning/enterprise/detail/id/13572.html?sid=370)
 
-## 想体验最现代的WPS端开发
+## 想体验最现代的WPS端开发？
 
 `npm install -g wpsjs`
 
 `wpsjs`工具包，提供WPS加载项的创建、调试、打包、发布功能，创建的WPS加载项项目还具有代码自动提示和补全能力，欢迎体验。
 
 > 加快npm获取资源速度可更换taobao源，`npm config set registry https://registry.npm.taobao.org`
+
+## 想和我们更紧密的交流？
+
+欢迎关注「[WPS二次开发](https://zhuanlan.zhihu.com/c_1256350603921915904)」专栏。
+
+多多交流，共同构建WPS的开发者社区。
