@@ -389,7 +389,7 @@ _wps['insertRedHeader'] = {
 
 function fillTemplate() {
     var filePath = prompt("请输入打开文件路径（本地或是url）：", GetDemoPath("样章2.docx"))
-    var templatePath = prompt("请输入需要填充的数据的请求地址:", "http://127.0.0.1:3888/getTemplateData")
+    var templatePath = prompt("请输入需要填充的数据的请求地址:", document.location.protocol + "//" + document.location.host + "/getTemplateData")
 
     _WpsInvoke([{
         "OpenDoc": {
