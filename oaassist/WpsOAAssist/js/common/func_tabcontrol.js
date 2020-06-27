@@ -1032,7 +1032,16 @@ function OnAction(control) {
                  * 内部封装了主动响应前端发送的请求的方法
                  */
                 let currentTime = new Date()
-                wps.OAAssist.WebNotify("我是主动发送的消息，内容可以自定义。如果想传一个对象，则使用JSON.stringify方法转成对象字符串。当前时间是："+ currentTime.toLocaleString()); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                let msgInfo =
+                {
+                    id: 1,
+                    name: 'kingsoft',
+                    since: "1988"
+                }
+                let msgInfoStr = currentTime.toLocaleString() + ": " + JSON.stringify(msgInfo)
+                msgInfoStr = msgInfoStr.replace(/\"/g,"'")//先用此方法做个应急，202008月版本修复了这个问题
+                wps.OAAssist.WebNotify(msgInfoStr); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                // wps.OAAssist.WebNotify("我是主动发送的消息，内容可以自定义。如果想传一个对象，则使用JSON.stringify方法转成对象字符串。当前时间是："+ currentTime.toLocaleString()); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 break;
             }
         default:

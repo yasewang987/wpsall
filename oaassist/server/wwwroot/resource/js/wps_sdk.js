@@ -278,11 +278,7 @@
         var time = new Date();
         var cmdId = "js" + time.getTime() + "_" + exId;
         var infocontent;
-        if (typeof (param) == "string") {
-            infocontent = JSON.stringify(param);
-        } else {
-            infocontent = param;
-        }
+        infocontent = JSON.stringify(param);
         var funcEx = "var res = " + func;
         var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));" //res 为func执行返回值
         var infoEx = infocontent + ");" + cbCode + "void(0";
