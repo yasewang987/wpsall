@@ -1040,7 +1040,7 @@ function OnAction(control) {
                 }
                 let msgInfoStr = currentTime.toLocaleString() + ": " + JSON.stringify(msgInfo)
                 msgInfoStr = msgInfoStr.replace(/\"/g,"'")//先用此方法做个应急，202008月版本修复了这个问题
-                wps.OAAssist.WebNotify(msgInfoStr); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                wps.OAAssist.WebNotify("我是主动发送的消息， 内容可以自定义。   " + msgInfoStr); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 // wps.OAAssist.WebNotify("我是主动发送的消息，内容可以自定义。如果想传一个对象，则使用JSON.stringify方法转成对象字符串。当前时间是："+ currentTime.toLocaleString()); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 break;
             }
