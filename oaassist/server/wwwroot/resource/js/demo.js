@@ -1,31 +1,32 @@
 var isServerOk = false
 var isSetupOk = false
-function envTest(){
+    // var 
+function envTest() {
     //1.服务端检测
-    
+
     var xhr = getHttpObj()
-    xhr.onload=function(e){
+    xhr.onload = function(e) {
         isServerOk = true
-        //2.安装包检测
+            //2.安装包检测
         var xhr1 = getHttpObj()
-        xhr1.onload=function(e){
-            if(xhr1.responseText.indexOf('异常')>-1||xhr1.responseText.indexOf('未安装')>-1||xhr1.responseText.indexOf('失败')>-1){
-                window.location.href="./demo.html"
-                return ;
+        xhr1.onload = function(e) {
+            if (xhr1.responseText.indexOf('异常') > -1 || xhr1.responseText.indexOf('未安装') > -1 || xhr1.responseText.indexOf('失败') > -1) {
+                window.location.href = "./demo.html"
+                return;
             }
             isSetupOk = true
-            window.location.href.indexOf("file://")>-1?window.location.href="http://127.0.0.1:3888/index.html":''
+            window.location.href.indexOf("file://") > -1 ? window.location.href = "http://127.0.0.1:3888/index.html" : ''
         }
-        xhr1.onerror=function(e){
+        xhr1.onerror = function(e) {
             isServerOk = false
-            window.location.href="./demo.html"
+            window.location.href = "./demo.html"
         }
-        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest', true)
+        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest?isPublish=', true)
         xhr1.send()
     }
-    xhr.onerror=function(e){
+    xhr.onerror = function(e) {
         isServerOk = false
-        window.location.href="./demo.html"
+        window.location.href = "./demo.html"
     }
     xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
     xhr.send();
@@ -67,7 +68,7 @@ function appChange() {
     SwitchTab(obj.selectedIndex);
 }
 
-window.onload = function () {
+window.onload = function() {
     // 默认切换到 wps
     SwitchTab(0);
     var app = document.getElementById("app");
@@ -75,6 +76,7 @@ window.onload = function () {
     opts[0].selected = true;
     envTest()
 }
+
 function IEVersion() {
     var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串  
     var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1; //判断是否IE<11浏览器  
@@ -103,6 +105,7 @@ function IEVersion() {
         return 30; //不是ie浏览器
     }
 }
+
 function getHttpObj() {
     var httpobj = null;
     if (IEVersion() < 10) {
