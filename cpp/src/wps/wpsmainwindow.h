@@ -92,6 +92,13 @@ public:
 	void hideToolBar();
 	void hideToolBtn();
 
+	void listTemplates();
+	void hyperlinks();
+	void highlight();
+	void inserttable();
+	void setFontSize();
+	void insertEllipse();
+
 	//注册事件
 	void registerCloseEvent();
 	void registerSaveEvent();

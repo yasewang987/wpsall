@@ -79,8 +79,8 @@
         <command idMso="ReviewAcceptChangeMenu" getEnabled="OnGetEnabled"/>
         <command idMso="FileSaveAsMenu" label="另存为" getEnabled="OnGetEnabled" onAction="OnAction"/>
         <command idMso="FileSaveAs" label="另存为" getEnabled="OnGetEnabled" onAction="OnAction"/>
-        <!--注册另存为（F12）的自定义事件覆盖原有功能-->
-        <command idMso="FileSave" label="保存" getEnabled="OnGetEnabled"/>
+        <!--注册另存为（F12）的自定义事件覆盖原有功能，之下注册Ctrl+S为自定义功能-->
+        <command idMso="FileSave" label="保存" getEnabled="OnGetEnabled" onAction="OnAction"/>
         <command idMso="SaveAll" label="保存所有文档" getEnabled="OnGetEnabled"/>
         <command idMso="FilePrint" label="打印" getEnabled="OnGetEnabled"/>
         <command idMso="FilePrintMenu" label="打印" getEnabled="OnGetEnabled"/>

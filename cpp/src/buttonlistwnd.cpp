@@ -63,7 +63,10 @@ void ButtonListWnd::initWpsButtonTree()
 	items << QString::fromUtf8("常用操作") << QString::fromUtf8("初始化")\
 				<< QString::fromUtf8("新建文档") << QString::fromUtf8("打开文档")\
 				<< QString::fromUtf8("另存文档") << QString::fromUtf8("关闭文档")\
-				<< QString::fromUtf8("打印文档");
+				<< QString::fromUtf8("打印文档") << QString::fromUtf8("添加编号")\
+				<< QString::fromUtf8("插入超链接") << QString::fromUtf8("插入表格")\
+				<< QString::fromUtf8("设置字体大小") << QString::fromUtf8("插入椭圆")\
+				<< QString::fromUtf8("突出显示");
 	addRootItem(items);
 	items.clear();
 	items << QString::fromUtf8("隐藏菜单按钮") << QString::fromUtf8("隐藏菜单")\
@@ -89,7 +92,8 @@ void ButtonListWnd::initEtButtonTree()
 	QStringList items;
 	items << QString::fromUtf8("常用操作") << QString::fromUtf8("初始化")\
 				<< QString::fromUtf8("新建文档") << QString::fromUtf8("打开文档")\
-				<< QString::fromUtf8("另存文档");
+				<< QString::fromUtf8("另存文档") <<QString::fromUtf8("设置字号")\
+				<< QString::fromUtf8("添加工作表");
 	addRootItem(items);
 	items.clear();
 	items << QString::fromUtf8("隐藏菜单按钮") << QString::fromUtf8("隐藏工具栏")\
@@ -100,7 +104,12 @@ void ButtonListWnd::initEtButtonTree()
 	addRootItem(items);
 	items.clear();
 	items << QString::fromUtf8("单元格设置") << QString::fromUtf8("单元格设值")\
-				<< QString::fromUtf8("合并取消单元格") << QString::fromUtf8("设置行高列宽");
+				<< QString::fromUtf8("合并取消单元格") << QString::fromUtf8("设置行高列宽")\
+				<< QString::fromUtf8("新建批注") << QString::fromUtf8("设置打印区域");
+	addRootItem(items);
+	items.clear();
+	items << QString::fromUtf8("图形操作") << QString::fromUtf8("插入图片")\
+				<< QString::fromUtf8("插入图表");
 	addRootItem(items);
 	items.clear();
 	items << QString::fromUtf8("事件注册") << QString::fromUtf8("注册关闭事件") \
@@ -129,6 +138,9 @@ void ButtonListWnd::initWppButtonTree()
 	items.clear();
 	items << QString::fromUtf8("其他") << QString::fromUtf8("关闭WPP")\
 				<< QString::fromUtf8("插入图片") << QString::fromUtf8("添加幻灯片")\
+				<< QString::fromUtf8("设置幻灯片大小") << QString::fromUtf8("插入文本框")\
+				<< QString::fromUtf8("插入表格") << QString::fromUtf8("插入音频")\
+				<< QString::fromUtf8("插入超链接") << QString::fromUtf8("新增节")\
 				<< QString::fromUtf8("开始播放");
 	addRootItem(items);
 }

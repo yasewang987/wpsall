@@ -270,6 +270,151 @@ public class WpsMainPanel extends JPanel {
             }
         });
 
+        menuPanel.addButton("常用", "设置标题", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Selection selection = app.get_Selection();
+                selection.put_Style("标题 1");
+                selection.TypeText("设置标题");
+            }
+        });
+
+        menuPanel.addButton("常用", "设置字体", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Selection selection = app.get_Selection();
+                selection.get_Font().put_Name("Dotum");
+                selection.TypeText("设置字体为Dotum");
+            }
+        });
+
+        menuPanel.addButton("常用", "设置字体大小", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Selection selection = app.get_Selection();
+                selection.get_Font().put_Size(36);
+                selection.TypeText("设置字体大小为36");
+            }
+        });
+
+        menuPanel.addButton("常用", "添加编号", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Selection selection = app.get_Selection();
+                selection.TypeText("编号一");
+                ListTemplate listT = app.get_ListGalleries().Item(WdListGalleryType.wdNumberGallery).get_ListTemplates().Item(1);
+                selection.get_Range().get_ListFormat().ApplyListTemplate(listT, WdContinue.wdContinueList, WdListApplyTo.wdListApplyToSelection, 262144);
+            }
+        });
+
+        menuPanel.addButton("常用", "插入分页符", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_Selection().InsertBreak(WdBreakType.wdPageBreak);
+            }
+        });
+
+        menuPanel.addButton("常用", "插入超链接", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String path = getPath("请选择一个文字文件", FileDialog.LOAD);
+                app.get_ActiveDocument().get_Hyperlinks().Add(app.get_Selection().get_Range(), path, "", "", path, "");
+            }
+        });
+
+        menuPanel.addButton("常用", "插入目录", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (int i = 1; i < 4; i++)
+                {
+                    String title = i + "级标题";
+                    String lever = "标题 " + i;
+                    app.get_Selection().TypeText(title);
+                    app.get_Selection().put_Style(lever);
+                    app.get_Selection().TypeParagraph();
+                }
+
+                app.get_Selection().SetRange(0,0);
+                Range rang = app.get_Selection().get_Range();
+
+                boolean UseHeadingStyles = true;
+                long UpperHeadingLevel = 1;
+                long LowerHeadingLevel = 3;
+                app.get_ActiveDocument().get_TablesOfContents().Add(rang, true, UpperHeadingLevel, LowerHeadingLevel,
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing()
+                        );
+            }
+        });
+
+        menuPanel.addButton("常用", "插入页眉页脚", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                View view = app.get_ActiveWindow().get_ActivePane().get_View();
+                view.put_SeekView(WdSeekView.wdSeekCurrentPageHeader);
+                app.get_Selection().TypeText("插入页眉");
+
+                view.put_SeekView(WdSeekView.wdSeekCurrentPageFooter);
+                app.get_Selection().TypeText("插入页脚");
+            }
+        });
+        menuPanel.addButton("常用", "打开文档结构图", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveWindow().put_DocumentMap(true);
+            }
+        });
+
+        menuPanel.addButton("常用", "分栏", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = "君不见黄河之水天上来，奔流到海不复回。" +
+                        "君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽空对月。" +
+                        "天生我材必有用，千金散尽还复来。烹羊宰牛且为乐，会须一饮三百杯。" +
+                        "岑夫子，丹丘生，将进酒，杯莫停。与君歌一曲，请君为我倾耳听。" +
+                        "钟鼓馔玉不足贵，但愿长醉不愿醒。古来圣贤皆寂寞，惟有饮者留其名。" +
+                        "陈王昔时宴平乐，斗酒十千恣欢谑。主人何为言少钱，径须沽取对君酌。" +
+                        "五花马、千金裘，呼儿将出换美酒，与尔同销万古愁。";
+                int textLen = text.length();
+                Selection selection = app.get_Selection();
+                selection.TypeText(text);
+                selection.InsertBreak(3);
+
+                selection.SetRange(0, textLen);
+                TextColumns textColumns = selection.get_Range().get_PageSetup().get_TextColumns();
+                textColumns.SetCount(3);
+                textColumns.put_EvenlySpaced(0);
+            }
+        });
+
+        menuPanel.addButton("常用", "清除格式", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_Selection().ClearFormatting();
+            }
+        });
+
+        menuPanel.addButton("常用", "旋转图形", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                com.wps.api.tree.wps.Shapes shapes = app.get_ActiveDocument().get_Shapes();
+                int Type = (int)MsoAutoShapeType.msoShapeCan.comEnumValue();
+                float Left = 150;
+                float Top = 122;
+                float Width = 118;
+                float Height = 83;
+                com.wps.api.tree.wps.Shape shape = shapes.AddShape(Type, Left, Top, Width, Height, Variant.getMissing());
+                shape.IncrementRotation(-90);
+            }
+        });
+
+
     }
 
     private  void initLocalMenu(){
