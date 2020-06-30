@@ -87,12 +87,12 @@
             xmlReq.open('POST', options.url);
             xmlReq.onload = function (res) {
                 bFinished = true;
-                if (options.callback) {
+                if (options.callback){
                     options.callback({
                         status: 0,
-                        response: IEVersion() < 10 ? xmlReq.responseText : res.target.response
+                        response: IEVersion() < 10?xmlReq.responseText:res.target.response
                     });
-                }
+				}
             }
             xmlReq.ontimeout = xmlReq.onerror = function (res) {
                 xmlReq.bTimeout = true;
@@ -217,22 +217,22 @@
         }
     }
 
-    function WpsStart(clientType, name, func, param, useHttps, callback, tryCount, bPop, jsPluginsXml) {
+    function WpsStart(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
         var startInfo = {
             "name": name,
             "function": func,
-            "info": param,
-            "jsPluginsXml": jsPluginsXml ? jsPluginsXml : ""
+            "info": param.param,
+			"jsPluginsXml" : param.jsPluginsXml
         };
         var strData = JSON.stringify(startInfo);
-        if (IEVersion() < 10) {
-            try {
+        if (IEVersion() < 10){
+            try{
                 eval("strData = '" + JSON.stringify(startInfo) + "';");
-            } catch (err) {
+            }catch(err){
 
             }
         }
-
+            
         var baseData = encode(strData);
         var url = "http://127.0.0.1:58890/" + clientType + "/runParams";
         if (useHttps)
@@ -249,12 +249,12 @@
         });
     }
 
-    function WpsStartWrap(clientType, name, func, param, callback, jsPluginsXml) {
-        WpsStart(clientType, name, func, param, false, callback, 4, true, jsPluginsXml)
+    function WpsStartWrap(clientType, name, func, param, callback) {
+        WpsStart(clientType, name, func, param, false, callback, 4, true)
     }
 
-    function WpsStartWrapHttps(clientType, name, func, param, callback, jsPluginsXml) {
-        WpsStart(clientType, name, func, param, true, callback, 4, true, jsPluginsXml)
+    function WpsStartWrapHttps(clientType, name, func, param, callback) {
+        WpsStart(clientType, name, func, param, true, callback, 4, true)
     }
 
     var exId = 0;
@@ -269,16 +269,14 @@
      * @param {*} callback		回调函数
      * @param {*} tryCount		重试次数
      * @param {*} bPop			是否弹出浏览器提示对话框
-     * @param {*} jsPluginsXml  自定义WPS加载项配置列表文件地址
      */
-    function WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, tryCount, bPop, jsPluginsXml) {
+    function WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
         var rspUrl = "http://127.0.0.1:58890/transferEcho/runParams";
         if (useHttps)
             rspUrl = "https://127.0.0.1:58891/transferEcho/runParams";
         var time = new Date();
         var cmdId = "js" + time.getTime() + "_" + exId;
-        var infocontent;
-        infocontent = JSON.stringify(param);
+        var infocontent = JSON.stringify(param.param);
         var funcEx = "var res = " + func;
         var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));" //res 为func执行返回值
         var infoEx = infocontent + ");" + cbCode + "void(0";
@@ -287,17 +285,17 @@
             "name": name,
             "function": funcEx,
             "info": infoEx,
-            "jsPluginsXml": jsPluginsXml ? jsPluginsXml : ""
+			"jsPluginsXml" : param.jsPluginsXml
         };
         var strData = JSON.stringify(startInfo);
-        if (IEVersion() < 10) {
-            try {
+        if (IEVersion() < 10){
+            try{
                 eval("strData = '" + JSON.stringify(startInfo) + "';");
-            } catch (err) {
+            }catch(err){
 
             }
         }
-
+            
         var baseData = encode(strData);
         var url = "http://127.0.0.1:58890/transfer/runParams";
         if (useHttps)
@@ -322,18 +320,7 @@
 
     var serverVersion = "wait"
 
-    /**
-     * 浏览器与WPS的交互方法
-     *
-     * @param {*} clientType            组件类型
-     * @param {*} name                  WPS加载项名称
-     * @param {*} func                  WPS加载项人口方法
-     * @param {*} param                 参数：包括WPS加载项内部定义的方法，参数等
-     * @param {*} useHttps              是否使用https协议
-     * @param {*} callback              回调函数
-     * @param {*} jsPluginsXml          自定义WPS加载项配置列表文件地址
-     */
-    function WpsStartWrapVersionInner(clientType, name, func, param, useHttps, callback, jsPluginsXml) {
+    function WpsStartWrapVersionInner(clientType, name, func, param, useHttps, callback) {
         if (serverVersion == "wait") {
             var url = "http://127.0.0.1:58890/version";
             if (useHttps)
@@ -348,9 +335,9 @@
                     }
                     serverVersion = res.response;
                     if (serverVersion === "") {
-                        WpsStart(clientType, name, func, param, useHttps, callback, 1, false, jsPluginsXml);
+                        WpsStart(clientType, name, func, param, useHttps, callback, 1, false);
                     } else {
-                        WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, false, jsPluginsXml);
+                        WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, false);
                     }
                 },
                 tryCount: 4,
@@ -359,9 +346,9 @@
             });
         } else {
             if (serverVersion === "") {
-                WpsStartWrap(clientType, name, func, param, useHttps, callback, jsPluginsXml);
+                WpsStartWrap(clientType, name, func, param, useHttps, callback);
             } else {
-                WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, true, jsPluginsXml);
+                WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, true);
             }
         }
     }
@@ -386,14 +373,14 @@
         }
         var askItem = function () {
             var xhr = WpsInvoke.CreateXHR()
-            xhr.onload = function (e) {
+            xhr.onload = function(e) {
                 callback(xhr.responseText)
                 window.setTimeout(askItem, 300)
             }
-            xhr.onerror = function (e) {
+            xhr.onerror = function(e) {
                 window.setTimeout(askItem, 10000)
             }
-            xhr.ontimeout = function (e) {
+            xhr.ontimeout = function(e) {
                 window.setTimeout(askItem, 10000)
             }
             if (IEVersion() < 10) {
@@ -417,11 +404,19 @@
     }
 
     function WpsStartWrapVersion(clientType, name, func, param, callback, jsPluginsXml) {
-        WpsStartWrapVersionInner(clientType, name, func, param, false, callback, jsPluginsXml);
+        let paramEx = {
+            jsPluginsXml:jsPluginsXml ? jsPluginsXml : "",
+            param:(typeof(param)=='object' ? param : JSON.parse(param))
+        }
+        WpsStartWrapVersionInner(clientType, name, func, paramEx, false, callback);
     }
 
     function WpsStartWrapHttpsVersion(clientType, name, func, param, callback, jsPluginsXml) {
-        WpsStartWrapVersionInner(clientType, name, func, param, true, callback, jsPluginsXml);
+        let paramEx = {
+            jsPluginsXml:jsPluginsXml ? jsPluginsXml : "",
+            param:(typeof(param)=='object' ? param : JSON.parse(param))
+        }
+        WpsStartWrapVersionInner(clientType, name, func, paramEx, true, callback);
     }
 
     global.WpsInvoke = {
