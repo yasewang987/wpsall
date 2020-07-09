@@ -21,7 +21,7 @@ function envTest() {
             isServerOk = false
             window.location.href = "./demo.html"
         }
-        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest?isPublish=', true)
+        xhr1.open('get', 'http://127.0.0.1:3888/WpsSetupTest', true)
         xhr1.send()
     }
     xhr.onerror = function(e) {
