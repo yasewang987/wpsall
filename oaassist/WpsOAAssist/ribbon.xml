@@ -101,6 +101,11 @@
         <command idMso="ReviewTrackChangesMenu" getEnabled="OnGetEnabled"/>
         <command idMso="ReviewRejectChangeMenu" getEnabled="OnGetEnabled"/>
         <command idMso="ReviewAcceptChangeMenu" getEnabled="OnGetEnabled"/>
+        <!--文档新建控制-->
+        <command idMso="FileNewMenu" getEnabled="OnGetEnabled"/>
+        <command idMso="FileNew" getEnabled="OnGetEnabled"/>
+        <command idMso="WindowNew" getEnabled="OnGetEnabled"/>
+        <command idMso="FileNewBlankDocument" getEnabled="OnGetEnabled"/>
     </commands>
     <contextMenus>
         <contextMenu idMso="ContextMenuText">

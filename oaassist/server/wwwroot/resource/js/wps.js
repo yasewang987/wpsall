@@ -6,14 +6,14 @@
 
 var bUseHttps = false;
 
-function _WpsInvoke(funcs) {
+function _WpsInvoke(funcs, jsPluginsXml) {
     var info = {};
-    info.funcs = funcs;
+    info.funcs = funcs;    
     var func = bUseHttps ? WpsInvoke.InvokeAsHttps : WpsInvoke.InvokeAsHttp
     func(WpsInvoke.ClientType.wps, // 组件类型
         "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
-        info, // 传递给插件的数据
+        info, // 传递给插件的数据        
         function (result) { // 调用回调，status为0为成功，其他是错误
             if (result.status) {
                 if (bUseHttps && result.status == 100) {
@@ -26,7 +26,8 @@ function _WpsInvoke(funcs) {
                 console.log(result.response)
                 showresult(result.response)
             }
-        })
+        },
+        jsPluginsXml)
 }
 /**
  * 该方法封装了发送给WPS客户端的请求，不需要用户去实现
@@ -74,8 +75,9 @@ var _wps = {}
 
 function newDoc() {
     _WpsInvoke([{
-        "NewDoc": {}
-    }]) // NewDoc方法对应于OA助手dispatcher支持的方法名
+            "NewDoc": {}
+        }],
+        "http://127.0.0.1:8080/iestart/jsplugins.xml") // NewDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['newDoc'] = {
@@ -661,18 +663,19 @@ window.onload = function () {
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             var onBtnAction = _wps[this.id].action
 
-            document.getElementById("demoBtn").onclick = function () { //IE不支持箭头函数，改为通用写法
-                var xhr = new WpsInvoke.CreateXHR();
-                xhr.onload = function () {
-                    onBtnAction()
-                }
-                xhr.onerror = function () {
-                    alert("请确认本地服务端(StartupServer.js)是启动状态")
-                    return
-                }
-                xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
-                xhr.send()
-            }
+            document.getElementById("demoBtn").onclick = onBtnAction //IE不支持箭头函数，改为通用写法
+            // document.getElementById("demoBtn").onclick = function () { //IE不支持箭头函数，改为通用写法
+            //     var xhr = new WpsInvoke.CreateXHR();
+            //     xhr.onload = function () {
+            //         onBtnAction()
+            //     }
+            //     xhr.onerror = function () {
+            //         alert("请确认本地服务端(StartupServer.js)是启动状态")
+            //         return
+            //     }
+            //     xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
+            //     xhr.send()
+            // }
 
             hljs.highlightBlock(document.getElementById("code"));
         }

@@ -1013,6 +1013,7 @@ function OnAction(control) {
             {
                 if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
                     alert("这是OA文档，将Ctrl+S动作做了重定义，可以调用OA的保存文件流到业务系统的接口。")
+                    OnBtnSaveToServer();
                 } else { //本地的文档，期望不做自定义，通过转调idMso的方法实现
                     // wps.WpsApplication().CommandBars.ExecuteMso("FileSave");
                     wps.WpsApplication().CommandBars.ExecuteMso("SaveAll");

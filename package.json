@@ -13,6 +13,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "wps-jsapi": "^1.0.3"
+    "wps-jsapi": "latest"
   }
 }
