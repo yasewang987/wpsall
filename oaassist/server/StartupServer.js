@@ -168,17 +168,23 @@ var server = app.listen(3888, function () {
 	console.log(getNow() + "启动本地web服务(http://127.0.0.1:3888)成功！");
 	let url="http://127.0.0.1:3888/index.html";
 	let exec=cp.exec;
-	switch (process.platform) {
-        //mac系统使用 一下命令打开url在浏览器
-        case "darwin":
-            exec(`open ${url}`);
-        //win系统使用 一下命令打开url在浏览器
-        case "win32":
-            exec(`start ${url}`);
-            // 默认mac系统
-        default:
-            exec(`open ${url}`);
-    }
+	try{
+		switch (process.platform) {
+			//mac系统使用 一下命令打开url在浏览器
+			case "darwin":
+				exec(`open ${url}`);
+			//win系统使用 一下命令打开url在浏览器
+			case "win32":
+				exec(`start ${url}`);
+			//linux系统使用 一下命令打开url在浏览器
+			case "linux":
+				exec(`xdg-open ${url}`)
+				// 默认linux系统
+			default:
+				exec(`xdg-open ${url}`)
+		}
+	}catch(e){
+	}
 });
 //启动node服务
 server.on('error', (e) => {

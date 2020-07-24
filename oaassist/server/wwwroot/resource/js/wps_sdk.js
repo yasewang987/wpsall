@@ -372,7 +372,7 @@
             type: clientType
         }
         var askItem = function () {
-            var xhr = WpsInvoke.CreateXHR()
+            var xhr = CreateXHR()
             xhr.onload = function(e) {
                 callback(xhr.responseText)
                 window.setTimeout(askItem, 300)
