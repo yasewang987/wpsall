@@ -173,15 +173,19 @@ var server = app.listen(3888, function () {
 			//mac系统使用 一下命令打开url在浏览器
 			case "darwin":
 				exec(`open ${url}`);
+				break;
 			//win系统使用 一下命令打开url在浏览器
 			case "win32":
 				exec(`start ${url}`);
+				break;
 			//linux系统使用 一下命令打开url在浏览器
 			case "linux":
 				exec(`xdg-open ${url}`)
+				break;
 				// 默认linux系统
 			default:
 				exec(`xdg-open ${url}`)
+				break;
 		}
 	}catch(e){
 	}
