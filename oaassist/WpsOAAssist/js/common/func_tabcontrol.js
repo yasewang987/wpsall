@@ -22,7 +22,7 @@ function OnWPSWorkTabLoad(ribbonUI) {
         wps.Enum = WPS_Enum;
     }
     OnJSWorkInit(); //初始化文档事件(全局参数,挂载监听事件)
-    setTimeout(activeTab,1000); // 激活OA助手菜单
+    setTimeout(activeTab,2000); // 激活OA助手菜单
     OpenTimerRun(OnDocSaveByAutoTimer); //启动定时备份过程
     return true;
 }

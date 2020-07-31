@@ -3,7 +3,7 @@ function OnWindowActivate() {
     console.log("OnWindowActivate" + "=======================");
 
     showOATab(); // 根据文件是否为OA文件来显示OA菜单再进行刷新按钮
-    setTimeout(activeTab, 500); // 激活页面必须要页签显示出来，所以做1秒延迟
+    setTimeout(activeTab, 2000); // 激活页面必须要页签显示出来，所以做1秒延迟
     return;
 }
 

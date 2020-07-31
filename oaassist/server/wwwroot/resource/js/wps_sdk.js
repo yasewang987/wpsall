@@ -404,7 +404,7 @@
     }
 
     function WpsStartWrapVersion(clientType, name, func, param, callback, jsPluginsXml) {
-        let paramEx = {
+        var paramEx = {
             jsPluginsXml:jsPluginsXml ? jsPluginsXml : "",
             param:(typeof(param)=='object' ? param : JSON.parse(param))
         }
@@ -412,7 +412,7 @@
     }
 
     function WpsStartWrapHttpsVersion(clientType, name, func, param, callback, jsPluginsXml) {
-        let paramEx = {
+        var paramEx = {
             jsPluginsXml:jsPluginsXml ? jsPluginsXml : "",
             param:(typeof(param)=='object' ? param : JSON.parse(param))
         }
