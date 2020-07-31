@@ -372,7 +372,7 @@
             type: clientType
         }
         var askItem = function () {
-            var xhr = CreateXHR()
+            var xhr = createXHR()
             xhr.onload = function(e) {
                 callback(xhr.responseText)
                 window.setTimeout(askItem, 300)
