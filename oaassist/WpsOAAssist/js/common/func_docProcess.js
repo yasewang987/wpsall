@@ -44,6 +44,7 @@ function NewFile(params) {
     DoSetOADocLandMode(doc, EnumDocLandMode.DLM_LocalDoc);
     //强制执行一次Activate事件
     OnWindowActivate();
+    wps.WpsApplication().WindowState=1;
     wps.WpsApplication().Activate(); //把WPS对象置前
 
     return doc; //返回新创建的Document对象
@@ -61,6 +62,7 @@ function OpenFile(params) {
         //下载文档之前，判断是否已下载该文件
         if (pCheckIsExistOpenOADoc(l_strFileUrl) == true) {
             //如果找到相同OA地址文档，则给予提示
+            wps.WpsApplication().WindowState=1;
             wps.WpsApplication().Activate(); //把WPS对象置前
             //根据OA助手对是否允许再次打开相同文件的判断处理
             var l_AllowOADocReOpen = false;
@@ -147,6 +149,7 @@ function pOpenFile(doc, params, isOnlineDoc) {
     // 触发切换窗口事件
     OnWindowActivate();
     // 把WPS对象置前
+    wps.WpsApplication().WindowState=1;
     wps.WpsApplication().Activate();
     return doc;
 }
@@ -542,7 +545,7 @@ function pGetValidDocTempPath(doc) {
         return;
     }
     if (doc.Path == "") { //对于不落地文档，文档路径为空
-        return wps.Env.GetTempPath();
+        return wps.Env.GetTempPath()+"/"+doc.Name.split(".")[0];
     } else {
         return doc.FullName.split(".")[0]
     }

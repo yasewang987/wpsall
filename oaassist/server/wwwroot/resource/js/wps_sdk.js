@@ -1,25 +1,16 @@
-﻿/**
- * 这是浏览器与WPS通信的SDK，是WPS提供的SDK
- * 无需修改
- * 直接引用到业务系统前端调用即可
- * 可覆盖如下使用场景：
- *  1. 通过浏览器中的页面直接启动WPS
- *  2. 浏览器与WPS双向通信，WPS发消息，浏览器前端页面可接受并解析
- */
+﻿(function (global, factory) {
 
-;
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ?
-        module.exports = factory(global) :
-        typeof define === 'function' && define.amd ?
-        define(factory) : factory(global)
-}((
-    typeof self !== 'undefined' ? self :
-    typeof window !== 'undefined' ? window :
-    typeof global !== 'undefined' ? global :
-    this
-), function (global) {
-    global = global || {};
+    "use strict";
+
+    if (typeof module === "object" && typeof module.exports === "object") {
+        module.exports = factory(global, true);
+    } else {
+        factory(global);
+    }
+
+})(typeof window !== "undefined" ? window : this, function (window, noGlobal) {
+
+    "use strict";
     var bFinished = true;
 
     function getHttpObj() {
@@ -87,12 +78,12 @@
             xmlReq.open('POST', options.url);
             xmlReq.onload = function (res) {
                 bFinished = true;
-                if (options.callback){
+                if (options.callback) {
                     options.callback({
                         status: 0,
-                        response: IEVersion() < 10?xmlReq.responseText:res.target.response
+                        response: IEVersion() < 10 ? xmlReq.responseText : res.target.response
                     });
-				}
+                }
             }
             xmlReq.ontimeout = xmlReq.onerror = function (res) {
                 xmlReq.bTimeout = true;
@@ -131,9 +122,9 @@
             return cc < 0x80 ? c :
                 cc < 0x800 ? (fromCharCode(0xc0 | (cc >>> 6)) +
                     fromCharCode(0x80 | (cc & 0x3f))) :
-                (fromCharCode(0xe0 | ((cc >>> 12) & 0x0f)) +
-                    fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) +
-                    fromCharCode(0x80 | (cc & 0x3f)));
+                    (fromCharCode(0xe0 | ((cc >>> 12) & 0x0f)) +
+                        fromCharCode(0x80 | ((cc >>> 6) & 0x3f)) +
+                        fromCharCode(0x80 | (cc & 0x3f)));
         } else {
             var cc = 0x10000 +
                 (c.charCodeAt(0) - 0xD800) * 0x400 +
@@ -156,7 +147,7 @@
             return btoa(utob(String(u)));
     }
 
-    if (typeof global.btoa !== 'function') global.btoa = func_btoa;
+    if (typeof window.btoa !== 'function') window.btoa = func_btoa;
 
     function func_btoa(input) {
         var str = String(input);
@@ -222,17 +213,17 @@
             "name": name,
             "function": func,
             "info": param.param,
-			"jsPluginsXml" : param.jsPluginsXml
+            "jsPluginsXml": param.jsPluginsXml
         };
         var strData = JSON.stringify(startInfo);
-        if (IEVersion() < 10){
-            try{
+        if (IEVersion() < 10) {
+            try {
                 eval("strData = '" + JSON.stringify(startInfo) + "';");
-            }catch(err){
+            } catch (err) {
 
             }
         }
-            
+
         var baseData = encode(strData);
         var url = "http://127.0.0.1:58890/" + clientType + "/runParams";
         if (useHttps)
@@ -285,17 +276,17 @@
             "name": name,
             "function": funcEx,
             "info": infoEx,
-			"jsPluginsXml" : param.jsPluginsXml
+            "jsPluginsXml": param.jsPluginsXml
         };
         var strData = JSON.stringify(startInfo);
-        if (IEVersion() < 10){
-            try{
+        if (IEVersion() < 10) {
+            try {
                 eval("strData = '" + JSON.stringify(startInfo) + "';");
-            }catch(err){
+            } catch (err) {
 
             }
         }
-            
+
         var baseData = encode(strData);
         var url = "http://127.0.0.1:58890/transfer/runParams";
         if (useHttps)
@@ -372,15 +363,15 @@
             type: clientType
         }
         var askItem = function () {
-            var xhr = createXHR()
-            xhr.onload = function(e) {
+            var xhr = WpsInvoke.CreateXHR()
+            xhr.onload = function (e) {
                 callback(xhr.responseText)
                 window.setTimeout(askItem, 300)
             }
-            xhr.onerror = function(e) {
+            xhr.onerror = function (e) {
                 window.setTimeout(askItem, 10000)
             }
-            xhr.ontimeout = function(e) {
+            xhr.ontimeout = function (e) {
                 window.setTimeout(askItem, 10000)
             }
             if (IEVersion() < 10) {
@@ -405,21 +396,22 @@
 
     function WpsStartWrapVersion(clientType, name, func, param, callback, jsPluginsXml) {
         var paramEx = {
-            jsPluginsXml:jsPluginsXml ? jsPluginsXml : "",
-            param:(typeof(param)=='object' ? param : JSON.parse(param))
+            jsPluginsXml: jsPluginsXml ? jsPluginsXml : "",
+            param: (typeof (param) == 'object' ? param : JSON.parse(param))
         }
         WpsStartWrapVersionInner(clientType, name, func, paramEx, false, callback);
     }
 
     function WpsStartWrapHttpsVersion(clientType, name, func, param, callback, jsPluginsXml) {
         var paramEx = {
-            jsPluginsXml:jsPluginsXml ? jsPluginsXml : "",
-            param:(typeof(param)=='object' ? param : JSON.parse(param))
+            jsPluginsXml: jsPluginsXml ? jsPluginsXml : "",
+            param: (typeof (param) == 'object' ? param : JSON.parse(param))
         }
         WpsStartWrapVersionInner(clientType, name, func, paramEx, true, callback);
     }
 
-    global.WpsInvoke = {
+    //从外部浏览器远程调用 WPS 加载项中的方法
+    var WpsInvoke = {
         InvokeAsHttp: WpsStartWrapVersion,
         InvokeAsHttps: WpsStartWrapHttpsVersion,
         RegWebNotify: RegWebNotify,
@@ -431,7 +423,122 @@
         CreateXHR: getHttpObj
     }
 
-    return {
-        WpsInvoke: global.WpsInvoke
+    if (typeof noGlobal === "undefined") {
+        window.WpsInvoke = WpsInvoke;
     }
-}));
+
+    function WpsAddonGetAllConfig(callBack) {
+        var baseData;
+        startWps({
+            url: "http://127.0.0.1:58890/publishlist",
+            type: "GET",
+            sendData: baseData,
+            callback: callBack,
+            tryCount: 10,
+            bPop: true,
+            timeout: 5000,
+            concurrent: false
+        });
+    }
+
+    function WpsAddonVerifyStatus(element, callBack) {
+        var xmlReq = getHttpObj();
+        var offline = element.online === "false";
+        var url = offline ? element.url : element.url + "ribbon.xml";
+        xmlReq.open("POST", "http://localhost:58890/redirect/runParams");
+        xmlReq.onload = function (res) {
+            if (offline && !res.target.response.indexOf("7z")==0) {
+                callBack({ status: 1, msg: "不是有效的7z格式" + url });
+            } else if (!offline && !res.target.response.indexOf("<customUI")==0) {
+                callBack({ status: 1, msg: "不是有效的ribbon.xml, " + url })
+            } else {
+                callBack({ status: 0, msg: "OK" })
+            }
+        }
+        xmlReq.onerror = function (res) {
+            xmlReq.bTimeout = true;
+            callBack({ status: 2, msg: "网页路径不可访问，如果是跨域问题，不影响使用" + url })
+        }
+        xmlReq.ontimeout = function (res) {
+            xmlReq.bTimeout = true;
+            callBack({ status: 3, msg: "访问超时" + url })
+        }
+        if (IEVersion() < 10) {
+            xmlReq.onreadystatechange = function () {
+                if (xmlReq.readyState != 4)
+                    return;
+                if (xmlReq.bTimeout) {
+                    return;
+                }
+                if (xmlReq.status === 200)
+                    xmlReq.onload();
+                else
+                    xmlReq.onerror();
+            }
+        }
+        xmlReq.timeout = 5000;
+        var data = {
+            method: "get",
+            url: url,
+            data: ""
+        }
+        var sendData = FormatSendData(data)
+        xmlReq.send(sendData);
+    }
+
+    function WpsAddonHandleEx(element, cmd, callBack) {
+        var data = FormatData(element, cmd);
+        startWps({
+            url: "http://localhost:58890/deployaddons/runParams",
+            type: "POST",
+            sendData: data,
+            callback: callBack,
+            tryCount: 1,
+            bPop: true,
+            timeout: 5000,
+            concurrent: false
+        });
+    }
+
+    function WpsAddonEnable(element, callBack) {
+        WpsAddonHandleEx(element, "enable", callBack)
+    }
+
+    function WpsAddonDisable(element, callBack) {
+        WpsAddonHandleEx(element, "disable", callBack)
+    }
+
+    function FormatData(element, cmd) {
+        var data = {
+            "cmd": cmd, //"enable", 启用， "disable", 禁用, "disableall", 禁用所有
+            "name": element.name,
+            "url": element.url,
+            "addonType": element.addonType,
+            "online": element.online,
+            "version": element.version,
+            "time":new Date().getTime()
+        }
+        return FormatSendData(data);
+    }
+
+    function FormatSendData(data) {
+        var strData = JSON.stringify(data);
+        if (IEVersion() < 10)
+            eval("strData = '" + JSON.stringify(strData) + "';");
+        return encode(strData);
+    }
+
+    //管理 WPS 加载项
+    var WpsAddonMgr = {
+        getAllConfig: WpsAddonGetAllConfig,
+        verifyStatus: WpsAddonVerifyStatus,
+        enable: WpsAddonEnable,
+        disable: WpsAddonDisable,
+    }
+
+    if (typeof noGlobal === "undefined") {
+        window.WpsAddonMgr = WpsAddonMgr;
+    }
+
+    return { WpsInvoke: WpsInvoke, WpsAddonMgr: WpsAddonMgr, version: "1.0.3" };
+});
