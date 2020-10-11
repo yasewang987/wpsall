@@ -1,5 +1,6 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnWPSWorkTabLoad">
     <ribbon startFromScratch="false">
+        
         <tabs>
             <tab id="WPSWorkExtTab" label="OA辅助" getVisible="OnGetVisible">                <!-- OA菜单开启显隐处理-->
                 <group id="grpWPSClound" label="WPS云文档相关功能" getVisible="OnGetVisible">

@@ -110,8 +110,15 @@
                 var doc = wps.WpsApplication().ActiveDocument;
                 var bookmarkData = GetDocParamsValue(doc, "bookmarkData");
                 if (typeof (bookmarkData) == undefined || bookmarkData == null || bookmarkData == "") {
-                    alert("未传入有效的书签数据,下拉框加载失败!");
-                    return;
+                    // alert("未传入有效的书签数据,下拉框加载失败!");
+                    // return;
+                    bookmarkData=[{
+                        bookmarksign:'bookmark1',
+                        bookmarkname:"我是测试书签1"
+                    },{
+                        bookmarksign:'bookmark2',
+                        bookmarkname:"我是测试书签2"
+                    }]
                 }
                 this.bookmarks = bookmarkData;    // 书签列表赋值
                 console.log("数据：" + vm.bookmarks);
@@ -145,9 +152,12 @@
                 var range = selection.Range;
                 var fields = doc.FormFields;
                 fields.Shaded = true; // 显示底纹
-                var formField = fields.Add(range, WdFieldType.wdFieldFormTextInput);
+
+                var formField = fields.Add(range, wps.Enum&&wps.Enum.wdFieldFormTextInput||70);//枚举值兼容性写法，70为枚举表中wps.Enum.wdFieldFormTextInput的值
                 formField.Name = vm.bookmarksign; // 书签名称设置
                 formField.Result = vm.bookmarkname; // 窗体域的显示结果设置
+                //选中，主动触发刷新
+                wps.WpsApplication().ActiveDocument.Range(selection.Start,selection.Start).Select()
                 // 添加成功给予提示
                 $("#showResult").html("书签【" + vm.bookmarksign + "】添加成功！");
             },
@@ -166,6 +176,8 @@
                         if (formField.Name == vm.bookmarksign) {
                             flag = true;
                             formField.Delete();
+                            //选中，主动触发刷新
+                            wps.WpsApplication().ActiveDocument.Range(selection.Start,selection.Start).Select()
                         }
                     }
                 }

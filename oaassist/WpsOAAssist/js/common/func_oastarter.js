@@ -46,6 +46,14 @@ function dispatcher(info) {
             }
         }
     },100)
+    for (var index = 0; index < funcs.length; index++) {
+        var func = funcs[index];
+        for (var key in func) {                    
+            if (key === "GetDocStatus") {
+                return GetDocStatus(func[key])
+            }
+        }
+    }
     return {message:"ok", app:wps.WpsApplication().Name}
 }
 

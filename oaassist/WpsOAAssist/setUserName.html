@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<title>OA助手WPS用户名设置</title>
 	<script type="text/javascript" src="js/common/enum.js"></script>
+	<script type="text/javascript" src="js/common/common.js"></script>
 	<script type="text/javascript">
 		function changeUserName(){
 			var l_Name = document.getElementById("txtUserName").value
@@ -12,6 +13,8 @@
 				return;
 			}
 			wps.PluginStorage.setItem(constStrEnum.WPSInitUserName, l_Name);
+			SetDocParamsValue(wps.WpsApplication().ActiveDocument,"userName",l_Name)
+			pSetWPSAppUserName();
 			wps.UpdateRibbon("btnUserName")
 			//wps.WpsApplication().ActiveDocument.Activate();
 			window.close();
@@ -20,7 +23,7 @@
 </head>
 
 <body>
-	<p>请在下面输入WPS Office的默认用户名称:</p>
+	<p>请在下面输入WPS Office的用户名称:</p>
 	<hr>
 	<form method="POST" action="">
 		<p>WPS用户名:<input type="text" id="txtUserName" size="20"></p>
