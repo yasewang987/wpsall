@@ -1024,22 +1024,41 @@ function OnAction(control) {
                 alert("您选择的内容是：\n" + selectText);
                 break;
             }
-        case "btnSendMessage":
+        case "btnSendMessage1":
+            {
+                 /**
+                 * 内部封装了主动响应前端发送的请求的方法
+                 */
+                //参数自定义，这里只是负责传递参数，在WpsInvoke.RegWebNotify方法的回调函数中去做接收，自行解析参数
+                let params={
+                    type:'executeFunc1',
+                    message:"当前时间为：" + currentTime()
+                }
+                /**
+                 * WebNotify:
+                 * 参数1：发送给业务系统的消息
+                 * 参数2：是否将消息加入队列，是否防止丢失消息，都需要设置为true
+                 */
+                wps.OAAssist.WebNotify(JSON.stringify(params),true); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                break;
+            }
+        case "btnSendMessage2":
             {
                 /**
                  * 内部封装了主动响应前端发送的请求的方法
                  */
-                let currentTime = new Date()
-                let msgInfo =
-                {
-                    id: 1,
-                    name: 'kingsoft',
-                    since: "1988"
+                //参数自定义，这里只是负责传递参数，在WpsInvoke.RegWebNotify方法的回调函数中去做接收，自行解析参数
+                
+                let params={
+                    type:'executeFunc2',
+                    message:"当前时间为：" + currentTime()
                 }
-                let msgInfoStr = currentTime.toLocaleString() + ": " + JSON.stringify(msgInfo)
-                msgInfoStr = msgInfoStr.replace(/\"/g,"'")//先用此方法做个应急，202008月版本修复了这个问题
-                wps.OAAssist.WebNotify("我是主动发送的消息， 内容可以自定义。   " + msgInfoStr); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
-                // wps.OAAssist.WebNotify("我是主动发送的消息，内容可以自定义。如果想传一个对象，则使用JSON.stringify方法转成对象字符串。当前时间是："+ currentTime.toLocaleString()); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                 /**
+                 * WebNotify:
+                 * 参数1：发送给业务系统的消息
+                 * 参数2：是否将消息加入队列，是否防止丢失消息，都需要设置为true
+                 */
+                wps.OAAssist.WebNotify(JSON.stringify(params),true); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 break;
             }
         case "btnAddWebShape":
@@ -1132,7 +1151,9 @@ function GetImage(control) {
             return "./icon/c_bookmark.png";
         case "btnImportTemplate":
             return "./icon/w_ImportDoc.png";
-        case "btnSendMessage":
+        case "btnSendMessage1":
+            return "./icon/3.svg"
+        case "btnSendMessage2":
             return "./icon/3.svg"
         default:
             ;

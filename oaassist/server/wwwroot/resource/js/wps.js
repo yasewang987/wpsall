@@ -5,7 +5,6 @@
  */
 
 var bUseHttps = false;
-
 function _WpsInvoke(funcs, front, jsPluginsXml) {
     var info = {};
     info.funcs = funcs;    
@@ -38,12 +37,28 @@ function _WpsInvoke(funcs, front, jsPluginsXml) {
  * @param {*} name 加载项对应的名字
  * @param {func} callback 接收到WPS客户端的消息后的回调函数
  */
-WpsInvoke.RegWebNotify(WpsInvoke.ClientType.wps, "WpsOAAssist", function (messageText) {
-    var span = window.parent.document.getElementById("webnotifyspan")
-    span.innerHTML = messageText
-})
+WpsInvoke.RegWebNotify(WpsInvoke.ClientType.wps, "WpsOAAssist",handleOaMessage)
 
-
+function handleOaMessage(data){
+    data=typeof (data) == 'object' ? data : JSON.parse(data)
+    var type=data.type;
+    switch(type){
+        case "executeFunc1":
+            handleOaFunc1(data.message);
+            break;
+        case "executeFunc2":
+            handleOaFunc2(data.message);
+            break;
+        default:
+            alert(data.messageData)
+    }
+}
+function handleOaFunc1(message){
+    alert("我是函数handleOaFunc1，我接收到的参数是："+message)
+}
+function handleOaFunc2(message){
+    alert("我是函数handleOaFunc1，我接收到的参数是："+message)
+}
 /**
  * 处理WPS加载项的方法返回值
  *

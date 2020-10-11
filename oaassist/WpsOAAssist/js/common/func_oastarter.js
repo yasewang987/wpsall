@@ -17,8 +17,23 @@
 let testFuncs=null;
 function dispatcher(info) {
     var funcs = info.funcs;
-
-    //执行web页面传递的方法
+    //解析参数
+    /**
+     * 分两种情况解析：
+     * 1、业务系统依赖客户端返回：做同步处理，直接在for循环中返回
+     */
+    for (var index = 0; index < funcs.length; index++) {
+        var func = funcs[index];
+        for (var key in func) {                    
+            if (key === "GetDocStatus") {
+                return GetDocStatus(func[key])
+            }
+        }
+    }
+    /**
+     * 2、业务系统不依赖客户端返回：
+     * 做异步处理，先返回接收状态，再在setTimeout中做打开文档的一系列业务逻辑
+     */
     setTimeout(function(){
         for (var index = 0; index < funcs.length; index++) {
             testFuncs=funcs;
@@ -46,14 +61,6 @@ function dispatcher(info) {
             }
         }
     },100)
-    for (var index = 0; index < funcs.length; index++) {
-        var func = funcs[index];
-        for (var key in func) {                    
-            if (key === "GetDocStatus") {
-                return GetDocStatus(func[key])
-            }
-        }
-    }
     return {message:"ok", app:wps.WpsApplication().Name}
 }
 

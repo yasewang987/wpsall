@@ -217,22 +217,22 @@ function currentTime() {
     var hh = now.getHours(); //时
     var mm = now.getMinutes(); //分
 
-    var clock = year + "";
+    var clock = year + "年";
 
     if (month < 10)
         clock += "0";
 
-    clock += month + "";
+    clock += month + "月";
 
     if (day < 10)
         clock += "0";
 
-    clock += day + "";
+    clock += day + "日";
 
     if (hh < 10)
         clock += "0";
 
-    clock += hh + "";
+    clock += hh + ":";
     if (mm < 10) clock += '0';
     clock += mm;
     return (clock);
