@@ -47,8 +47,10 @@ function selectTemplate() {
     var path = base + redId;
     SetDocParamsValue(activeDoc, "insertFileUrl", path);
     InsertRedHeadDoc(activeDoc);
+
     window.opener = null;
     window.open('', '_self', '');
+    
     window.close();
 }
 //判断是否是word文档

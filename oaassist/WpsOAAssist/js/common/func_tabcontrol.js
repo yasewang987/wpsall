@@ -22,7 +22,7 @@ function OnWPSWorkTabLoad(ribbonUI) {
         wps.Enum = WPS_Enum;
     }
     OnJSWorkInit(); //初始化文档事件(全局参数,挂载监听事件)
-    setTimeout(activeTab,2000); // 激活OA助手菜单
+    // setTimeout(activeTab,2000); // 激活OA助手菜单
     OpenTimerRun(OnDocSaveByAutoTimer); //启动定时备份过程
     return true;
 }
@@ -89,7 +89,7 @@ function OnPageSetupClicked() {
     if (!doc) {
         return;
     }
-    wpsApp.Dialogs.Item(wps.Enum.wdDialogFilePageSetup).Show();
+    wpsApp.Dialogs.Item(wps.Enum&&wps.Enum.wdDialogFilePageSetup||178).Show();
 }
 
 /**
@@ -101,7 +101,7 @@ function OnPrintDocBtnClicked() {
     if (!doc) {
         return;
     }
-    wpsApp.Dialogs.Item(wps.Enum.wdDialogFilePrint).Show();
+    wpsApp.Dialogs.Item(wps.Enum&&wps.Enum.wdDialogFilePrint||88).Show();
 }
 
 
@@ -219,8 +219,10 @@ function DoInsertPicToDoc() {
     //获取当前文档对象对应的OA参数
     var l_picPath = GetDocParamsValue(l_doc, constStrEnum.picPath); // 获取OA参数传入的图片路径
     if (l_picPath == "") {
-        alert("未获取到系统传入的图片URL路径，不能正常插入图片");
-        return;
+        // alert("未获取到系统传入的图片URL路径，不能正常插入图片");
+        // return;
+        //如果没有传，则默认写一个图片地址
+        l_picPath="http://127.0.0.1:3888/file/OA模板公章.png"
     }
 
     var l_picHeight = GetDocParamsValue(l_doc, constStrEnum.picHeight); //图片高
@@ -235,7 +237,7 @@ function DoInsertPicToDoc() {
 
     var l_shape = l_doc.Shapes.AddPicture(l_picPath, false, true);
     l_shape.Select();
-    // l_shape.WrapFormat.Type = wps.Enum.wdWrapBehind; //图片的默认版式为浮于文字上方，可通过此设置图片环绕模式
+    // l_shape.WrapFormat.Type = wps.Enum&&wps.Enum.wdWrapBehind||5; //图片的默认版式为浮于文字上方，可通过此设置图片环绕模式
 }
 /**
  * 作用：模拟插入签章图片
@@ -244,7 +246,7 @@ function DoInsertPicToDoc() {
  * @param {*} picWidth 图片宽度
  * @param {*} picHeight 图片高度
  */
-function OnInsertPicToDoc(doc, picPath, picWidth, picHeight) {
+function OnInsertPicToDoc(doc, picPath, picWidth, picHeight,callBack) {
     // alert("图片路径："+picPath);
     if (!doc) {
         return;
@@ -261,23 +263,28 @@ function OnInsertPicToDoc(doc, picPath, picWidth, picHeight) {
     }
 
     var selection = doc.ActiveWindow.Selection; // 活动窗口选定范围或插入点
-    var pagecount = doc.BuiltInDocumentProperties.Item(wps.Enum.wdPropertyPages); //获取文档页数
-    selection.GoTo(wps.Enum.wdGoToPage, wps.Enum.wdGoToPage, pagecount.Value); //将光标指向文档最后一页
-
-    var picture = selection.InlineShapes.AddPicture(picPath, false, true); //插入图片
-    picture.LockAspectRatio = 0; //在调整形状大小时可分别改变其高度和宽度
-    picture.Height = picHeight; //设定图片高度
-    picture.Width = picWidth; //设定图片宽度
-    picture.LockAspectRatio = 0;
-    picture.Select(); //当前图片为焦点
-
-    //定义印章图片对象
-    var seal_shape = picture.ConvertToShape(); //类型转换:嵌入型图片->粘贴版型图片
-
-    seal_shape.RelativeHorizontalPosition = wps.Enum.wdRelativeHorizontalPositionPage;
-    seal_shape.RelativeVerticalPosition = wps.Enum.wdRelativeHorizontalPositionPage;
-    seal_shape.Left = 315; //设置指定形状或形状范围的垂直位置（以磅为单位）。
-    seal_shape.Top = 630; //指定形状或形状范围的水平位置（以磅为单位）。
+    var pagecount = doc.BuiltInDocumentProperties.Item(wps.Enum&&wps.Enum.wdPropertyPages||14); //获取文档页数
+    selection.GoTo(wps.Enum&&wps.Enum.wdGoToPage||1, wps.Enum&&wps.Enum.wdGoToPage||1, pagecount.Value); //将光标指向文档最后一页
+    DownloadFile(picPath,function(url){
+        selection.ParagraphFormat.LineSpacing = 12 //防止文档设置了固定行距
+        var picture = selection.InlineShapes.AddPicture(url, true, true); //插入图片
+        wps.FileSystem.Remove(url) //删除本地的图片
+        picture.LockAspectRatio = 0; //在调整形状大小时可分别改变其高度和宽度
+        picture.Height = picHeight; //设定图片高度
+        picture.Width = picWidth; //设定图片宽度
+        picture.LockAspectRatio = 0;
+        picture.Select(); //当前图片为焦点
+    
+        //定义印章图片对象
+        var seal_shape = picture.ConvertToShape(); //类型转换:嵌入型图片->粘贴版型图片
+    
+        seal_shape.RelativeHorizontalPosition = wps.Enum&&wps.Enum.wdRelativeHorizontalPositionPage||1;
+        seal_shape.RelativeVerticalPosition = wps.Enum&&wps.Enum.wdRelativeVerticalPositionPage||1;
+        seal_shape.Left = 315; //设置指定形状或形状范围的垂直位置（以磅为单位）。
+        seal_shape.Top = 630; //指定形状或形状范围的水平位置（以磅为单位）。
+        callBack&&callBack()
+    })
+    
 }
 
 
@@ -343,7 +350,12 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
     wps.PluginStorage.setItem(constStrEnum.OADocUserSave, true); //设置一个临时变量，用于在BeforeSave事件中判断 
     if (p_ShowRevision == false) { // 强制关闭痕迹显示
         var l_SourceName = p_Doc.FullName;
-        l_NewName = p_Doc.Path + "\\B_" + p_Doc.Name;
+        var l_NewName="";
+        if(p_Doc.Path.indexOf("\\")>0){
+            l_NewName = p_Doc.Path + "\\B_" + p_Doc.Name;
+        }else{
+            l_NewName = p_Doc.Path + "/B_" + p_Doc.Name;
+        }
         p_Doc.SaveAs2($FileName = l_NewName, $AddToRecentFiles = false);
         p_Doc.SaveAs2($FileName = l_SourceName, $AddToRecentFiles = false);
 
@@ -433,7 +445,7 @@ function OnBtnClearRevDoc() {
     }
     //去除所有批注
     if (doc.Comments.Count >= 1) {
-        doc.RemoveDocumentInformation(wps.Enum.wdRDIComments);
+        doc.RemoveDocumentInformation(wps.Enum&&wps.Enum.wdRDIComments||1);
     }
 
     //删除所有ink墨迹对象
@@ -606,7 +618,7 @@ function OnInsertRedHeaderClick() {
     if (l_BkFile == "" || l_insertFileUrl == "") {
         var height = 250;
         var width = 400;
-        OnShowDialog("redhead.html", "OA助手", 400, height);
+        OnShowDialog("redhead.html", "OA助手", width, height);
         return;
     }
     InsertRedHeadDoc(l_Doc);
@@ -624,7 +636,7 @@ function OnInsertDateClicked() {
     var l_Doc = wps.WpsApplication().ActiveDocument;
     if (l_Doc) {
         //打开插入日期对话框
-        wps.WpsApplication().Dialogs.Item(wps.Enum.wdDialogInsertDateTime).Show();
+        wps.WpsApplication().Dialogs.Item(wps.Enum&&wps.Enum.wdDialogInsertDateTime||165).Show();
     }
 }
 
@@ -837,30 +849,6 @@ function GetParamsValue(Params, Key) {
     return l_rtnValue;
 }
 
-/**
- *  设置文档参数的属性值
- * @param {*} Doc 
- * @param {*} Key 
- * @param {*} Value 
- */
-function SetDocParamsValue(Doc, Key, Value) {
-    if (!Doc || !Key) {
-        return;
-    }
-
-    var l_Params = wps.PluginStorage.getItem(Doc.DocID);
-    if (!l_Params) {
-        return;
-    }
-
-    var l_objParams = JSON.parse(l_Params);
-    if (!(typeof(l_objParams) == "undefined")) {
-        l_objParams[Key] = Value;
-    }
-
-    //把属性值整体再写回原来的文档ID中
-    wps.PluginStorage.setItem(Doc.DocID, JSON.stringify(l_objParams));
-}
 
 
 /**
@@ -1036,22 +1024,41 @@ function OnAction(control) {
                 alert("您选择的内容是：\n" + selectText);
                 break;
             }
-        case "btnSendMessage":
+        case "btnSendMessage1":
+            {
+                 /**
+                 * 内部封装了主动响应前端发送的请求的方法
+                 */
+                //参数自定义，这里只是负责传递参数，在WpsInvoke.RegWebNotify方法的回调函数中去做接收，自行解析参数
+                let params={
+                    type:'executeFunc1',
+                    message:"当前时间为：" + currentTime()
+                }
+                /**
+                 * WebNotify:
+                 * 参数1：发送给业务系统的消息
+                 * 参数2：是否将消息加入队列，是否防止丢失消息，都需要设置为true
+                 */
+                wps.OAAssist.WebNotify(JSON.stringify(params),true); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                break;
+            }
+        case "btnSendMessage2":
             {
                 /**
                  * 内部封装了主动响应前端发送的请求的方法
                  */
-                let currentTime = new Date()
-                let msgInfo =
-                {
-                    id: 1,
-                    name: 'kingsoft',
-                    since: "1988"
+                //参数自定义，这里只是负责传递参数，在WpsInvoke.RegWebNotify方法的回调函数中去做接收，自行解析参数
+                
+                let params={
+                    type:'executeFunc2',
+                    message:"当前时间为：" + currentTime()
                 }
-                let msgInfoStr = currentTime.toLocaleString() + ": " + JSON.stringify(msgInfo)
-                msgInfoStr = msgInfoStr.replace(/\"/g,"'")//先用此方法做个应急，202008月版本修复了这个问题
-                wps.OAAssist.WebNotify("我是主动发送的消息， 内容可以自定义。   " + msgInfoStr); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
-                // wps.OAAssist.WebNotify("我是主动发送的消息，内容可以自定义。如果想传一个对象，则使用JSON.stringify方法转成对象字符串。当前时间是："+ currentTime.toLocaleString()); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                 /**
+                 * WebNotify:
+                 * 参数1：发送给业务系统的消息
+                 * 参数2：是否将消息加入队列，是否防止丢失消息，都需要设置为true
+                 */
+                wps.OAAssist.WebNotify(JSON.stringify(params),true); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 break;
             }
         case "btnAddWebShape":
@@ -1144,7 +1151,9 @@ function GetImage(control) {
             return "./icon/c_bookmark.png";
         case "btnImportTemplate":
             return "./icon/w_ImportDoc.png";
-        case "btnSendMessage":
+        case "btnSendMessage1":
+            return "./icon/3.svg"
+        case "btnSendMessage2":
             return "./icon/3.svg"
         default:
             ;
@@ -1312,6 +1321,8 @@ function OnGetEnabled(control) {
                 let bFlag = wps.PluginStorage.getItem(constStrEnum.RevisionEnableFlag)
                 return !bFlag
             }
+        case "PictureInsert":
+            return false;
         default:
             ;
     }

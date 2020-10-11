@@ -519,7 +519,8 @@
             "url": element.url,
             "addonType": element.addonType,
             "online": element.online,
-            "version": element.version
+            "version": element.version,
+            "time":new Date().getTime()
         }
         return FormatSendData(data);
     }

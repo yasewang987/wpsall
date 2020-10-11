@@ -491,14 +491,14 @@ function handleFileAndUpload(suffix, doc, uploadPath, FieldName) {
         case '.pdf':
             l_strPath = pGetValidDocTempPath(doc) + ".pdf"; //获取有效输出路径
             wps.FileSystem.Remove(l_strPath); //先删除之前可能存在的临时文件
-            doc.ExportAsFixedFormat(l_strPath, wps.Enum.wdFormatPDF, true); //文档另存为PDF格式
+            doc.ExportAsFixedFormat(l_strPath, wps.Enum&&wps.Enum.wdFormatPDF||17, true); //文档另存为PDF格式
             l_strChangeFileName = doc.Name.split(".")[0] + ".pdf";
             UploadFile(l_strChangeFileName, l_strPath, uploadPath, l_FieldName, OnChangeSuffixUploadSuccess, OnChangeSuffixUploadFail);
             break;
         case '.uof':
             l_strPath = pGetValidDocTempPath(doc) + suffix;
             wps.FileSystem.Remove(l_strPath); //先删除之前可能存在的临时文件
-            doc.ExportAsFixedFormat(l_strPath, wps.Enum.wdFormatOpenDocumentText, true); //转换文件格式
+            doc.ExportAsFixedFormat(l_strPath, wps.Enum&&wps.Enum.wdFormatOpenDocumentText||23, true); //转换文件格式
             doc.SaveAs2(l_strPath);
             l_strChangeFileName = doc.Name.split(".")[0] + suffix;
             UploadFile(l_strChangeFileName, l_strPath, uploadPath, l_FieldName, OnChangeSuffixUploadSuccess, OnChangeSuffixUploadFail);
@@ -507,7 +507,7 @@ function handleFileAndUpload(suffix, doc, uploadPath, FieldName) {
         case '.uot':
             l_strPath = pGetValidDocTempPath(doc) + suffix;
             wps.FileSystem.Remove(l_strPath); //先删除之前可能存在的临时文件
-            doc.ExportAsFixedFormat(l_strPath, wps.Enum.wdFormatOpenDocumentText, true);
+            doc.ExportAsFixedFormat(l_strPath, wps.Enum&&wps.Enum.wdFormatOpenDocumentText||23, true);
             doc.SaveAs2(l_strPath);
             l_strChangeFileName = doc.Name.split(".")[0] + suffix;
             UploadFile(l_strChangeFileName, l_strPath, uploadPath, l_FieldName, OnChangeSuffixUploadSuccess, OnChangeSuffixUploadFail);
@@ -516,8 +516,8 @@ function handleFileAndUpload(suffix, doc, uploadPath, FieldName) {
         case '.ofd':
             l_strPath = pGetValidDocTempPath(doc) + suffix;
             wps.FileSystem.Remove(l_strPath); //先删除之前可能存在的临时文件
-            doc.ExportAsFixedFormat(l_strPath, wps.Enum.wdFormatOpenDocumentText, true);
-            doc.SaveAs2(l_strPath);
+            doc.ExportAsFixedFormat(l_strPath, wps.Enum&&wps.Enum.wdFormatOpenDocumentText||23, true);
+            doc.SaveAs2(l_strPath,102);
             l_strChangeFileName = doc.Name.split(".")[0] + suffix;
             UploadFile(l_strChangeFileName, l_strPath, uploadPath, l_FieldName, OnChangeSuffixUploadSuccess, OnChangeSuffixUploadFail);
             doc.SaveAs2(l_DocSourcePath); //保存回原来的文档内容
@@ -787,7 +787,7 @@ function pInsertRInedHead(doc, strFile, bookmark) {
     var l_revisionCtrl = GetDocParamsValue(activeDoc, constStrEnum.revisionCtrl);
     activeDoc.TrackRevisions = l_revisionCtrl == "" ? false : l_revisionCtrl.bOpenRevision;
     //取消WPS关闭时的提示信息
-    wps.WpsApplication().DisplayAlerts = wps.Enum.wdAlertsNone;
+    wps.WpsApplication().DisplayAlerts = wps.Enum&&wps.Enum.wdAlertsNone||0;
 }
 /**
  * 从OA-web端点击套红头

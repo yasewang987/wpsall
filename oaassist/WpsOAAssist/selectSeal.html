@@ -81,18 +81,18 @@
         <div class="row clear" style="height: 15%;padding-top: 2%;">
             <div id="seal_name">
                 <span>印章名称：</span>
-                <select class="seal_control" v-model="sealItem" style="width: 60%;">
+                <select class="seal_control" v-model="sealItem" style="width: 60%;" @change="vm.loadSeal()">
                     <option value="-1">请选择印章</option>
-                    <option v-for="item in seals" :value="item.signatureID">{{item.MarkName}}</option>
+                    <option v-for="(item,index) in seals" :key="index" :value="item.signatureID">{{item.MarkName}}</option>
                 </select>
             </div>
-            <div id="seal_password">
+            <!-- <div id="seal_password">
                 <span>密码：</span>
                 <input class="seal_control" type="password" v-model="sealPassword" placeholder="请输入密码" />
             </div>
             <div id="seal_load">
                 <button class="seal_control" @click="vm.loadSeal()">盖章</button>
-            </div>
+            </div> -->
         </div>
         <div id="seal_preview" class="row" style="height: 70%;padding-top: 5%;overflow: auto;">
             <img :src="seal" v-if="visible" style="width: 50%;height: 85%;" draggable="false">
@@ -132,54 +132,70 @@
                 var l_doc = wps.WpsApplication().ActiveDocument;
                 var l_sealData = GetDocParamsValue(l_doc, "sealData");
                 if (typeof (l_sealData) == undefined || l_sealData == null || l_sealData == "") {
-                    alert("未传入有效的印章数据,下拉框加载失败!");
-                    return;
+                    // alert("未传入有效的印章数据,下拉框加载失败!");
+                    // return;
+                    l_sealData=[{
+                        MarkName:"测试印章1",
+                        signatureID:1
+                    },{
+                        MarkName:"测试印章2",
+                        signatureID:2
+                    }]
                 }
                 this.seals = l_sealData;
-                console.log("数据：" + l_sealData);
+                console.log("数据：",l_sealData);
             },
             loadSeal: function () {
-                // this.visible = true;
-                // this.picPath = "data:image/gif;base64,R0lGODlhMwAxAIAAAAAAAP///yH5BAAAAAAALAAAAAAzADEAAAK8jI+pBr0PowytzotTtbm/DTqQ6C3hGXElcraA9jIr66ozVpM3nseUvYP1UEHF0FUUHkNJxhLZfEJNvol06tzwrgdLbXsFZYmSMPnHLB+zNJFbq15+SOf50+6rG7lKOjwV1ibGdhHYRVYVJ9Wnk2HWtLdIWMSH9lfyODZoZTb4xdnpxQSEF9oyOWIqp6gaI9pI1Qo7BijbFZkoaAtEeiiLeKn72xM7vMZofJy8zJys2UxsCT3kO229LH1tXAAAOw==";
-                // this.seal = this.picPath;
                 if (this.sealItem == "" || this.sealItem == -1) {
+                    this.visible = false;
+                    this.picPath = "";
+                    this.seal = "";
                     alert("请选择印章!");
                     return;
                 }
-                if (this.sealPassword == "") {
-                    alert("请输入密码!");
-                    return;
-                }
-                var doc = wps.WpsApplication().ActiveDocument;
-                var url = GetDocParamsValue(doc, "validatePath");
-                if (url == "") {
-                    alert("未传入有效的印章验证URL,盖章失败!");
-                    return;
-                }
-                url += "&signatureID=" + this.sealItem + "&passwd=" + this.sealPassword;
-                this.$http.get(url).then(function (res) {
-                    var data = res.body;
-                    if (data.code == "0") {
-                        this.visible = true;
-                        this.picPath = data.url;
-                        this.seal = this.picPath;
-                    } else {
-                        this.picPath = "";
-                        this.$Message.error(data.message);
-                    }
-                }, function () {
-                    console.log("获取响应失败");
-                });
+
+                //静态印章
+                this.visible = true;
+                this.picPath = getHtmlURL("template/OA模板公章.png");
+                this.seal = getHtmlURL("template/OA模板公章.png");
+                //后台获取 印章
+                // if (this.sealPassword == "") {
+                //     alert("请输入密码!");
+                //     return;
+                // }
+                // var doc = wps.WpsApplication().ActiveDocument;
+                // var url = GetDocParamsValue(doc, "validatePath");//印章验证接口
+                
+                // if (url == "") {
+                //     alert("未传入有效的印章验证URL,盖章失败!");
+                //     return;
+                // }
+                // url += "&signatureID=" + this.sealItem + "&passwd=" + this.sealPassword;
+                // this.$http.get(url).then(function (res) {
+                //     var data = res.body;
+                //     if (data.code == "0") {
+                //         this.visible = true;
+                //         this.picPath = data.url;
+                //         this.seal = this.picPath;
+                //     } else {
+                //         this.picPath = "";
+                //         this.$Message.error(data.message);
+                //     }
+                // }, function () {
+                //     console.log("获取响应失败");
+                // });
             },
             doSeal: function () {
                 var l_doc = wps.WpsApplication().ActiveDocument;
                 if (!l_doc) {
                     return;
                 }
-                OnInsertPicToDoc(l_doc, this.picPath, 95, 95);  // 调用插入图片函数
-                window.opener = null;
-                window.open('', '_self', '');
-                window.close();
+                OnInsertPicToDoc(l_doc, this.picPath, 95, 95,()=>{
+                    window.opener = null;
+                    window.open('', '_self', '');
+                    window.close();
+                });  // 调用插入图片函数
+                
             }
         },
         mounted: function () {

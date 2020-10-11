@@ -1,5 +1,6 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnWPSWorkTabLoad">
     <ribbon startFromScratch="false">
+        
         <tabs>
             <tab id="WPSWorkExtTab" label="OA辅助" getVisible="OnGetVisible">                <!-- OA菜单开启显隐处理-->
                 <group id="grpWPSClound" label="WPS云文档相关功能" getVisible="OnGetVisible">
@@ -67,7 +68,10 @@
                     </box>
                 </group>
                 <group id="grpNotice" label="通知消息" getVisible="OnGetVisible">
-                    <button id="btnSendMessage" label="给业务系统前端发送消息" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                    <box id="boxNotice" boxStyle="vertical" visible="true">
+                        <button id="btnSendMessage1" label="执行业务系统函数handleOaFunc1" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                        <button id="btnSendMessage2" label="执行业务系统函数handleOaFunc2" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                    </box>
                     <button id="btnAddWebShape" label="插入活动对象" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                 </group>
             </tab>

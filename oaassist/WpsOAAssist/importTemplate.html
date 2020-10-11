@@ -111,11 +111,11 @@
             alert('请选中模板!!');
             return;
         }
-        var p_Doc = wps.WpsApplication().ActiveDocument;
-        var templatePath = GetDocParamsValue(p_Doc, "templatePath");
-        if (templatePath == "") { templatePath = OA_DOOR.templateBaseURL; }
-        var templateURL = templatePath + templateId;
-
+        // var p_Doc = wps.WpsApplication().ActiveDocument;
+        // var templatePath = GetDocParamsValue(p_Doc, "templatePath");
+        // if (templatePath == "") { templatePath = OA_DOOR.templateBaseURL; }
+        // var templateURL = templatePath + templateId;
+        var templateURL = getHtmlURL("template/模板.docx");
         importTemlateFile(templateURL);
         window.opener = null;
         window.open('', '_self', '');
@@ -138,23 +138,30 @@
         methods: {
             getAllTemplate: function () {
                 var _this = this
-                var p_Doc = wps.WpsApplication().ActiveDocument;
-                var templateDataUrl = GetDocParamsValue(p_Doc, "templateDataUrl");
-                if (templateDataUrl == "") { templateDataUrl = OA_DOOR.templateDataUrl; }
-                $.ajax({
-                    url: templateDataUrl,
-                    async: false,
-                    method: "post",
-                    dataType: 'json',
-                    success: function (res) {
-                        _this.templates = res;
-                        console.log("模板列表数据：" + JSON.stringify(res));
-                    },
-                    error: function (res) {
-                        alert("获取响应失败");
-                        _this.templates = {}
-                    }
-                });
+                //通过接口拉取模板列表
+                // var p_Doc = wps.WpsApplication().ActiveDocument;
+                // var templateDataUrl = GetDocParamsValue(p_Doc, "templateDataUrl");
+                // if (templateDataUrl == "") { templateDataUrl = OA_DOOR.templateDataUrl; }
+                // $.ajax({
+                //     url: templateDataUrl,
+                //     async: false,
+                //     method: "post",
+                //     dataType: 'json',
+                //     success: function (res) {
+                //         _this.templates = res;
+                //         console.log("模板列表数据：" + JSON.stringify(res));
+                //     },
+                //     error: function (res) {
+                //         alert("获取响应失败");
+                //         _this.templates = {}
+                //     }
+                // });
+
+                //本地静态列表
+                this.templates=[{
+                    tempName:'模板',
+                    tempId:1
+                }]
             }
         },
         mounted: function () {
