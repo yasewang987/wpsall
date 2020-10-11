@@ -505,7 +505,8 @@ _wps['exitWPS'] = {
 function getDocStatus() {
     _WpsInvoke([{
         "GetDocStatus": {}
-    }])
+    }],
+    false)
 }
 
 _wps['getDocStatus'] = {
