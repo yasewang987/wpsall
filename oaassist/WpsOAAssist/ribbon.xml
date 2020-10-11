@@ -68,6 +68,7 @@
                 </group>
                 <group id="grpNotice" label="通知消息" getVisible="OnGetVisible">
                     <button id="btnSendMessage" label="给业务系统前端发送消息" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                    <button id="btnAddWebShape" label="插入活动对象" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                 </group>
             </tab>
         </tabs>
@@ -102,10 +103,10 @@
         <command idMso="ReviewRejectChangeMenu" getEnabled="OnGetEnabled"/>
         <command idMso="ReviewAcceptChangeMenu" getEnabled="OnGetEnabled"/>
         <!--文档新建控制-->
-        <command idMso="FileNewMenu" getEnabled="OnGetEnabled"/>
-        <command idMso="FileNew" getEnabled="OnGetEnabled"/>
-        <command idMso="WindowNew" getEnabled="OnGetEnabled"/>
-        <command idMso="FileNewBlankDocument" getEnabled="OnGetEnabled"/>
+        <command idMso="FileNewMenu" getEnabled="OnGetEnabled" onAction="OnAction"/>
+        <command idMso="FileNew" getEnabled="OnGetEnabled" onAction="OnAction"/>
+        <command idMso="WindowNew" getEnabled="OnGetEnabled" onAction="OnAction"/>
+        <command idMso="FileNewBlankDocument" getEnabled="OnGetEnabled" onAction="OnAction"/>
     </commands>
     <contextMenus>
         <contextMenu idMso="ContextMenuText">

@@ -6,7 +6,7 @@
 
 var bUseHttps = false;
 
-function _WpsInvoke(funcs, jsPluginsXml) {
+function _WpsInvoke(funcs, front, jsPluginsXml) {
     var info = {};
     info.funcs = funcs;    
     var func = bUseHttps ? WpsInvoke.InvokeAsHttps : WpsInvoke.InvokeAsHttp
@@ -27,6 +27,7 @@ function _WpsInvoke(funcs, jsPluginsXml) {
                 showresult(result.response)
             }
         },
+        front,//这个参数是控制着通过页面执行WPS加载项方法，WPS的界面是否在执行时在前台显示
         jsPluginsXml)
 }
 /**
@@ -48,8 +49,6 @@ WpsInvoke.RegWebNotify(WpsInvoke.ClientType.wps, "WpsOAAssist", function (messag
  *
  * @param {*} resultData
  */
-
-
 function showresult(resultData) {
     let json = eval('(' + resultData + ')')
     switch (json.message) {
@@ -77,6 +76,7 @@ function newDoc() {
     _WpsInvoke([{
             "NewDoc": {}
         }],
+        false,
         "http://127.0.0.1:8080/iestart/jsplugins.xml") // NewDoc方法对应于OA助手dispatcher支持的方法名
 }
 
