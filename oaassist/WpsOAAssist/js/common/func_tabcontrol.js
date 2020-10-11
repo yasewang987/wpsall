@@ -1009,6 +1009,15 @@ function OnAction(control) {
                 }
                 break;
             }
+        case "FileNew":
+        case "FileNewMenu":
+        case "WindowNew":
+        case "FileNewBlankDocument":
+            {
+                if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
+                    alert("这是OA文档，将Ctrl+N动作做了禁用")
+                }
+            }
         case "ShowAlert_ContextMenuText":
             {
                 let selectText = wps.WpsApplication().Selection.Text;
@@ -1031,6 +1040,12 @@ function OnAction(control) {
                 msgInfoStr = msgInfoStr.replace(/\"/g,"'")//先用此方法做个应急，202008月版本修复了这个问题
                 wps.OAAssist.WebNotify("我是主动发送的消息， 内容可以自定义。   " + msgInfoStr); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
                 // wps.OAAssist.WebNotify("我是主动发送的消息，内容可以自定义。如果想传一个对象，则使用JSON.stringify方法转成对象字符串。当前时间是："+ currentTime.toLocaleString()); //如果想传一个对象，则使用JSON.stringify方法转成对象字符串。
+                break;
+            }
+        case "btnAddWebShape":
+            {                
+                let l_doc = wps.WpsApplication().ActiveDocument;
+                l_doc.Shapes.AddWebShape("https://www.wps.cn");
                 break;
             }
         default:
@@ -1231,6 +1246,14 @@ function OnGetVisible(control) {
             return true;
         case "btnOpenScan":
             return false;
+        case "btnAddWebShape":
+            {
+                if (wps.WpsApplication().Build.toString().indexOf("11.1") != -1){
+                    return true;
+                }
+                return false;
+            }
+            break;
         default:
 
     }
@@ -1261,6 +1284,11 @@ function OnGetEnabled(control) {
         case "btnChangeToUOT": //保存到UOT格式再上传
         case "btnChangeToOFD": //保存到OFD格式再上传
         case "SaveAll": //保存所有文档
+        //以下四个idMso的控制是关于文档新建的
+        case "FileNew":
+        case "FileNewMenu":
+        case "WindowNew":
+        case "FileNewBlankDocument":
             return OnSetSaveToOAEnable();
         case "btnCloseRevision":
             {
