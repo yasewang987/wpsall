@@ -1047,11 +1047,18 @@ function OnAction(control) {
                 /**
                  * 内部封装了主动响应前端发送的请求的方法
                  */
+                let msgInfo =
+                {
+                     id: 1,
+                     name: 'kingsoft',
+                     since: "1988"
+                }
                 //参数自定义，这里只是负责传递参数，在WpsInvoke.RegWebNotify方法的回调函数中去做接收，自行解析参数
                 
                 let params={
                     type:'executeFunc2',
-                    message:"当前时间为：" + currentTime()
+                    message:"当前时间为：" + currentTime(),
+                    msgInfoStr: JSON.stringify(msgInfo)
                 }
                  /**
                  * WebNotify:
@@ -1323,6 +1330,19 @@ function OnGetEnabled(control) {
             }
         case "PictureInsert":
             return false;
+        case "TabInsert"://WPS自身tab：插入
+        case "TabDeveloper": //WPS自身tab：开发工具
+        // case "TabPageLayoutWord": //WPS自身tab：页面布局
+        // case "TabReferences": //WPS自身tab：引用
+        // case "TabReviewWord": //WPS自身tab：审阅
+        // case "TabView": //WPS自身tab：视图
+            {
+                if(pCheckIfOADoc()){
+                    return false;//如果是OA打开的文档，把这个几个tab不可用/隐藏
+                }else{
+                    return true;
+                }
+            }
         default:
             ;
     }

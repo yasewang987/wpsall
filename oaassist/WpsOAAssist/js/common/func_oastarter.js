@@ -27,6 +27,8 @@ function dispatcher(info) {
         for (var key in func) {                    
             if (key === "GetDocStatus") {
                 return GetDocStatus(func[key])
+            } else if (key === "ExitWPS") {
+                ExitWPS(func[key])
             }
         }
     }
@@ -51,10 +53,6 @@ function dispatcher(info) {
                     InsertRedHead(func[key]);
                 } else if (key === "taskPaneBookMark"){
                     taskPaneBookMark(func[key])
-                } else if (key === "ExitWPS") {
-                    ExitWPS(func[key])
-                } else if (key === "GetDocStatus") {
-                    return GetDocStatus(func[key])
                 } else if (key === "NewOfficialDocument"){
                     return OpenDoc(func[key])
                 }
@@ -86,6 +84,8 @@ function GetDocStatus() {
  * 关闭WPS活动文档并退出WPS进程
  */
 function ExitWPS() {
+    //为了接下来的用户确认操作，先将WPS界面激活显示在最前
+    wps.WpsApplication().Activate();
     let l_doc = wps.WpsApplication().ActiveDocument
     if (l_doc && pCheckIfOADoc()) {//此方法还可根据需要进行扩展
         l_doc.Close();

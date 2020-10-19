@@ -1,7 +1,9 @@
 /**
  * 此方法是根据wps_sdk.js做的调用方法封装
  * 可参照此定义
- * @param {*} funcs     这是在WPS加载项内部定义的方法，采用JSON格式（先方法名，再参数）
+ * @param {*} funcs         这是在WPS加载项内部定义的方法，采用JSON格式（先方法名，再参数）
+ * @param {*} front         控制着通过页面执行WPS加载项方法，WPS的界面是否在执行时在前台显示
+ * @param {*} jsPluginsXml  指定一个新的WPS加载项配置文件的地址
  */
 
 var bUseHttps = false;
@@ -26,7 +28,7 @@ function _WpsInvoke(funcs, front, jsPluginsXml) {
                 showresult(result.response)
             }
         },
-        front,//这个参数是控制着通过页面执行WPS加载项方法，WPS的界面是否在执行时在前台显示
+        front,
         jsPluginsXml)
 }
 /**
@@ -47,7 +49,7 @@ function handleOaMessage(data){
             handleOaFunc1(data.message);
             break;
         case "executeFunc2":
-            handleOaFunc2(data.message);
+            handleOaFunc2(data.message + data.msgInfoStr);
             break;
         default:
             alert(data.messageData)
@@ -57,7 +59,9 @@ function handleOaFunc1(message){
     alert("我是函数handleOaFunc1，我接收到的参数是："+message)
 }
 function handleOaFunc2(message){
-    alert("我是函数handleOaFunc1，我接收到的参数是："+message)
+    alert("我是函数handleOaFunc2，我接收到的参数是："+message)
+    var span = window.parent.document.getElementById("webnotifyspan")
+    span.innerHTML = message
 }
 /**
  * 处理WPS加载项的方法返回值
@@ -91,7 +95,7 @@ function newDoc() {
     _WpsInvoke([{
             "NewDoc": {}
         }],
-        false,
+        true,
         "http://127.0.0.1:8080/iestart/jsplugins.xml") // NewDoc方法对应于OA助手dispatcher支持的方法名
 }
 
@@ -500,7 +504,7 @@ _wps['taskPaneBookMark'] = {
 function exitWPS() {
     _WpsInvoke([{
         "ExitWPS": {}
-    }])
+    }],true)
 }
 
 _wps['exitWPS'] = {
