@@ -1,39 +1,16 @@
-/*
-** Copyright @ 2012-2019, Kingsoft office,All rights reserved.
-** Redistribution and use in source and binary forms, with or without 
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice, 
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright notice,
-**    this list of conditions and the following disclaimer in the documentation
-**    and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its 
-**    contributors may be used to endorse or promote products derived from this
-**    software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-*/
 package com.wps.examples;
 
+import com.wps.api.tree.ex.WindowEx;
 import com.wps.api.tree.kso.*;
 import com.wps.api.tree.kso.events._CommandBarButtonEvents;
 import com.wps.api.tree.wps.*;
 import com.wps.api.tree.wps.ClassFactory;
 import com.wps.api.tree.wps.events.ApplicationEvents4;
+import com.wps.api.tree.wps.KsoOfdServiceProviderType;
 import com.wps.api.tree.ex._ApplicationEx;
 import com.wps.api.tree.ex._DocumentEx;
 import com.wps.runtime.utils.WpsArgs;
+import com.wps.runtime.utils.Platform;
 import com4j.EventCookie;
 import com4j.Holder;
 import com4j.Variant;
@@ -42,13 +19,15 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.awt.WindowIDProvider;
-import sun.awt.X11.XEmbedCanvasPeer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.peer.ComponentPeer;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -82,10 +61,15 @@ public class WpsMainPanel extends JPanel {
         this.add(officePanel, BorderLayout.CENTER);
         initNormalMenu();           //常用接口
         initLocalMenu();            //本地文档相关接口
+        initOFDPDFMenu();           //ofd和pdf相关接口
         initMenu();                 //菜单栏操作接口
+        initRibbon();               // Ribbon风格界面
         initRepairedMenu();         //修订接口
+        initFieldsMenu();           //公文域操作接口
+        initSignMenu();             //手写批注相关接口
         initEventMenu();            //事件监听回调接口
         initOthersMenu();           //其他
+        initFrameListener();        //注册窗口关闭事件处理
     }
 
     public static String getPath(String title, int type){
@@ -107,28 +91,47 @@ public class WpsMainPanel extends JPanel {
                         return;
                     }
                 }
-                WindowIDProvider pid = (WindowIDProvider) client.getPeer();
-                XEmbedCanvasPeer peer = (XEmbedCanvasPeer) pid;
-                peer.removeXEmbedDropTarget();
+
+                long nativeWinId = 0;
                 try {
-                    Method detachChiled = XEmbedCanvasPeer.class.getDeclaredMethod("detachChild");
-                    detachChiled.setAccessible(true);
-                    Method isXEmbedActive = XEmbedCanvasPeer.class.getDeclaredMethod("isXEmbedActive");
-                    isXEmbedActive.setAccessible(true);
-                    Boolean isActive = (Boolean) isXEmbedActive.invoke(peer);
-                    if(isActive){
-                        detachChiled.invoke(peer);
+                    if (Platform.isWindows()) {
+                    	ComponentPeer peer = client.getPeer();
+                    	Class<?> clsCanvasPeer = Class.forName("sun.awt.windows.WComponentPeer");
+                    	Method getHWnd = clsCanvasPeer.getDeclaredMethod("getHWnd");
+                    	getHWnd.setAccessible(true);
+
+                        nativeWinId = (long)getHWnd.invoke(peer);
+                    } else {
+                        WindowIDProvider pid = (WindowIDProvider) client.getPeer();
+
+                        Class<?> clsCanvasPeer = Class.forName("sun.awt.X11.XEmbedCanvasPeer");
+                        Method removeXEmbedDropTarget = clsCanvasPeer.getDeclaredMethod("removeXEmbedDropTarget");
+                        removeXEmbedDropTarget.setAccessible(true);
+                        removeXEmbedDropTarget.invoke(pid);
+
+                        Method detachChiled = clsCanvasPeer.getDeclaredMethod("detachChild");
+                        detachChiled.setAccessible(true);
+                        Method isXEmbedActive = clsCanvasPeer.getDeclaredMethod("isXEmbedActive");
+                        isXEmbedActive.setAccessible(true);
+                        Boolean isActive = (Boolean) isXEmbedActive.invoke(pid);
+                        if(isActive){
+                            detachChiled.invoke(pid);
+                        }
+
+                        nativeWinId = pid.getWindow();
                     }
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException ex) {
                     ex.printStackTrace();
                 }
+
                 WpsArgs args = WpsArgs.ARGS_MAP.get(WpsArgs.App.WPS);
 //              args.setPath("/home/wps/workspace/wps_2016/build_debug/WPSOffice/office6/wps"); //手动指定的wps程序路径（默认调用/usr/bin/wps）
-                args.setWinid(pid.getWindow());
+                args.setWinid(nativeWinId);
                 args.setHeight(client.getHeight());
                 args.setWidth(client.getWidth());
 //                args.setCrypted(false); //wps2016需要关闭加密
                 app = ClassFactory.createApplication();
+                app.put_Visible(true);
             }
         });
 
@@ -270,151 +273,6 @@ public class WpsMainPanel extends JPanel {
             }
         });
 
-        menuPanel.addButton("常用", "设置标题", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Selection selection = app.get_Selection();
-                selection.put_Style("标题 1");
-                selection.TypeText("设置标题");
-            }
-        });
-
-        menuPanel.addButton("常用", "设置字体", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Selection selection = app.get_Selection();
-                selection.get_Font().put_Name("Dotum");
-                selection.TypeText("设置字体为Dotum");
-            }
-        });
-
-        menuPanel.addButton("常用", "设置字体大小", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Selection selection = app.get_Selection();
-                selection.get_Font().put_Size(36);
-                selection.TypeText("设置字体大小为36");
-            }
-        });
-
-        menuPanel.addButton("常用", "添加编号", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Selection selection = app.get_Selection();
-                selection.TypeText("编号一");
-                ListTemplate listT = app.get_ListGalleries().Item(WdListGalleryType.wdNumberGallery).get_ListTemplates().Item(1);
-                selection.get_Range().get_ListFormat().ApplyListTemplate(listT, WdContinue.wdContinueList, WdListApplyTo.wdListApplyToSelection, 262144);
-            }
-        });
-
-        menuPanel.addButton("常用", "插入分页符", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                app.get_Selection().InsertBreak(WdBreakType.wdPageBreak);
-            }
-        });
-
-        menuPanel.addButton("常用", "插入超链接", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String path = getPath("请选择一个文字文件", FileDialog.LOAD);
-                app.get_ActiveDocument().get_Hyperlinks().Add(app.get_Selection().get_Range(), path, "", "", path, "");
-            }
-        });
-
-        menuPanel.addButton("常用", "插入目录", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (int i = 1; i < 4; i++)
-                {
-                    String title = i + "级标题";
-                    String lever = "标题 " + i;
-                    app.get_Selection().TypeText(title);
-                    app.get_Selection().put_Style(lever);
-                    app.get_Selection().TypeParagraph();
-                }
-
-                app.get_Selection().SetRange(0,0);
-                Range rang = app.get_Selection().get_Range();
-
-                boolean UseHeadingStyles = true;
-                long UpperHeadingLevel = 1;
-                long LowerHeadingLevel = 3;
-                app.get_ActiveDocument().get_TablesOfContents().Add(rang, true, UpperHeadingLevel, LowerHeadingLevel,
-                        Variant.getMissing(),
-                        Variant.getMissing(),
-                        Variant.getMissing(),
-                        Variant.getMissing(),
-                        Variant.getMissing(),
-                        Variant.getMissing(),
-                        Variant.getMissing(),
-                        Variant.getMissing()
-                        );
-            }
-        });
-
-        menuPanel.addButton("常用", "插入页眉页脚", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                View view = app.get_ActiveWindow().get_ActivePane().get_View();
-                view.put_SeekView(WdSeekView.wdSeekCurrentPageHeader);
-                app.get_Selection().TypeText("插入页眉");
-
-                view.put_SeekView(WdSeekView.wdSeekCurrentPageFooter);
-                app.get_Selection().TypeText("插入页脚");
-            }
-        });
-        menuPanel.addButton("常用", "打开文档结构图", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                app.get_ActiveWindow().put_DocumentMap(true);
-            }
-        });
-
-        menuPanel.addButton("常用", "分栏", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String text = "君不见黄河之水天上来，奔流到海不复回。" +
-                        "君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽空对月。" +
-                        "天生我材必有用，千金散尽还复来。烹羊宰牛且为乐，会须一饮三百杯。" +
-                        "岑夫子，丹丘生，将进酒，杯莫停。与君歌一曲，请君为我倾耳听。" +
-                        "钟鼓馔玉不足贵，但愿长醉不愿醒。古来圣贤皆寂寞，惟有饮者留其名。" +
-                        "陈王昔时宴平乐，斗酒十千恣欢谑。主人何为言少钱，径须沽取对君酌。" +
-                        "五花马、千金裘，呼儿将出换美酒，与尔同销万古愁。";
-                int textLen = text.length();
-                Selection selection = app.get_Selection();
-                selection.TypeText(text);
-                selection.InsertBreak(3);
-
-                selection.SetRange(0, textLen);
-                TextColumns textColumns = selection.get_Range().get_PageSetup().get_TextColumns();
-                textColumns.SetCount(3);
-                textColumns.put_EvenlySpaced(0);
-            }
-        });
-
-        menuPanel.addButton("常用", "清除格式", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                app.get_Selection().ClearFormatting();
-            }
-        });
-
-        menuPanel.addButton("常用", "旋转图形", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                com.wps.api.tree.wps.Shapes shapes = app.get_ActiveDocument().get_Shapes();
-                int Type = (int)MsoAutoShapeType.msoShapeCan.comEnumValue();
-                float Left = 150;
-                float Top = 122;
-                float Width = 118;
-                float Height = 83;
-                com.wps.api.tree.wps.Shape shape = shapes.AddShape(Type, Left, Top, Width, Height, Variant.getMissing());
-                shape.IncrementRotation(-90);
-            }
-        });
-
-
     }
 
     private  void initLocalMenu(){
@@ -514,6 +372,7 @@ public class WpsMainPanel extends JPanel {
                 formatMap.put("dotm",15);
                 formatMap.put("uof",100);
                 formatMap.put("uot",101);
+                formatMap.put("ofd",102);
                 formatMap.put("pdf",17);
 
                 //需要打开本地文件对话框
@@ -562,6 +421,32 @@ public class WpsMainPanel extends JPanel {
     }
 
     private void initMenu(){
+
+        menuPanel.addButton("菜单栏", "隐藏输出ofd和pdf按钮", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CommandBar commandBar = app.get_CommandBars().get_Item("file");
+                if(commandBar == null){
+                    logger.error("CommandBar is null!");
+                    return ;
+                }
+                CommandBarControl controlPdf = commandBar.get_Controls().get_Item(25);
+                if(controlPdf == null){
+                    logger.error("ControlPdf is null!");
+                    return ;
+                }
+                controlPdf.put_Visible(false);
+
+                CommandBarControl controlOfd = commandBar.get_Controls().get_Item(26);
+                if(controlOfd == null){
+                    logger.error("ControlOfd is null!");
+                    return ;
+                }
+                controlOfd.put_Caption("输出为OFD格式(&G)...");
+                controlOfd.put_Visible(false);
+            }
+        });
+
         menuPanel.addButton("菜单栏", "隐藏文件菜单", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -652,6 +537,45 @@ public class WpsMainPanel extends JPanel {
             }
         });
     }
+
+    private void initOFDPDFMenu(){
+        menuPanel.addButton("ofd和pdf", "本地导出ofd", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((Document)app.get_ActiveDocument()).SaveAs(
+                        getPath("保存", FileDialog.SAVE),
+                        102,            //保存格式， 102-->>ofd
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing(),
+                        Variant.getMissing()
+                );
+            }
+        });
+
+        menuPanel.addButton("ofd和pdf", "ofd厂商设置为Suwell", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_OfdExportOptions().put_SelectServiceProvider(KsoOfdServiceProviderType.KsoOfdServiceProviderSuwell);
+            }
+        });
+        menuPanel.addButton("ofd和pdf", "ofd厂商设置为Foxit", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_OfdExportOptions().put_SelectServiceProvider(KsoOfdServiceProviderType.KsoOfdServiceProviderFoxit);
+            }
+        });
+     }
 
     private void initRepairedMenu(){
         menuPanel.addButton("修订", "开启/关闭修订", new ActionListener() {
@@ -886,6 +810,475 @@ public class WpsMainPanel extends JPanel {
 
     }
 
+    private void initFieldsMenu(){
+
+        menuPanel.addButton("公文域", "插入一个公文域", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // WordBasic接口未支持QueryInterface，只能用Com4jObject表示，然后通过invoke调用函数。
+                // 但java上WordBasic接口定义未列出函数的DispID，尚不能调用
+                // Com4jObject wordBasic = app.get_WordBasic();
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                wordBasic.insertDocumentField("wps1");
+            }
+        });
+
+        menuPanel.addButton("公文域", "插入多个公文域", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                wordBasic.insertMultiDocumentField("份号,密级,保密期限,紧急程度,后缀标志,发文机关名称,发文机关代字,年份,发文顺序号,签发人_1,签发人_2,标题,主送机关,正文,发文机关署名,成文日期,抄送机关_1,抄送机关_2,抄送机关_3,抄送机关_4,抄送机关_5,印发机关,印发日期", "，",",");
+            }
+        });
+
+        menuPanel.addButton("公文域", "设置公文域底纹显示_函数调用", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).put_ShowDocumentFieldTarget(1);
+            }
+        });
+
+        menuPanel.addButton("公文域", "设置公文域底纹隐藏_函数调用", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).put_ShowDocumentFieldTarget(0);
+            }
+        });
+
+        menuPanel.addButton("公文域", "判断公文域底纹状态", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Document pDoc = app.get_ActiveDocument();
+                if(pDoc == null){
+                    logger.error("Document is null");
+                    return ;
+                }
+                _DocumentEx pDocEx = pDoc.queryInterface(_DocumentEx.class);
+                if(pDocEx == null){
+                    logger.error("_DocumentEx is null");
+                    return ;
+                }
+                JOptionPane.showMessageDialog(null,pDocEx.get_ShowDocumentFieldTarget());
+            }
+        });
+
+        menuPanel.addButton("公文域", "获取公文域列表", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                JOptionPane.showMessageDialog(null, wordBasic.getAllDocumentField());
+            }
+        });
+
+        menuPanel.addButton("公文域", "公文域删除", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().get_DocumentFields().Item("wps1").Delete(true);
+            }
+        });
+
+        menuPanel.addButton("公文域", "公文域显示", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().get_DocumentFields().Item("wps1").put_Hidden(false);
+                officePanel.grabFocus();
+            }
+        });
+
+        menuPanel.addButton("公文域", "公文域不显示", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().get_DocumentFields().Item("wps1").put_Hidden(true);
+            }
+        });
+
+        menuPanel.addButton("公文域", "查询公文域内容", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String value = app.get_ActiveDocument().get_DocumentFields().Item("wps1").get_Value();
+                JOptionPane.showMessageDialog(null, "<html><body><p style='width: 200px;'>"+value+"</p></body></html>");
+            }
+        });
+
+        menuPanel.addButton("公文域", "公文域可编辑", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().get_DocumentFields().Item("wps1").put_ReadOnly(false);
+            }
+        });
+
+        menuPanel.addButton("公文域", "公文域不可编辑", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().get_DocumentFields().Item("wps1").put_ReadOnly(true);
+            }
+        });
+
+        menuPanel.addButton("公文域", "公文域插入文档内容", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().get_DocumentFields().Item("wps1").InsertDocument(getPath("请选择一个文字文件", FileDialog.LOAD));
+            }
+        });
+
+        menuPanel.addButton("公文域", "判断公文域是否存在", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(app.get_ActiveDocument().get_DocumentFields().Exists("wps1")){;
+                    JOptionPane.showMessageDialog(null,true);
+                }else{
+                    JOptionPane.showMessageDialog(null,false);
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "删除(backspace)", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_Selection().TypeBackspace();
+            }
+        });
+
+        menuPanel.addButton("公文域", "光标移动到公文域的指定位置", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                wordBasic.cursorToDocumentField("wps1",4);
+            }
+        });
+
+        menuPanel.addButton("公文域", "光标选中指定公文域", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                wordBasic.cursorToDocumentField("wps1",5);
+            }
+        });
+
+        menuPanel.addButton("公文域", "光标位置插入文本", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_Selection().TypeText("Kingsoft");
+            }
+        });
+
+        menuPanel.addButton("公文域", "设置公文标识", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentProperties properties = (DocumentProperties)app.get_ActiveDocument().get_CustomDocumentProperties();
+                DocumentProperty property = properties.get_Item("公文标识",0);
+                if (null == property){
+                    properties.Add("公文标识",false,Variant.getMissing(),"kingsoft",Variant.getMissing(),0);
+                }else{
+                    property.put_Value(0,"kingsoft");
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "获取公文标识", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentProperties properties = (DocumentProperties)app.get_ActiveDocument().get_CustomDocumentProperties();
+                if(properties == null){
+                    logger.error("DocumentProperties is null");
+                    return ;
+                }
+                JOptionPane.showMessageDialog(null,properties.get_Item("公文标识",0).get_Value(0).toString());
+            }
+        });
+
+        menuPanel.addButton("公文域", "设置文种", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentProperties properties = (DocumentProperties)app.get_ActiveDocument().get_CustomDocumentProperties();
+                DocumentProperty property = properties.get_Item("文种",0);
+                if (null == property){
+                    properties.Add("文种",false,Variant.getMissing(),"纪要",Variant.getMissing(),0);
+                }else{
+                    property.put_Value(0,"纪要");
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "获取文种", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentProperties properties = (DocumentProperties)app.get_ActiveDocument().get_CustomDocumentProperties();
+                JOptionPane.showMessageDialog(null,properties.get_Item("文种",0).get_Value(0).toString());
+            }
+        });
+
+        menuPanel.addButton("公文域", "隐藏多个公文域", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentFields fields = app.get_ActiveDocument().get_DocumentFields();
+                if(fields == null){
+                    logger.error("DocumentFields is null");
+                    return ;
+                }
+                String split = ",";
+                String id = "份号,密级,保密期限,紧急程度,后缀标志,发文机关名称,发文机关代字,年份,发文顺序号,签发人_1,签发人_2,标题,主送机关,正文,发文机关署名,成文日期,抄送机关_1,抄送机关_2,抄送机关_3,抄送机关_4,抄送机关_5,印发机关,印发日期";
+                String [] ids = id.split(split);
+                for(int i = 0; i < ids.length; i++){
+                    String name = ids[i];
+                    fields.Item(name).put_Hidden(true);
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "显示多个公文域", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentFields fields = app.get_ActiveDocument().get_DocumentFields();
+                if(fields == null){
+                    logger.error("DocumentFields is null");
+                    return ;
+                }
+                String split = ",";
+                String id = "份号,密级,保密期限,紧急程度,后缀标志,发文机关名称,发文机关代字,年份,发文顺序号,签发人_1,签发人_2,标题,主送机关,正文,发文机关署名,成文日期,抄送机关_1,抄送机关_2,抄送机关_3,抄送机关_4,抄送机关_5,印发机关,印发日期";
+                String [] ids = id.split(split);
+                for(int i = 0; i < ids.length; i++){
+                    String name = ids[i];
+                    fields.Item(name).put_Hidden(false);
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "删除多个公文域", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DocumentFields fields = app.get_ActiveDocument().get_DocumentFields();
+                if(fields == null){
+                    logger.error("DocumentFields is null");
+                    return ;
+                }
+                String split = ",";
+                String id = "份号,密级,保密期限,紧急程度,后缀标志,发文机关名称,发文机关代字,年份,发文顺序号,签发人_1,签发人_2,标题,主送机关,正文,发文机关署名,成文日期,抄送机关_1,抄送机关_2,抄送机关_3,抄送机关_4,抄送机关_5,印发机关,印发日期";
+                String [] ids = id.split(split);
+                for(int i = 0; i < ids.length; i++){
+                    String name = ids[i];
+                    fields.Item(name).Delete(true);
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "修改公文域内容", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                String[] fields = wordBasic.getAllDocumentField().split(",");
+                String names = "";
+                String values = "";
+                for(int i = 0; i < fields.length; i++){
+                    names += fields[i];
+                    if(fields[i].equals("正文")){
+                        values += "正文";
+                    }else{
+                        values += String.valueOf(i+1);
+                    }
+                    if(i != fields.length -1){
+                        names += "@#_*@";
+                        values += "@#_*@";
+                    }
+                }
+                try {
+                    wordBasic.setMultiDocumentField(names, new String(Base64.encodeBase64(values.getBytes("UTF-8")), "UTF-8"), true, "@#_*@");
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        menuPanel.addButton("公文域", "修改公文域内容_除正文", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                WordBasic wordBasic = (WordBasic) app.get_WordBasic();
+                if(wordBasic == null){
+                    logger.error("WordBasic is null");
+                    return ;
+                }
+                String[] fields = wordBasic.getAllDocumentField().split(",");
+                String names = "";
+                String values = "";
+                for(int i = 0; i < fields.length; i++){
+                    if(fields[i].equals("正文")){
+                        continue;
+                    }else{
+                        values += String.valueOf(i+100);
+                    }
+                    names += fields[i];
+                    if(i != fields.length -1){
+                        names += "@#_*@";
+                        values += "@#_*@";
+                    }
+                }
+                try {
+                    wordBasic.setMultiDocumentField(names, new String(Base64.encodeBase64(values.getBytes("UTF-8")), "UTF-8"), true, "@#_*@");
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+    private void initSignMenu(){
+        //手写批签
+        menuPanel.addButton("手写批注", "隐藏手写签批", new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CommandBar commandBar = app.get_CommandBars().get_Item("Reviewing");
+                if(commandBar == null){
+                    logger.error("CommandBar is null");
+                    return ;
+                }
+                commandBar.get_Controls().get_Item(15).put_Visible(false);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "进入手写签批状态", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // windows版本仅2020年11月之后版本才支持EnterInkDraw
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).EnterInkDraw();
+            }
+        });
+
+        menuPanel.addButton("手写批注", "退出手写签批状态", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // windows版本仅2020年11月之后版本才支持ExitInkDraw
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).ExitInkDraw();
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置签批颜色", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // windows版本调用需标注方法 DISPID或VTID
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawColor("#BBFFFF");
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置使用笔", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawStyle(0);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注笔类型_圆珠笔", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawPenStyle(0);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注笔类型_水彩笔", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawPenStyle(1);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注笔类型_荧光笔", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawPenStyle(2);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置使用形状", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawStyle(1);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注形状类型_直线", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawShapeStyle(0);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注形状类型_波浪线", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawShapeStyle(1);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注形状类型_矩形", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawShapeStyle(2);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注磅值_0.25", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawLineStyle(0);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注磅值_4", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawLineStyle(4);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "设置批注磅值_8", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawLineStyle(8);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "进入橡皮擦", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawEraser(true);
+            }
+        });
+
+        menuPanel.addButton("手写批注", "退出橡皮擦", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.get_ActiveDocument().queryInterface(_DocumentEx.class).SetInkDrawEraser(false);
+            }
+        });
+
+    }
+
     private void initEventMenu(){
         //事件监听及回调
         menuPanel.addButton("事件监听及回调", "注册关闭事件", new ActionListener() {
@@ -897,8 +1290,11 @@ public class WpsMainPanel extends JPanel {
                 @Override
                 public void DocumentBeforeClose(Document doc, Holder<Boolean> cancel) {
                     logger.info("调用注册的关闭事件");
-                    JOptionPane.showMessageDialog(null,"关闭事件被拦截");
-                    cancel.value = true;
+                    //! 由于事件可能是在ui线程触发并阻塞等待，在此显示弹框可能会把ui卡住。
+                    if (!Platform.isWindows()) {
+                        JOptionPane.showMessageDialog(null,"关闭事件被拦截");
+                        cancel.value = true;
+                    }
                 }
             });
             }
@@ -987,10 +1383,6 @@ public class WpsMainPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File file = new File(getPath("请选择一个文字文件", FileDialog.LOAD));
-                if(file == null){
-                    logger.error("file not exist");
-                    return ;
-                }
                 JOptionPane.showMessageDialog(null,file.length());
             }
         });
@@ -998,6 +1390,7 @@ public class WpsMainPanel extends JPanel {
         menuPanel.addButton("其他", "开启自动备份", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // windows 版本需2020年11月之后版本才支持
                 app.get_Application().queryInterface(_ApplicationEx.class).put_ForceBackupEnable(true);
             }
         });
@@ -1118,5 +1511,64 @@ public class WpsMainPanel extends JPanel {
             }
         });
 
+    }
+
+    private void initRibbon(){
+
+        menuPanel.addButton("功能区", "隐藏/显示-功能区", new ActionListener() {
+            private boolean visible = false;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // windows企业版要2020年11月以后的版本才支持IWindowEx接口
+                com.wps.api.tree.wps.Window win = app.get_ActiveWindow();
+                WindowEx winEx = win.queryInterface(WindowEx.class);
+                winEx.put_ShowRibbon(visible);
+                visible = !visible;
+            }
+        });
+
+        menuPanel.addButton("功能区", "禁用/启用-剪切按钮", new ActionListener() {
+            private boolean enabled = false;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // windows企业版要2020年11月以后的版本才支持SetEnabledMso函数
+                app.get_CommandBars().SetEnabledMso("Cut", enabled);
+                enabled = !enabled;
+            }
+        });
+
+        menuPanel.addButton("功能区", "隐藏/显示-剪切按钮", new ActionListener() {
+            private boolean visible = false;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // windows企业版要2020年11月以后的版本才支持SetVisibleMso函数
+                app.get_CommandBars().SetVisibleMso("Cut", visible);
+                visible = !visible;
+            }
+        });
+    }
+
+    private void initFrameListener() {
+        if (!Platform.isWindows())
+            return;
+
+        final JPanel thiz = this;
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                JFrame p = (JFrame) SwingUtilities.getWindowAncestor(thiz);
+                p.addWindowListener(new WindowAdapter() {
+
+                    @Override
+                    public void windowClosing(WindowEvent arg0) {
+                        if (app != null) {
+                            logger.info("退出WPS");
+                            app.Quit(Variant.getMissing(), Variant.getMissing(), Variant.getMissing());
+                        }
+                    }
+                });
+            }
+        });
     }
 }

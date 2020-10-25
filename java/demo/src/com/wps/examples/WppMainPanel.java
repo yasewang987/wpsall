@@ -1,39 +1,20 @@
-/*
-** Copyright @ 2012-2019, Kingsoft office,All rights reserved.
-** Redistribution and use in source and binary forms, with or without 
-** modification, are permitted provided that the following conditions are met:
-**
-** 1. Redistributions of source code must retain the above copyright notice, 
-**    this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright notice,
-**    this list of conditions and the following disclaimer in the documentation
-**    and/or other materials provided with the distribution.
-** 3. Neither the name of the copyright holder nor the names of its 
-**    contributors may be used to endorse or promote products derived from this
-**    software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-** POSSIBILITY OF SUCH DAMAGE.
-*/
 package com.wps.examples;
 
+import com.wps.api.tree.ex.DocumentWindowEx;
 import com.wps.api.tree.wpp.*;
 import com.wps.runtime.utils.WpsArgs;
+import com.wps.runtime.utils.Platform;
 import sun.awt.WindowIDProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.peer.ComponentPeer;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Project              :   Java API Examples
@@ -56,25 +37,45 @@ public class WppMainPanel extends JPanel {
         this.add(menuPanel, BorderLayout.WEST);
         this.add(officePanel, BorderLayout.CENTER);
         initMenu();
+        initRibbon();
+        initFrameListener();
     }
 
     private void initMenu(){
         menuPanel.addButton("常用", "初始化", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            Canvas client = officePanel.getCanvas();
-            if (app != null) {
-                JOptionPane.showMessageDialog(client, "已经初始化过，不需要重新初始化！");
-                return;
-            }
-            WindowIDProvider pid = (WindowIDProvider) client.getPeer();
-            WpsArgs args = WpsArgs.ARGS_MAP.get(WpsArgs.App.WPP);
-//            args.setPath("/home/wps/workspace/wps_2016/build_debug/WPSOffice/office6/wpp"); //手动指定的wpp程序路径（默认调用/usr/bin/wpp）
-            args.setWinid(pid.getWindow());
-            args.setHeight(client.getHeight());
-            args.setWidth(client.getWidth());
-//            args.setCrypted(false); //wps2016需要关闭加密
-            app = ClassFactory.createApplication();
+                Canvas client = officePanel.getCanvas();
+                if (app != null) {
+                    JOptionPane.showMessageDialog(client, "已经初始化过，不需要重新初始化！");
+                    return;
+                }
+
+                long nativeWinId = 0;
+                try {
+                    if (Platform.isWindows()) {
+                        ComponentPeer peer = client.getPeer();
+                        Class<?> clsCanvasPeer = Class.forName("sun.awt.windows.WComponentPeer");
+                        Method getHWnd = clsCanvasPeer.getDeclaredMethod("getHWnd");
+                        getHWnd.setAccessible(true);
+
+                        nativeWinId = (long)getHWnd.invoke(peer);
+                    } else {
+                        WindowIDProvider pid = (WindowIDProvider) client.getPeer();
+                        nativeWinId = pid.getWindow();
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException | IllegalArgumentException | InvocationTargetException ex) {
+                    ex.printStackTrace();
+                }
+
+                WpsArgs args = WpsArgs.ARGS_MAP.get(WpsArgs.App.WPP);
+    //            args.setPath("/home/wps/workspace/wps_2016/build_debug/WPSOffice/office6/wpp"); //手动指定的wpp程序路径（默认调用/usr/bin/wpp）
+                args.setWinid(nativeWinId);
+                args.setHeight(client.getHeight());
+                args.setWidth(client.getWidth());
+    //            args.setCrypted(false); //wps2016需要关闭加密
+                app = ClassFactory.createApplication();
+                app.put_Visible(MsoTriState.msoTrue);
             }
         });
 
@@ -100,72 +101,63 @@ public class WppMainPanel extends JPanel {
                 JOptionPane.showMessageDialog(null, version);
             }
         });
+    }
 
-        menuPanel.addButton("常用", "设置幻灯片大小", new ActionListener() {
+
+    private void initRibbon(){
+
+        menuPanel.addButton("功能区", "隐藏/显示-功能区", new ActionListener() {
+            private boolean visible = false;
             @Override
             public void actionPerformed(ActionEvent e) {
-                app.get_ActivePresentation().get_PageSetup().put_SlideSize(PpSlideSizeType.ppSlideSizeOnScreen16x10);
+                // windows企业版要2020年11月以后的版本才支持IWindowEx接口
+                com.wps.api.tree.wpp.DocumentWindow win = app.get_ActiveWindow();
+                DocumentWindowEx winEx = win.queryInterface(DocumentWindowEx.class);
+                winEx.put_ShowRibbon(visible);
+                visible = !visible;
             }
         });
 
-        menuPanel.addButton("常用", "插入文本框", new ActionListener() {
+        menuPanel.addButton("功能区", "禁用/启用-剪切按钮", new ActionListener() {
+            private boolean enabled = false;
             @Override
             public void actionPerformed(ActionEvent e) {
-                float Left = 100;
-                float Top = 100;
-                float Width = 300;
-                float Height = 200;
-                MsoTextOrientation Orientation = MsoTextOrientation.msoTextOrientationHorizontal;
-                com.wps.api.tree.wpp.Shape shape = app.get_ActiveWindow().get_Selection().get_SlideRange().get_Shapes().AddTextbox(Orientation, Left, Top, Width, Height);
-                shape.get_TextFrame().get_TextRange().put_Text("插入文本框");
+                // windows企业版要2020年11月以后的版本才支持SetEnabledMso函数
+                app.get_CommandBars().SetEnabledMso("Cut", enabled);
+                enabled = !enabled;
             }
         });
 
-        menuPanel.addButton("常用", "文本框居中对齐", new ActionListener() {
+        menuPanel.addButton("功能区", "隐藏/显示-剪切按钮", new ActionListener() {
+            private boolean visible = false;
             @Override
             public void actionPerformed(ActionEvent e) {
-                Selection selection = app.get_ActiveWindow().get_Selection();
-                float Left = 100;
-                float Top = 100;
-                float Width = 300;
-                float Height = 200;
-                MsoTextOrientation Orientation = MsoTextOrientation.msoTextOrientationHorizontal;
-                com.wps.api.tree.wpp.Shape shape = selection.get_SlideRange().get_Shapes().AddTextbox(Orientation, Left, Top, Width, Height);
-                TextRange textRange = shape.get_TextFrame().get_TextRange();
-                textRange.put_Text("文本框居中对齐");
-                textRange.Paragraphs(-1, -1).get_ParagraphFormat().put_Alignment(PpParagraphAlignment.ppAlignCenter);
+                // windows企业版要2020年11月以后的版本才支持SetVisibleMso函数
+                app.get_CommandBars().SetVisibleMso("Cut", visible);
+                visible = !visible;
             }
         });
+    }
 
-        menuPanel.addButton("常用", "添加页脚", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    private void initFrameListener() {
+        if (!Platform.isWindows())
+            return;
 
-                HeaderFooter footer = app.get_ActiveWindow().get_Selection().get_SlideRange().get_HeadersFooters().get_Footer();
-                if (footer != null)
-                {
-                    footer.put_Visible(MsoTriState.msoTrue);
-                    footer.put_Text("插入页脚");
-                }
-            }
-        });
+        final JPanel thiz = this;
+        SwingUtilities.invokeLater(new Runnable() {
 
-        menuPanel.addButton("常用", "插入自选图形", new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                float Left = 50;
-                float Top = 50;
-                float Width = 300;
-                float Height = 200;
-                app.get_ActiveWindow().get_Selection().get_SlideRange().get_Shapes().AddShape(MsoAutoShapeType.msoShape5pointStar, Left, Top, Width, Height);
-            }
-        });
-        menuPanel.addButton("常用", "新增节", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SectionProperties SectionProperties = app.get_ActivePresentation().get_SectionProperties();
-                int count = SectionProperties.get_Count() + 1;
-                SectionProperties.AddSection(count,"新增节" + count);
+            public void run() {
+                JFrame p = (JFrame) SwingUtilities.getWindowAncestor(thiz);
+                p.addWindowListener(new WindowAdapter() {
+
+                    @Override
+                    public void windowClosing(WindowEvent arg0) {
+                        if (app != null) {
+                            app.Quit();
+                        }
+                    }
+                });
             }
         });
     }

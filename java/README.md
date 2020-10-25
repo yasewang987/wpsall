@@ -1,4 +1,4 @@
-Notice: Licenses for 'dependencies\api-1.0.jar' can be found in the ‘dependencies\license_for_api-1.0.txt’ file.
+Notice: Licenses for 'dependencies\api-1.1.jar' can be found in the ‘dependencies\license_for_api-1.1.txt’ file.
 
 # WPS JavaAPI 概述 
 ## 基本介绍
@@ -11,7 +11,9 @@ WPS JavaAPI 属于WPS的跨平台二次开发解决方案的一部分，使用 J
 - 标准化集成。API 文档完整，接口设计符合 Java 语法规范，上手难度低，缩短开发周期。
 
 ## 使用场景
-在第三方开发的系统中想要实现一些文档编辑功能，然而自行开发一套文档编辑系统成本非常高也不现实，所以可以直接将wps集成到第三方的系统中，通过调用WPS二次开发接口实现想要的文档编辑功能。
+- 在第三方开发的系统中想要实现一些文档编辑功能，然而自行开发一套文档编辑系统成本非常高也不现实，所以可以直接将WPS集成到第三方的系统中，通过调用WPS二次开发接口实现想要的文档编辑功能。
+
+- 此场景仅适用于将WPS客户端（Windows/Linux）与Java客户端集成，在桌面计算机面向用户使用；**不建议将WPS客户端安装在服务端与业务系统集成，此类场景可集成WPS在线预览/在线编辑服务**
 
 ## Java整合wps二次开发流程介绍
 ### 一、通用说明
@@ -199,3 +201,8 @@ WPS JavaAPI 属于WPS的跨平台二次开发解决方案的一部分，使用 J
 ### 使用eclipse导入
 安装支持二次开发的2019版wps，安装jdk1.7和eclipse, 打开eclipse导入demo工程，运行main函数即可启动界面。
 
+### Windows环境运行时需注意
+- 文字组件（wps）对应的GUID是`000209FF-0000-0000-C000-000000000046`
+- 表格组件（et）对应的GUID是`00024500-0000-0000-C000-000000000046`
+- 演示组件（wpp）对应的GUID是`91493441-5A91-11CF-8700-00AA0060263B`
+- **文字、表格、演示分别与微软的Word、Excel和PowerPoint所用的GUID相同，请确认注册表中相对应的程序值是WPS各组件**

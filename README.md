@@ -9,7 +9,7 @@
 
 ## 如果您想了解现在WPS集成的最佳实践
 
-请参看[WPS产品矩阵集成解决方案-WPS二次开发集成篇V1.1.pptx](https://kdocs.cn/l/cyKkDebda)
+请参看[WPS产品矩阵集成解决方案-WPS二次开发集成篇V1.2.pptx](https://kdocs.cn/l/cyKkDebda)
 
 ## WPS二次开发场景与本仓库代码对应关系
 
@@ -27,7 +27,7 @@
 - [ ] 嵌入浏览器——ActiveX，IE，Windows环境【待入库】
 - [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Windows环境](np-example/browser-integration-wps/README.md)【已入库】
 - [x] [嵌入浏览器——NPAPI，Firefox/360/奇安信，Linux环境](np-example/browser-integration-wps/README.md)【已入库】
-- [x] [嵌入Java客户端——Windows环境](https://kdocs.cn/l/sJyOAdMPn)【待入库】
+- [x] [嵌入Java客户端——Windows环境](java/README.md)【已入库】
 - [x] [嵌入Java客户端——Linux环境](java/README.md)【已入库】
 - [x] [嵌入C++客户端——Windows环境](https://kdocs.cn/l/c7jl7x76T)【待入库】
 - [x] [嵌入C++客户端——Linux环境，QT](cpp/README.md)【已入库】
@@ -47,7 +47,8 @@
 ---
 
 - **联系我们的项目经理获取服务**
-- [ ] WebOffice集成（在线预览、编辑、协同）——私有化部署
+- [ ] WPS在线预览（无损预览、格式转换、文档智能处理）——私有化部署
+- [ ] WebOffice集成（编辑、协同）——私有化部署
 - [ ] WPS云服务（存储、管理、利用）——私有化部署
 - [ ] 安全文档——私有化部署
 
@@ -55,7 +56,6 @@
 
 - **只有WPS移动专业版支持二次开发和集成**
 - [x] [WPS Office移动专业版集成（AIDL）](http://mo.wps.cn/pc-app/office-pro.html)
-- [ ] WPS Office移动预览SDK（仅安卓）
 
 ## 怎么用这个仓库呢？
 
