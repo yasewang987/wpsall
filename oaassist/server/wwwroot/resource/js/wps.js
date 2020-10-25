@@ -683,19 +683,20 @@ window.onload = function () {
             document.getElementById("code").innerText = _wps[this.id].code.toString()
             var onBtnAction = _wps[this.id].action
 
-            document.getElementById("demoBtn").onclick = onBtnAction //IE不支持箭头函数，改为通用写法
-            // document.getElementById("demoBtn").onclick = function () { //IE不支持箭头函数，改为通用写法
-            //     var xhr = new WpsInvoke.CreateXHR();
-            //     xhr.onload = function () {
-            //         onBtnAction()
-            //     }
-            //     xhr.onerror = function () {
-            //         alert("请确认本地服务端(StartupServer.js)是启动状态")
-            //         return
-            //     }
-            //     xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
-            //     xhr.send()
-            // }
+            // document.getElementById("demoBtn").onclick = onBtnAction //IE不支持箭头函数，改为通用写法
+            document.getElementById("demoBtn").onclick = function () { //IE不支持箭头函数，改为通用写法
+                //之下动作是做了对Node服务的判断和oem.ini的设置
+                var xhr = new WpsInvoke.CreateXHR();
+                xhr.onload = function () {
+                    onBtnAction()
+                }
+                xhr.onerror = function () {
+                    alert("请确认本地服务端(StartupServer.js)是启动状态")
+                    return
+                }
+                xhr.open('get', 'http://127.0.0.1:3888/FileList', true)
+                xhr.send()
+            }
 
             hljs.highlightBlock(document.getElementById("code"));
         }
