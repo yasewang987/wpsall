@@ -216,25 +216,27 @@ function currentTime() {
 
     var hh = now.getHours(); //时
     var mm = now.getMinutes(); //分
-
-    var clock = year + "年";
+    var ss = now.getSeconds();
+    var clock = year + "";
 
     if (month < 10)
         clock += "0";
 
-    clock += month + "月";
+    clock += month + "";
 
     if (day < 10)
         clock += "0";
 
-    clock += day + "日";
+    clock += day + "";
 
     if (hh < 10)
         clock += "0";
 
-    clock += hh + ":";
+    clock += hh + "";
     if (mm < 10) clock += '0';
     clock += mm;
+    if (ss < 10) clock += '0';
+    clock += ss;
     return (clock);
 }
 
