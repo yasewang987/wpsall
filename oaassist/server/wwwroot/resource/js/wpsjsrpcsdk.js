@@ -66,11 +66,19 @@
                 if (bFinished)
                     return;
                 bFinished = true;
-                if (options.callback)
-                    options.callback({
-                        status: 2,
-                        message: "请允许浏览器打开WPS Office"
-                    });
+                if (options.callback){
+                    if(options.url.indexOf>=0){
+                        options.callback({
+                            status: 100,
+                            message: "请授权信任https"
+                        });
+                    }else{
+                        options.callback({
+                            status: 2,
+                            message: "请允许浏览器打开WPS Office"
+                        });
+                    }
+                }
                 return;
             }
             var xmlReq = getHttpObj();
@@ -365,32 +373,36 @@
             type: clientType
         }
         var askItem = function () {
-            var xhr = getHttpObj()
-            xhr.onload = function (e) {
-                callback(xhr.responseText)
-                window.setTimeout(askItem, 300)
-            }
-            xhr.onerror = function (e) {
-                window.setTimeout(askItem, 10000)
-            }
-            xhr.ontimeout = function (e) {
-                window.setTimeout(askItem, 10000)
-            }
-            if (IEVersion() < 10) {
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState != 4)
-                        return;
-                    if (xhr.bTimeout) {
-                        return;
-                    }
-                    if (xhr.status === 200)
-                        xhr.onload();
-                    else
-                        xhr.onerror();
+            if(serverVersion == "wait"){
+                var xhr = WpsInvoke.CreateXHR()
+                xhr.onload = function (e) {
+                    callback(xhr.responseText)
+                    window.setTimeout(askItem, 300)
                 }
+                xhr.onerror = function (e) {
+                    window.setTimeout(askItem, 10000)
+                }
+                xhr.ontimeout = function (e) {
+                    window.setTimeout(askItem, 10000)
+                }
+                if (IEVersion() < 10) {
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState != 4)
+                            return;
+                        if (xhr.bTimeout) {
+                            return;
+                        }
+                        if (xhr.status === 200)
+                            xhr.onload();
+                        else
+                            xhr.onerror();
+                    }
+                }
+                xhr.open('POST', 'http://127.0.0.1:58890/askwebnotify', true)
+                xhr.send(JSON.stringify(paramStr))
+            }else{
+                window.setTimeout(askItem, 2000)
             }
-            xhr.open('POST', 'http://127.0.0.1:58890/askwebnotify', true)
-            xhr.send(JSON.stringify(paramStr))
         }
 
         window.setTimeout(askItem, 2000)
@@ -413,7 +425,10 @@
         }
         WpsStartWrapVersionInner(clientType, name, func, paramEx, true, callback);
     }
-
+    function AuthHttpesCert(msg) {
+		if (confirm(msg))
+			window.open("https://localhost:58891/isInstalled", "_top")
+	}
     //从外部浏览器远程调用 WPS 加载项中的方法
     var WpsInvoke = {
         InvokeAsHttp: WpsStartWrapVersion,
@@ -424,7 +439,8 @@
             et: "et",
             wpp: "wpp"
         },
-        CreateXHR: getHttpObj
+        CreateXHR: getHttpObj,
+        AuthHttpesCert:AuthHttpesCert
     }
 
     if (typeof noGlobal === "undefined") {
