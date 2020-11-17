@@ -67,7 +67,7 @@
                     return;
                 bFinished = true;
                 if (options.callback){
-                    if(options.url.indexOf>=0){
+                    if(options.url.indexOf("https")==0){
                         options.callback({
                             status: 100,
                             message: "请授权信任https"
