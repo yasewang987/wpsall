@@ -363,8 +363,8 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
         var l_textEncoding = wps.WpsApplication().Options.DefaultTextEncoding; //默认 936
         var l_Doc = wps.WpsApplication().Documents.Open(l_NewName, false, false, false, "", "", false, "", "", 0, l_textEncoding, false);
 
-        l_Doc.TrackRevision = false; //关闭修订模式
-        l_Doc.ShowRevision = false; //隐含属性，隐藏修订模式
+        l_Doc.TrackRevisions = false; //关闭修订模式
+        l_Doc.ShowRevisions = false; //隐含属性，隐藏修订模式
         l_Doc.AcceptAllRevisions();
         l_Doc.Save();
         handleFileAndUpload(l_suffix, l_Doc, l_uploadPath, l_FieldName);
