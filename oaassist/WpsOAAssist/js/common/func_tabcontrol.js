@@ -1018,6 +1018,7 @@ function OnAction(control) {
                     alert("这是OA文档，将Ctrl+N动作做了禁用")
                 }
             }
+            break
         case "ShowAlert_ContextMenuText":
             {
                 let selectText = wps.WpsApplication().Selection.Text;

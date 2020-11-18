@@ -200,7 +200,7 @@ function onlineEditDoc() {
             "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
             "userName": "东方不败"
         }
-    }]) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
+    }],true) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['onlineEditDoc'] = {
