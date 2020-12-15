@@ -187,18 +187,35 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                 let bookStart = bookmark.Range.Start;
                 let bookEnd = bookmark.Range.End;
                 let start = template.Range().End
-                if (bookmark) {
+                //方案1，直接替换，手动添加书签
+                // if (bookmark) {
+                //     if (!it.type || it.type === "text") {
+                //         bookmark.Range.Text = it.text;
+                //     } else if (it.type === "link") {
+                //         bookmark.Range.InsertFile(it.text);
+                //     } else if (it.type === "pic") {
+                //         bookmark.Range.InlineShapes.AddPicture(it.text);
+                //     }
+                // }
+                // let end = template.Range().End
+                // let range=bookmark.Range;
+                // if (!Bookmarks.Exists(bookmark.Name))
+                //     Bookmarks.Add(bookmark.Name, range.SetRange(bookStart, bookEnd + (end - start)))
+
+                //方案2，不完全替换
+                if(bookmark){
                     if (!it.type || it.type === "text") {
-                        bookmark.Range.Text = it.text;
+                        bookmark.Range.InsertBefore(it.text);
                     } else if (it.type === "link") {
                         bookmark.Range.InsertFile(it.text);
                     } else if (it.type === "pic") {
                         bookmark.Range.InlineShapes.AddPicture(it.text);
                     }
                 }
-                let end = template.Range().End
-                if (!Bookmarks.Exists(bookmark.Name))
-                    Bookmarks.Add(bookmark.Name, bookmark.Range.SetRange(bookStart, bookEnd + (end - start)))
+                var selection=wps.WpsApplication().ActiveWindow.Selection;
+                selection.Start=bookmark.Range.End-(bookEnd-bookStart);
+                selection.End=bookmark.Range.End;
+                selection.Cut()
             })
         }
     });

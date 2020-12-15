@@ -311,7 +311,20 @@ function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
     //默认设置为以当前文件的显示模式输出，即当前为修订则输出带有修订痕迹的
     pDoChangeToOtherDocFormat(l_doc, l_suffix, pShowPrompt, true);
 }
-
+/**
+ * 作用：获取一个有效的临时文档路径，用于保存转换格式后的文档
+ * @param {*} doc 
+ */
+function getDocSavePath(doc) {
+    if (!doc) {
+        return;
+    }
+    if (doc.Path == "") { //对于不落地文档，文档路径为空
+        return wps.Env.GetTempPath()+"/";
+    } else {
+        return doc.Path
+    }
+}
 /**
  * 作用：把当前文档输出为另外的格式保存
  * @param {*} p_Doc 文档对象
@@ -352,9 +365,9 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
         var l_SourceName = p_Doc.FullName;
         var l_NewName="";
         if(p_Doc.Path.indexOf("\\")>0){
-            l_NewName = p_Doc.Path + "\\B_" + p_Doc.Name;
+            l_NewName = getDocSavePath(p_Doc) + "\\B_" + p_Doc.Name;
         }else{
-            l_NewName = p_Doc.Path + "/B_" + p_Doc.Name;
+            l_NewName = getDocSavePath(p_Doc) + "/B_" + p_Doc.Name;
         }
         p_Doc.SaveAs2($FileName = l_NewName, $AddToRecentFiles = false);
         p_Doc.SaveAs2($FileName = l_SourceName, $AddToRecentFiles = false);

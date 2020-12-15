@@ -426,7 +426,7 @@
     }
     function AuthHttpesCert(msg) {
 		if (confirm(msg))
-			window.open("https://localhost:58891/isInstalled", "_top")
+			window.open("https://localhost:58891/version")
 	}
     //从外部浏览器远程调用 WPS 加载项中的方法
     var WpsInvoke = {
