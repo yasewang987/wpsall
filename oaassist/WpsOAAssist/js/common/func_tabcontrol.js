@@ -320,7 +320,7 @@ function getDocSavePath(doc) {
         return;
     }
     if (doc.Path == "") { //对于不落地文档，文档路径为空
-        return wps.Env.GetTempPath()+"/";
+        return wps.Env.GetTempPath();
     } else {
         return doc.Path
     }
@@ -364,10 +364,11 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
     if (p_ShowRevision == false) { // 强制关闭痕迹显示
         var l_SourceName = p_Doc.FullName;
         var l_NewName="";
-        if(p_Doc.Path.indexOf("\\")>0){
-            l_NewName = getDocSavePath(p_Doc) + "\\B_" + p_Doc.Name;
+        var docPath=getDocSavePath(p_Doc);
+        if(docPath.indexOf("\\")>0){
+            l_NewName = docPath + "\\B_" + p_Doc.Name;
         }else{
-            l_NewName = getDocSavePath(p_Doc) + "/B_" + p_Doc.Name;
+            l_NewName = docPath + "/B_" + p_Doc.Name;
         }
         p_Doc.SaveAs2($FileName = l_NewName, $AddToRecentFiles = false);
         p_Doc.SaveAs2($FileName = l_SourceName, $AddToRecentFiles = false);
