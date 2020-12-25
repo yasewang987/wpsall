@@ -1009,8 +1009,8 @@ function OnAction(control) {
         case "btnImportTemplate": //导入模板
             OnImportTemplate();
             break;
-        // case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
-        // case "FileSaveAs":
+        case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
+        case "FileSaveAs":
         case "FileSave": //通过idMso进行「保存」功能的自定义
             {
                 if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
