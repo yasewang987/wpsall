@@ -1,5 +1,13 @@
 ## Welcome to WPS OAAssist Demo
 
+### 使用此demo的步骤(以windows平台wps为例):
+
+* 进入server目录下
+* npm install //安装相应依赖
+* node StartupServer //启动demo
+
+参考本Demo目录下的「WPS加载项快速上手说明.pdf
+
 ### 这个项目是什么？
 
 这个工程主要提供常见的OA助手的场景示例来演示网页端启动WPS客户端并和WPS加载项交互WPS API的功能，方便大家能够快速理解并熟悉WPS加载项机制以及和浏览器调用交互的流程。
@@ -19,6 +27,3 @@
 * 为了保护代码，建议代码上线前进行混淆
 * 使用该工程的时候，必须要安装WPS专业版，请咨询QQ：3253920855
 
-### 使用此demo的步骤(以windows平台wps为例):
-
-参考本Demo目录下的「WPS加载项快速上手说明.pdf

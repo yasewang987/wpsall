@@ -312,7 +312,7 @@ function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
     pDoChangeToOtherDocFormat(l_doc, l_suffix, pShowPrompt, true);
 }
 /**
- * 作用：获取一个有效的临时文档路径，用于保存转换格式后的文档
+ * 作用：获取文档的Path或者临时文件路径
  * @param {*} doc 
  */
 function getDocSavePath(doc) {
