@@ -255,7 +255,16 @@ function OnOpenOnLineDocSuccess(resp) {
 /**
  *  打开在线不落地文档出现失败时，给予错误提示
  */
-function OnOpenOnLineDocDownFail() {
+function OnOpenOnLineDocDownFail(res) {
+    var err={}
+    try{
+        res=JSON.parse(res)
+        err.Body=Base64.decode(res.Body)
+        err.Headers=Base64.decode(JSON.stringify(res.Headers))
+        console.log(err)
+    }catch(err){
+
+    }
     alert("打开在线不落地文档失败！请尝试重新打开。");
     return;
 }

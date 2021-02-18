@@ -69,7 +69,6 @@ function AddDocumentEvent() {
     console.log("AddDocumentEvent");
 }
 
-
 /**
  * 打开插入书签页面
  */

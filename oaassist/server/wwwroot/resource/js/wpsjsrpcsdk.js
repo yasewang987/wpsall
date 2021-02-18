@@ -1,4 +1,4 @@
-﻿(function (global, factory) {
+(function (global, factory) {
 
     "use strict";
 
@@ -66,19 +66,11 @@
                 if (bFinished)
                     return;
                 bFinished = true;
-                if (options.callback){
-                    if(options.url.indexOf("https")==0){
-                        options.callback({
-                            status: 100,
-                            message: "请授权信任https"
-                        });
-                    }else{
-                        options.callback({
-                            status: 2,
-                            message: "请允许浏览器打开WPS Office"
-                        });
-                    }
-                }
+                if (options.callback)
+                    options.callback({
+                        status: 2,
+                        message: "请允许浏览器打开WPS Office"
+                    });
                 return;
             }
             var xmlReq = getHttpObj();
@@ -217,12 +209,12 @@
         }
     }
 
-    function WpsStart(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
+    function WpsStart(options) {
         var startInfo = {
-            "name": name,
-            "function": func,
-            "info": param.param,
-            "jsPluginsXml": param.jsPluginsXml
+            "name": options.name,
+            "function": options.func,
+            "info": options.param.param,
+            "jsPluginsXml": options.param.jsPluginsXml
         };
         var strData = JSON.stringify(startInfo);
         if (IEVersion() < 10) {
@@ -234,30 +226,34 @@
         }
 
         var baseData = encode(strData);
-        var url = "http://127.0.0.1:58890/" + clientType + "/runParams";
-        if (useHttps)
-            url = "https://127.0.0.1:58891/" + clientType + "/runParams";
-        var data = "ksowebstartup" + clientType + "://" + baseData;
+        var url = options.urlBase + "/" + options.clientType + "/runParams";
+        var data = "ksowebstartup" + options.clientType + "://" + baseData;
         startWps({
             url: url,
             sendData: data,
-            callback: callback,
-            tryCount: tryCount,
-            bPop: bPop,
+            callback: options.callback,
+            tryCount: options.tryCount,
+            bPop: options.bPop,
             timeout: 5000,
-            concurrent: false
+            concurrent: false,
+            client: options.wpsclient
         });
     }
 
-    function WpsStartWrap(clientType, name, func, param, callback) {
-        WpsStart(clientType, name, func, param, false, callback, 4, true)
+    function WpsStartWrap(options) {
+        WpsStart({
+            clientType: options.clientType,
+            name: options.name,
+            func: options.func,
+            param: options.param,
+            urlBase: options.urlBase,
+            callback: options.callback,
+            tryCount: 4,
+            bPop: true,
+            wpsclient: options.wpsclient,
+        })
     }
 
-    function WpsStartWrapHttps(clientType, name, func, param, callback) {
-        WpsStart(clientType, name, func, param, true, callback, 4, true)
-    }
-
-    var exId = 0;
     /**
      * 支持浏览器触发，WPS有返回值的启动
      *
@@ -265,29 +261,32 @@
      * @param {*} name			WPS加载项名称
      * @param {*} func			WPS加载项入口方法
      * @param {*} param			参数：包括WPS加载项内部定义的方法，参数等
-     * @param {*} useHttps		是否使用https协议
      * @param {*} callback		回调函数
      * @param {*} tryCount		重试次数
      * @param {*} bPop			是否弹出浏览器提示对话框
      */
-    function WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, tryCount, bPop) {
-        var rspUrl = "http://127.0.0.1:58890/transferEcho/runParams";
-        if (useHttps)
-            rspUrl = "https://127.0.0.1:58891/transferEcho/runParams";
-        var time = new Date();
-        var cmdId = "js" + time.getTime() + "_" + exId;
-        var infocontent = JSON.stringify(param.param);
-        var funcEx = "var res = " + func;
-        var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));" //res 为func执行返回值
-        var infoEx = infocontent + ");" + cbCode + "void(0";
-        //固定格式，无需修改
+    var exId = 0;
+    function WpsStartWrapExInner(options) {
+        var infocontent = options.param.param;
+        if (!options.wpsclient) {
+            infocontent = JSON.stringify(options.param.param);
+            var rspUrl = options.urlBase + "/transferEcho/runParams";
+            var time = new Date();
+            var cmdId = "js" + time.getTime() + "_" + exId;
+            var funcEx = "var res = " + options.func;
+            var cbCode = "var xhr = new XMLHttpRequest();xhr.open('POST', '" + rspUrl + "');xhr.send(JSON.stringify({id: '" + cmdId + "', response: res}));" //res 为func执行返回值
+            var infoEx = infocontent + ");" + cbCode + "void(0";
+            options.func = funcEx;
+            infocontent = infoEx;
+        }
         var startInfo = {
-            "name": name,
-            "function": funcEx,
-            "info": infoEx,
-			"showToFront": param.showToFront,
-            "jsPluginsXml": param.jsPluginsXml
+            "name": options.name,
+            "function": options.func,
+            "info": infocontent,
+            "showToFront": options.param.showToFront,
+            "jsPluginsXml": options.param.jsPluginsXml,
         };
+
         var strData = JSON.stringify(startInfo);
         if (IEVersion() < 10) {
             try {
@@ -298,141 +297,211 @@
         }
 
         var baseData = encode(strData);
-        var url = "http://127.0.0.1:58890/transfer/runParams";
-        if (useHttps)
-            url = "https://127.0.0.1:58891/transfer/runParams";
-        var data = "ksowebstartup" + clientType + "://" + baseData;
-        var wrapper = {
-            id: cmdId,
-            app: clientType,
-            data: data
-        };
+        var wrapper;
+
+        if (!options.wpsclient) {
+            var url = options.urlBase + "/transfer/runParams";
+            var data = "ksowebstartup" + options.clientType + "://" + baseData;
+            wrapper = {
+                id: cmdId,
+                app: options.clientType,
+                data: data
+            };
+        }
+        else {
+            var url = options.urlBase + "/transferEx/runParams";
+            wrapper = {
+                id: options.wpsclient.clientId,
+                app: options.clientType,
+                data: baseData,
+                mode: options.wpsclient.silentMode ? "true" : "false"
+            };
+        }
         wrapper = JSON.stringify(wrapper);
         startWps({
             url: url,
             sendData: wrapper,
-            callback: callback,
-            tryCount: tryCount,
-            bPop: bPop,
+            callback: options.callback,
+            tryCount: options.tryCount,
+            bPop: options.bPop,
             timeout: 0,
-            concurrent: true
+            concurrent: options.concurrent,
+            client: options.wpsclient
         });
     }
 
     var serverVersion = "wait"
-
-    function WpsStartWrapVersionInner(clientType, name, func, param, useHttps, callback) {
+    var cloudSvrStart = true;
+    function WpsStartWrapVersionInner(options) {
         if (serverVersion == "wait") {
-            var url = "http://127.0.0.1:58890/version";
-            if (useHttps)
-                url = "https://127.0.0.1:58891/version";
+            if (cloudSvrStart == false) {
+                window.location.href = "ksoWPSCloudSvr://start=RelayHttpServer" //是否启动wps弹框
+            }
             startWps({
-                url: url,
+                url: options.urlBase + '/version',
                 data: "",
                 callback: function (res) {
                     if (res.status !== 0) {
-                        callback(res)
+                        options.callback(res)
                         return;
                     }
                     serverVersion = res.response;
+                    cloudSvrStart = true;
+                    options.tryCount = 1
+                    options.bPop = false
                     if (serverVersion === "") {
-                        WpsStart(clientType, name, func, param, useHttps, callback, 1, false);
+                        WpsStart(options)
+                    } else if (serverVersion < "1.0.1" && options.wpsclient) {
+                        if (options.callback) {
+                            options.callback({
+                                status: 4,
+                                message: "当前客户端不支持，请升级客户端"
+                            })
+                        }
                     } else {
-                        WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, false);
+                        WpsStartWrapExInner(options);
                     }
                 },
                 tryCount: 4,
                 bPop: true,
-                timeout: 5000
+                timeout: 5000,
+                concurrent: options.concurrent
             });
         } else {
             if (serverVersion === "") {
-                WpsStartWrap(clientType, name, func, param, useHttps, callback);
+                WpsStartWrap(options)
+            } else if (serverVersion < "1.0.1" && options.wpsclient) {
+                if (options.callback) {
+                    options.callback({
+                        status: 4,
+                        message: "当前客户端不支持，请升级客户端"
+                    })
+                }
             } else {
-                WpsStartWrapExInner(clientType, name, func, param, useHttps, callback, 1, true);
+                WpsStartWrapExInner(options);
             }
         }
     }
 
-    var RegWebNotifyID = null
+    var RegWebNotifyMap = { wps: {}, wpp: {}, et: {} }
+    var bWebNotifyUseTimeout = true
+    function WebNotifyUseTimeout(value) {
+        bWebNotifyUseTimeout = value ? true : false
+    }
     /**
      * 注册一个前端页面接收WPS传来消息的方法
      * @param {*} clientType wps | et | wpp
      * @param {*} name WPS加载项的名称
      * @param {*} callback 回调函数
      */
-    function RegWebNotify(clientType, name, callback) {
-        if (RegWebNotifyID) {
-            return
+    function RegWebNotify(clientType, name, callback, wpsclient) {
+        if (clientType != "wps" && clientType != "wpp" && clientType != "et")
+            return;
+        var paramStr = {}
+        if (wpsclient) {
+            if (wpsclient.notifyRegsitered == true) {
+                return
+            }
+            wpsclient.notifyRegsitered = true;
+            paramStr = {
+                clientId: wpsclient.clientId,
+                name: name,
+                type: clientType
+            }
+        }
+        else {
+            if (typeof callback != 'function')
+                return
+            if (RegWebNotifyMap[clientType][name]) {
+                RegWebNotifyMap[clientType][name] = callback;
+                return
+            }
+            var RegWebNotifyID = new Date().valueOf() + ''
+            paramStr = {
+                id: RegWebNotifyID,
+                name: name,
+                type: clientType
+            }
+            RegWebNotifyMap[clientType][name] = callback
         }
 
-        RegWebNotifyID = new Date().valueOf() + ''
-        var paramStr = {
-            id: RegWebNotifyID,
-            name: name,
-            type: clientType
-        }
         var askItem = function () {
-            if(serverVersion == "wait"){
-                var xhr = WpsInvoke.CreateXHR()
-                xhr.onload = function (e) {
-                    callback(xhr.responseText)
-                    window.setTimeout(askItem, 300)
+            var xhr = getHttpObj()
+            xhr.onload = function (e) {
+                if (xhr.responseText == "WPSInnerMessage_quit") {
+                    return;
                 }
-                xhr.onerror = function (e) {
-                    window.setTimeout(askItem, 10000)
+                if (wpsclient) {
+                    wpsclient.OnRegWebNotify(xhr.responseText)
+                } else {
+                    var func = RegWebNotifyMap[clientType][name]
+                    func(xhr.responseText)
                 }
-                xhr.ontimeout = function (e) {
-                    window.setTimeout(askItem, 10000)
-                }
-                if (IEVersion() < 10) {
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState != 4)
-                            return;
-                        if (xhr.bTimeout) {
-                            return;
-                        }
-                        if (xhr.status === 200)
-                            xhr.onload();
-                        else
-                            xhr.onerror();
-                    }
-                }
-                xhr.open('POST', 'http://127.0.0.1:58890/askwebnotify', true)
-                xhr.send(JSON.stringify(paramStr))
-            }else{
-                window.setTimeout(askItem, 2000)
+                window.setTimeout(askItem, 300)
             }
+            xhr.onerror = function (e) {
+                if (bWebNotifyUseTimeout)
+                    window.setTimeout(askItem, 1000)
+                else
+                    window.setTimeout(askItem, 10000)
+            }
+            xhr.ontimeout = function (e) {
+                if (bWebNotifyUseTimeout)
+                    window.setTimeout(askItem, 300)
+                else
+                    window.setTimeout(askItem, 10000)
+            }
+            if (IEVersion() < 10) {
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState != 4)
+                        return;
+                    if (xhr.bTimeout) {
+                        return;
+                    }
+                    if (xhr.status === 200)
+                        xhr.onload();
+                    else
+                        xhr.onerror();
+                }
+            }
+            xhr.open('POST', GetUrlBase() + '/askwebnotify', true)
+            if (bWebNotifyUseTimeout)
+                xhr.timeout = 2000;
+            xhr.send(JSON.stringify(paramStr))
         }
 
         window.setTimeout(askItem, 2000)
     }
 
-    function WpsStartWrapVersion(clientType, name, func, param, callback, showToFront, jsPluginsXml) {
-        let paramEx = {
-            jsPluginsXml: jsPluginsXml ? jsPluginsXml : "",
-			showToFront: typeof(showToFront) == 'boolean' ? showToFront : true,
-            param: (typeof (param) == 'object' ? param : JSON.parse(param))
-        }
-        WpsStartWrapVersionInner(clientType, name, func, paramEx, false, callback);
+    function GetUrlBase() {
+        if (location.protocol == "http:")
+            return "http://127.0.0.1:58890"
+        return "https://127.0.0.1:58891"
     }
 
-    function WpsStartWrapHttpsVersion(clientType, name, func, param, callback, showToFront, jsPluginsXml) {
-        let paramEx = {
+    function WpsStartWrapVersion(clientType, name, func, param, callback, showToFront, jsPluginsXml) {
+        var paramEx = {
             jsPluginsXml: jsPluginsXml ? jsPluginsXml : "",
-			showToFront: typeof(showToFront) == 'boolean' ? showToFront : true,
+            showToFront: typeof (showToFront) == 'boolean' ? showToFront : true,
             param: (typeof (param) == 'object' ? param : JSON.parse(param))
         }
-        WpsStartWrapVersionInner(clientType, name, func, paramEx, true, callback);
+        var options = {
+            clientType: clientType,
+            name: name,
+            func: func,
+            param: paramEx,
+            urlBase: GetUrlBase(),
+            callback: callback,
+            wpsclient: undefined,
+            concurrent: true
+        }
+        WpsStartWrapVersionInner(options);
     }
-    function AuthHttpesCert(msg) {
-		if (confirm(msg))
-			window.open("https://localhost:58891/isInstalled", "_top")
-	}
+
     //从外部浏览器远程调用 WPS 加载项中的方法
     var WpsInvoke = {
         InvokeAsHttp: WpsStartWrapVersion,
-        InvokeAsHttps: WpsStartWrapHttpsVersion,
+        InvokeAsHttps: WpsStartWrapVersion,
         RegWebNotify: RegWebNotify,
         ClientType: {
             wps: "wps",
@@ -440,17 +509,335 @@
             wpp: "wpp"
         },
         CreateXHR: getHttpObj,
-        AuthHttpesCert:AuthHttpesCert
+        IsClientRunning: IsClientRunning
+    }
+
+    window.wpsclients = [];
+    /**
+     * @constructor WpsClient           wps客户端
+     * @param {string} clientType       必传参数，加载项类型，有效值为"wps","wpp","et"；分别表示文字，演示，电子表格
+     */
+    function WpsClient(clientType) {
+        /**
+         * 设置RegWebNotify的回调函数，加载项给业务端发消息通过该函数
+         * @memberof WpsClient
+         * @member onMessage
+         */
+        this.onMessage;
+
+        /**
+         * 设置加载项路径
+         * @memberof WpsClient
+         * @member jsPluginsXml
+         */
+        this.jsPluginsXml;
+
+        /**
+         * 内部成员，外部无需调用
+         */
+        this.notifyRegsitered = false;
+        this.clientId = "";
+        this.concurrent = false;
+        this.clientType = clientType;
+        this.firstRequest = true;
+
+        /**
+         * 内部函数，外部无需调用
+         * @param {*} options 
+         */
+        this.initWpsClient = function (options) {
+            options.clientType = this.clientType
+            options.wpsclient = this
+            options.concurrent = this.firstRequest ? true : this.concurrent
+            this.firstRequest = false;
+            WpsStartWrapVersionInner(options)
+        }
+
+        /**
+         * 以http启动
+         * @param {string} name              加载项名称
+         * @param {string} func              要调用的加载项中的函数行
+         * @param {string} param             在加载项中执行函数func要传递的数据
+         * @param {function({int, string})} callback        回调函数，status = 0 表示成功，失败请查看message信息
+         * @param {bool} showToFront         设置wps是否显示到前面来
+         * @return {string}                  "Failed to send message to WPS." 发送消息失败，客户端已关闭；
+         *                                   "WPS Addon is not response." 加载项阻塞，函数执行失败
+         */
+        this.InvokeAsHttp = function (name, func, param, callback, showToFront) {
+            function clientCallback(res) {
+                //this不是WpsClient
+                if (res.status !== 0 || serverVersion < "1.0.1") {
+                    if (callback) callback(res);
+                    return;
+                }
+                var resObject = JSON.parse(res.response);
+                if (this.client.clientId == "") {
+                    this.client.clientId = resObject.clientId;
+                }
+                this.client.concurrent = true;
+                if (typeof resObject.data == "object")
+                    res.response = JSON.stringify(resObject.data);
+                else
+                    res.response = resObject.data;
+                if (IEVersion() < 10)
+                    eval(" res.response = '" + res.response + "';");
+                if (callback)
+                    callback(res);
+                this.client.RegWebNotify(name);
+            }
+            var paramEx = {
+                jsPluginsXml: this.jsPluginsXml ? this.jsPluginsXml : "",
+                showToFront: typeof (showToFront) == 'boolean' ? showToFront : true,
+                param: (typeof (param) == 'object' ? param : JSON.parse(param))
+            }
+            this.initWpsClient({
+                name: name,
+                func: func,
+                param: paramEx,
+                urlBase: GetUrlBase(),
+                callback: clientCallback
+            })
+        }
+
+        /**
+         * 以https启动
+         * @param {string} name              加载项名称
+         * @param {string} func              要调用的加载项中的函数行
+         * @param {string} param             在加载项中执行函数func要传递的数据
+         * @param {function({int, string})} callback        回调函数，status = 0 表示成功，失败请查看message信息
+         * @param {bool} showToFront         设置wps是否显示到前面来
+         */
+        this.InvokeAsHttps = function (name, func, param, callback, showToFront) {
+            var paramEx = {
+                jsPluginsXml: this.jsPluginsXml ? this.jsPluginsXml : "",
+                showToFront: typeof (showToFront) == 'boolean' ? showToFront : true,
+                param: (typeof (param) == 'object' ? param : JSON.parse(param))
+            }
+            this.initWpsClient({
+                name: name,
+                func: func,
+                param: paramEx,
+                urlBase: GetUrlBase(),
+                callback: callback
+            })
+        }
+
+        /**
+         * 内部函数，外部无需调用
+         * @param {*} name 
+         */
+        this.RegWebNotify = function (name) {
+            RegWebNotify(this.clientType, name, null, this);
+        }
+
+        this.OnRegWebNotify = function (message) {
+            if (this.onMessage)
+                this.onMessage(message)
+        }
+
+        /**
+         * 以静默模式启动客户端
+         * @param {string} name                 必传参数，加载项名称
+         * @param {function({int, string})} [callback]         回调函数，status = 0 表示成功，失败请查看message信息
+         */
+        this.StartWpsInSilentMode = function (name, callback) {
+            function initCallback(res) {
+                //this不是WpsClient
+                if (res.status !== 0 || serverVersion < "1.0.1") {
+                    if (callback) callback(res);
+                    return;
+                }
+                if (this.client.clientId == "") {
+                    this.client.clientId = JSON.parse(res.response).clientId;
+                    window.wpsclients[window.wpsclients.length] = { name: name, client: this.client };
+                }
+                res.response = JSON.stringify(JSON.parse(res.response).data);
+                this.client.concurrent = true;
+                if (callback) {
+                    callback(res);
+                }
+                this.client.RegWebNotify(name);
+            }
+            var paramEx = {
+                jsPluginsXml: this.jsPluginsXml,
+                showToFront: false,
+                param: { status: "InitInSilentMode" }
+            }
+            this.silentMode = true;
+            this.initWpsClient({
+                name: name,
+                func: "",
+                param: paramEx,
+                urlBase: GetUrlBase(),
+                callback: initCallback
+            })
+        }
+
+        /**
+         * 显示客户端到最前面
+         * @param {string} name             必传参数，加载项名称
+         * @param {function({int, string})} [callback]     回调函数
+         */
+        this.ShowToFront = function (name, callback) {
+            if (serverVersion < "1.0.1") {
+                if (callback) {
+                    callback({
+                        status: 4,
+                        message: "当前客户端不支持，请升级客户端"
+                    });
+                    return;
+                }
+                return;
+            }
+            if (this.clientId == "") {
+                if (callback) callback({
+                    status: 3,
+                    message: "没有静默启动客户端"
+                });
+                return;
+            }
+            var paramEx = {
+                jsPluginsXml: "",
+                showToFront: true,
+                param: { status: "ShowToFront" }
+            }
+            this.initWpsClient({
+                name: name,
+                func: "",
+                param: paramEx,
+                urlBase: GetUrlBase(),
+                callback: callback
+            })
+        }
+
+        /**
+         * 关闭未显示出来的静默启动客户端
+         * @param {string} name             必传参数，加载项名称
+         * @param {function({int, string})} [callback]     回调函数
+         */
+        this.CloseSilentClient = function (name, callback) {
+            if (serverVersion < "1.0.1") {
+                if (callback) {
+                    callback({
+                        status: 4,
+                        message: "当前客户端不支持，请升级客户端"
+                    });
+                    return;
+                }
+                return;
+            }
+            if (this.clientId == "") {
+                if (callback) callback({
+                    status: 3,
+                    message: "没有静默启动客户端"
+                });
+                return;
+            }
+            var paramEx = {
+                jsPluginsXml: "",
+                showToFront: false,
+                param: undefined
+            }
+            var func;
+            if (this.clientType == "wps")
+                func = "wps.WpsApplication().Quit"
+            else if (this.clientType == "et")
+                func = "wps.EtApplication().Quit"
+            else if (this.clientType == "wpp")
+                func = "wps.WppApplication().Quit"
+
+            function closeSilentClient(res) {
+                if (res.status == 0)
+                    this.client.clientId = ""
+                if (callback) callback(res);
+                return;
+            }
+            this.initWpsClient({
+                name: name,
+                func: func,
+                param: paramEx,
+                urlBase: GetUrlBase(),
+                callback: closeSilentClient
+            })
+        }
+
+        /**
+         * 当前客户端是否在运行，使用WpsClient.IsClientRunning()进行调用
+         * @param {function({int, string})} [callback]      回调函数，"Client is running." 客户端正在运行
+         *                                                  "Client is not running." 客户端没有运行
+         */
+        this.IsClientRunning = function (callback) {
+            if (serverVersion < "1.0.1") {
+                if (callback) {
+                    callback({
+                        status: 4,
+                        message: "当前客户端不支持，请升级客户端"
+                    });
+                    return;
+                }
+                return;
+            }
+            IsClientRunning(this.clientType, callback, this)
+        }
+    }
+
+    function InitSdk() {
+        var url = GetUrlBase() + "/version";
+        startWps({
+            url: url,
+            data: "",
+            callback: function (res) {
+                if (res.status !== 0) {
+                    cloudSvrStart = false;
+                    return;
+                }
+                if (serverVersion == "wait") {
+                    serverVersion = res.response;
+                    cloudSvrStart = true;
+                }
+            },
+            tryCount: 1,
+            bPop: false,
+            timeout: 5000
+        });
     }
 
     if (typeof noGlobal === "undefined") {
         window.WpsInvoke = WpsInvoke;
+        window.WpsClient = WpsClient;
+        window.WebNotifyUseTimeout = WebNotifyUseTimeout;
+        InitSdk();
+    }
+
+    /**
+     * 当前客户端是否在运行，使用WpsInvoke.IsClientRunning()进行调用
+     * @param {string} clientType       加载项类型
+     * @param {function} [callback]      回调函数，"Client is running." 客户端正在运行
+     *                                   "Client is not running." 客户端没有运行
+     */
+    function IsClientRunning(clientType, callback, wpsclient) {
+        var url = GetUrlBase() + "/isRunning";
+        var wrapper = {
+            id: wpsclient == undefined ? undefined : wpsclient.clientId,
+            app: clientType
+        }
+        wrapper = JSON.stringify(wrapper);
+        startWps({
+            url: url,
+            sendData: wrapper,
+            callback: callback,
+            tryCount: 1,
+            bPop: false,
+            timeout: 2000,
+            concurrent: true,
+            client: wpsclient
+        });
     }
 
     function WpsAddonGetAllConfig(callBack) {
         var baseData;
         startWps({
-            url: "http://127.0.0.1:58890/publishlist",
+            url: GetUrlBase() + "/publishlist",
             type: "GET",
             sendData: baseData,
             callback: callBack,
@@ -465,7 +852,7 @@
         var xmlReq = getHttpObj();
         var offline = element.online === "false";
         var url = offline ? element.url : element.url + "ribbon.xml";
-        xmlReq.open("POST", "http://localhost:58890/redirect/runParams");
+        xmlReq.open("POST", GetUrlBase() + "/redirect/runParams");
         xmlReq.onload = function (res) {
             if (offline && !res.target.response.startsWith("7z")) {
                 callBack({ status: 1, msg: "不是有效的7z格式" + url });
@@ -509,7 +896,7 @@
     function WpsAddonHandleEx(element, cmd, callBack) {
         var data = FormatData(element, cmd);
         startWps({
-            url: "http://localhost:58890/deployaddons/runParams",
+            url: GetUrlBase() + "/deployaddons/runParams",
             type: "POST",
             sendData: data,
             callback: callBack,
@@ -535,8 +922,7 @@
             "url": element.url,
             "addonType": element.addonType,
             "online": element.online,
-            "version": element.version,
-            "time":new Date().getTime()
+            "version": element.version
         }
         return FormatSendData(data);
     }
@@ -546,6 +932,13 @@
         if (IEVersion() < 10)
             eval("strData = '" + JSON.stringify(strData) + "';");
         return encode(strData);
+    }
+
+    window.onbeforeunload = function () {
+        for (var i = 0; i < window.wpsclients.length; ++i) {
+            var item = window.wpsclients[i]
+            item.client.CloseSilentClient(item.name)
+        }
     }
 
     //管理 WPS 加载项
@@ -560,5 +953,5 @@
         window.WpsAddonMgr = WpsAddonMgr;
     }
 
-    return { WpsInvoke: WpsInvoke, WpsAddonMgr: WpsAddonMgr, version: "1.0.4" };
+    return { WpsInvoke: WpsInvoke, WpsAddonMgr: WpsAddonMgr, version: "1.0.12" };
 });

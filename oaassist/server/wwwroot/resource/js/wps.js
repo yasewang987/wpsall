@@ -1,3 +1,5 @@
+
+//单进程封装开始
 /**
  * 此方法是根据wps_sdk.js做的调用方法封装
  * 可参照此定义
@@ -43,7 +45,56 @@ function _WpsInvoke(funcs, front, jsPluginsXml) {
  * @param {func} callback 接收到WPS客户端的消息后的回调函数
  */
 WpsInvoke.RegWebNotify(WpsInvoke.ClientType.wps, "WpsOAAssist",handleOaMessage)
+//单进程封装结束
 
+// 多进程封装开始
+// var wpsClient=new WpsClient(WpsInvoke.ClientType.wps);//加载项类型wps,et,wpp
+// function _WpsInvoke(funcs, front, jsPluginsXml) {
+//     var info = {};
+//     info.funcs = funcs;    
+//     wpsClient.jsPluginsXml=jsPluginsXml?jsPluginsXml:"";
+//     if(localStorage.getItem("wpsClientId")){
+//         wpsClient.clientId=localStorage.getItem("wpsClientId")
+//     }
+//     wpsClient.InvokeAsHttp(
+//         "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
+//         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
+//         info, // 传递给插件的数据        
+//         function (result) { // 调用回调，status为0为成功，其他是错误
+//             if(wpsClient.clientId){
+//                 localStorage.setItem("wpsClientId",wpsClient.clientId)
+//             }
+//             if (result.status !== 0){
+//                 alert(result.message)
+//             }else {
+//                 if (result.response == "Failed to send message to WPS.") {
+//                     wpsClient.IsClientRunning(function (status) {
+//                         if (status.response == "Client is running.")
+//                             alert("任务发送失败，WPS 正在执行其他任务，请前往WPS完成当前任务")
+//                         else{
+//                             wpsClient.clientId="";
+//                             wpsClient.notifyRegsitered=false;
+//                             localStorage.setItem("wpsClientId","")
+//                             _WpsInvoke(funcs,front,jsPluginsXml);
+//                         }
+//                     })
+//                 } else {
+//                     console.log(result.response)
+//                 }
+//             }
+//         },
+//         front)
+// }
+// /**
+//  * 该方法封装了发送给WPS客户端的请求，不需要用户去实现
+//  * 接收消息：WpsInvoke.RegWebNotify（type，name,callback）
+//  * WPS客户端返回消息： wps.OAAssist.WebNotify（message）
+//  * @param {*} type 加载项对应的插件类型
+//  * @param {*} name 加载项对应的名字
+//  * @param {func} callback 接收到WPS客户端的消息后的回调函数
+//  */
+// wpsClient.onMessage=handleOaMessage
+//多进程封装结束
 function handleOaMessage(data){
     data=typeof (data) == 'object' ? data : JSON.parse(data)
     var type=data.type;

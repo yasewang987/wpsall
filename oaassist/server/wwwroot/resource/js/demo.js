@@ -74,7 +74,7 @@ window.onload = function() {
     var app = document.getElementById("app");
     var opts = app.getElementsByTagName("option"); //得到数组option
     opts[0].selected = true;
-    envTest()
+    envTest()   //自动配置oem.ini
 }
 
 function IEVersion() {
