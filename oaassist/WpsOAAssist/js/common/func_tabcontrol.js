@@ -65,7 +65,7 @@ function AddDocumentEvent() {
     wps.ApiEvent.AddApiEventListener("DocumentBeforePrint", OnDocumentBeforePrint);
     wps.ApiEvent.AddApiEventListener("DocumentOpen", OnDocumentOpen);
     wps.ApiEvent.AddApiEventListener("DocumentNew", OnDocumentNew);
-
+    // wps.ApiEvent.AddApiEventListener("NewDocument", OnDocumentNew);
     console.log("AddDocumentEvent");
 }
 

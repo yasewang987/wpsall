@@ -81,23 +81,23 @@
             <!-- 全集可以去open.wps.cn/docs/office的idMso列表查询-->
             <!--WPS自身功能常见tab的idMso如下-->
             <!--开始-->
-            <tab idMso="TabHome" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabHome" getEnabled="OnGetEnabled"/> -->
             <!--插入-->
-            <tab idMso="TabInsert" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabInsert" getEnabled="OnGetEnabled"/> -->
             <!--页面布局-->
-            <tab idMso="TabPageLayoutWord" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabPageLayoutWord" getEnabled="OnGetEnabled"/> -->
             <!--引用-->
-            <tab idMso="TabReferences" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabReferences" getEnabled="OnGetEnabled"/> -->
             <!--审阅-->
-            <tab idMso="TabReviewWord" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabReviewWord" getEnabled="OnGetEnabled"/> -->
             <!--视图-->
-            <tab idMso="TabView" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabView" getEnabled="OnGetEnabled"/> -->
             <!--章节 bug-->
             <!-- <tab idMso="TabSection" getEnabled="OnGetEnabled"/> -->
             <!--安全 bug-->
             <!-- <tab idMso="TabSecurity" getEnabled="OnGetEnabled"/> -->
             <!--开发工具-->
-            <tab idMso="TabDeveloper" getEnabled="OnGetEnabled"/>
+            <!-- <tab idMso="TabDeveloper" getEnabled="OnGetEnabled"/> -->
             <!--云服务 bug-->
             <!-- <tab idMso="TabWorkSpace" getEnabled="OnGetEnabled"/> -->
         </tabs>
