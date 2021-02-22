@@ -66,7 +66,9 @@
 * npm install //安装相应依赖
 * node StartupServer //启动demo
 
-    参考本Demo目录下的「WPS加载项快速上手说明.pdf
+    uos系统由于系统的安装包路径与其他路径linux系统不一样，所以需要注释掉oaassist/server/wwwroot/resource/js/demo.js中envTest()这一行，并手动修改oem.ini。查看排查文档5.2：
+    https://kdocs.cn/l/cCVZwo3LW
+    [金山文档] WPS问题排查.docx
 
 ### 项目集成
 1. 部署加载项
