@@ -29,28 +29,32 @@ function CheckIfOADocSaveAs(doc) {
 // 当文件保存前触发的事件
 function OnDocumentBeforeSave(doc) {
     //设置变量，判断是否当前用户按了自定义的OA文件保存按钮
-    var l_IsOADocButtonSave = false;
-    l_IsOADocButtonSave = wps.PluginStorage.getItem(constStrEnum.OADocUserSave);
+    if(wps.WpsApplication().ActiveDocument&&doc.DocID==wps.WpsApplication().ActiveDocument.DocID){
+        var l_IsOADocButtonSave = false;
+        l_IsOADocButtonSave = wps.PluginStorage.getItem(constStrEnum.OADocUserSave);
 
-    //根据传入参数判断当前文档是否能另存为，默认不能另存为
-    if (pCheckCurrOADocCanSaveAs(doc) == false) { //先根据OA助手的默认设置判断是否允许OA文档另存为操作        
-        //0.如果配置文件：OA文档不允许另存为，则再判断
-        //1.先判断是否是在线文档且是通过WPS自身按钮或快捷键保存，则取消弹出另存到本地的弹出框
-        if (pIsOnlineOADoc(doc) == true && l_IsOADocButtonSave == false) {
-            alert("来自OA的不落地文档，禁止另存为本地文档！");
-            //如果是OA文档，则禁止另存为
-            wps.ApiEvent.Cancel = true;
+        //根据传入参数判断当前文档是否能另存为，默认不能另存为
+        if (pCheckCurrOADocCanSaveAs(doc) == false) { //先根据OA助手的默认设置判断是否允许OA文档另存为操作        
+            //0.如果配置文件：OA文档不允许另存为，则再判断
+            //1.先判断是否是在线文档且是通过WPS自身按钮或快捷键保存，则取消弹出另存到本地的弹出框
+            if (pIsOnlineOADoc(doc) == true && l_IsOADocButtonSave == false) {
+                alert("来自OA的不落地文档，禁止另存为本地文档！");
+                //如果是OA文档，则禁止另存为
+                wps.ApiEvent.Cancel = true;
+            }
+            //2.如果是落地打开的OA文档并且通过WPS自身按钮或者快捷键保存，则执行保存到本地临时目录，取消弹出对话框
+            if (pIsOnlineOADoc(doc) == false && l_IsOADocButtonSave == false){
+                //用户手动另存为操作时，在这里被屏蔽掉
+                doc.Save();
+                //如果是OA文档，则禁止另存为
+                wps.ApiEvent.Cancel = true;
+            }        
         }
-        //2.如果是落地打开的OA文档并且通过WPS自身按钮或者快捷键保存，则执行保存到本地临时目录，取消弹出对话框
-        if (pIsOnlineOADoc(doc) == false && l_IsOADocButtonSave == false){
-            //用户手动另存为操作时，在这里被屏蔽掉
-            doc.Save();
-            //如果是OA文档，则禁止另存为
-            wps.ApiEvent.Cancel = true;
-        }        
+        //保存文档后，也要刷新一下Ribbon按钮的状态
+        showOATab();
+    }else{
+        wps.ApiEvent.Cancel=true;
     }
-    //保存文档后，也要刷新一下Ribbon按钮的状态
-    showOATab();
     return;
 }
 
@@ -107,7 +111,6 @@ function OnDocumentOpen(doc) {
     //     pSetNoneOADocFlag(doc);
     //     console.log(wps.PluginStorage.getItem(wps.WpsApplication().ActiveDocument.DocID))
     // }
-    console.log(testFuncs);
     OnWindowActivate();
     ChangeOATabOnDocOpen(); //打开文档后，默认打开Tab页
     setTimeout(activeTab,2000); // 激活OA助手菜单

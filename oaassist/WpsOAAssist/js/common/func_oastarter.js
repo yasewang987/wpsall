@@ -17,6 +17,7 @@
 let testFuncs=null;
 function dispatcher(info) {
     var funcs = info.funcs;
+    wps.WpsApplication().Options.UseLocalUserInfo=true//修订时，不使用登录名
     //解析参数
     /**
      * 分两种情况解析：

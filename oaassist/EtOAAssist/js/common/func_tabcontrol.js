@@ -58,10 +58,8 @@ function AddWorkbookEvent() {
     wps.ApiEvent.AddApiEventListener("WindowActivate", OnWindowActivate);
     wps.ApiEvent.AddApiEventListener("WorkbookBeforeClose", OnWorkbookBeforeClose);
     wps.ApiEvent.AddApiEventListener("WorkbookBeforeSave", OnWorkbookBeforeSave);
-    wps.ApiEvent.AddApiEventListener("WorkbookAfterClose", OnWorkbookAfterClose);
-    wps.ApiEvent.AddApiEventListener("WorkbookBeforePrint", OnWorkbookBeforePrint);
     wps.ApiEvent.AddApiEventListener("WorkbookOpen", OnWorkbookOpen);
-    wps.ApiEvent.AddApiEventListener("WorkbookNew", OnWorkbookNew);
+    wps.ApiEvent.AddApiEventListener("NewWorkbook", OnWorkbookNew);
     console.log("AddWorkbookEvent");
 }
 
@@ -320,7 +318,7 @@ function OnBtnSaveAsLocalFile() {
 }
 
 /**
- * 
+ * 获取对象中属性的值
  * @param {*} params 
  * @param {*} Key 
  */
@@ -335,7 +333,16 @@ function GetParamsValue(Params, Key) {
 
 
 function OnAction(control) {
-    var strId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (strId) {
         case "btnSaveToServer":
             OnBtnSaveToServer();
@@ -350,7 +357,16 @@ function OnAction(control) {
 }
 
 function OnGetEnabled(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnSaveToServer": //保存到OA服务器的相关按钮。判断，如果非OA文件，禁止点击
             return OnSetSaveToOAEnable();
@@ -366,7 +382,16 @@ function OnGetEnabled(control) {
 }
 
 function OnGetVisible(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     var l_value = false;
     //按照 OA文档传递过来的属性进行判断
     l_value = pShowRibbonGroupByOADocParam(eleId);
@@ -374,7 +399,16 @@ function OnGetVisible(control) {
 }
 
 function GetImage(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnSaveToServer": //保存到OA后台服务端
             return "./icon/w_Save.png";
@@ -387,7 +421,16 @@ function GetImage(control) {
 }
 
 function OnGetLabel(control) {
-    var eleId = typeof (control) == "object" ? control.Id : control;
+    var eleId;
+    if (typeof control == "object" && arguments.length == 1) { //针对Ribbon的按钮的
+        eleId = control.Id;
+    } else if (typeof control == "undefined" && arguments.length > 1) { //针对idMso的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "boolean" && arguments.length > 1) { //针对checkbox的
+        eleId = arguments[1].Id;
+    } else if (typeof control == "number" && arguments.length > 1) { //针对combox的
+        eleId = arguments[2].Id;
+    }
     switch (eleId) {
         case "btnSaveAsFile":
             return "另存为本地";

@@ -314,7 +314,7 @@ function OnDoChangeToOtherDocFormat(p_FileSuffix, pShowPrompt) {
  * 作用：获取文档的Path或者临时文件路径
  * @param {*} doc 
  */
-function getDocSavePath(doc) {
+ function getDocSavePath(doc) {
     if (!doc) {
         return;
     }
@@ -361,7 +361,7 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
     // 先把文档输出保存为指定的文件格式，再上传到后台
     wps.PluginStorage.setItem(constStrEnum.OADocUserSave, true); //设置一个临时变量，用于在BeforeSave事件中判断 
     if (p_ShowRevision == false) { // 强制关闭痕迹显示
-        var l_SourceName = p_Doc.FullName;
+        var l_SourceName = p_Doc.Name;
         var l_NewName="";
         var docPath=getDocSavePath(p_Doc);
         if(docPath.indexOf("\\")>0){
@@ -369,9 +369,14 @@ function pDoChangeToOtherDocFormat(p_Doc, p_Suffix, pShowPrompt, p_ShowRevision)
         }else{
             l_NewName = docPath + "/B_" + p_Doc.Name;
         }
+        if(docPath.indexOf("\\")>0){
+            l_SourceName = docPath + "\\" + l_SourceName;
+        }else{
+            l_SourceName = docPath + "/" + l_SourceName;
+        }
+
         p_Doc.SaveAs2($FileName = l_NewName, $AddToRecentFiles = false);
         p_Doc.SaveAs2($FileName = l_SourceName, $AddToRecentFiles = false);
-
         //以下以隐藏模式打开另一个文档
         var l_textEncoding = wps.WpsApplication().Options.DefaultTextEncoding; //默认 936
         var l_Doc = wps.WpsApplication().Documents.Open(l_NewName, false, false, false, "", "", false, "", "", 0, l_textEncoding, false);
@@ -578,10 +583,16 @@ function OnBtnSaveToServer() {
         //对于本地磁盘文件上传OA，先用Save方法保存后，再上传
         //设置用户保存按钮标志，避免出现禁止OA文件保存的干扰信息
         wps.PluginStorage.setItem(constStrEnum.OADocUserSave, EnumDocSaveFlag.OADocSave);
-        l_doc.Save(); //执行一次保存方法
+        if (l_doc.Path == "") { //对于不落地文档，文档路径为空
+            l_doc.SaveAs2(wps.Env.GetTempPath() + "/" + l_doc.Name, undefined, undefined, undefined, false);
+        } else {
+            l_doc.Save();
+        }
+         //执行一次保存方法
         //设置用户保存按钮标志
         wps.PluginStorage.setItem(constStrEnum.OADocUserSave, EnumDocSaveFlag.NoneOADocSave);
         //落地文档，调用UploadFile方法上传到OA后台
+        l_DocPath = l_doc.FullName;
         try {
             //调用OA助手的上传方法
             UploadFile(l_UploadName, l_DocPath, l_uploadPath, l_FieldName, OnUploadToServerSuccess, OnUploadToServerFail);
@@ -809,14 +820,15 @@ function pShowRibbonGroupByOADocParam(CtrlID) {
     }
     // 添加OA菜单判断
     if (CtrlID == "WPSWorkExtTab") {
+        if(wps.WpsApplication().ActiveDocument){
+            let l_value=GetDocParamsValue(wps.WpsApplication().ActiveDocument,"isOA");
+            return l_value?true:false;
+        }
         var l_value = wps.PluginStorage.getItem(constStrEnum.ShowOATabDocActive);
         wps.PluginStorage.setItem(constStrEnum.ShowOATabDocActive, false); //初始化临时状态变量
         console.log("菜单：" + l_value);
         return l_value;
     }
-
-    //disableBtns
-
     return true;
 }
 
@@ -849,7 +861,7 @@ function GetDocParamsValue(Doc, Key) {
 }
 
 /**
- * 
+ * 获取对象中指定属性的值
  * @param {*} params 
  * @param {*} Key 
  */
@@ -878,7 +890,47 @@ function OnInsertQRCode() {
 function OnOpenLocalFile() {
     OpenLocalFile();
 }
-
+/**
+ *   插入水印
+ */
+function DoInsertWaterToDoc(){
+    var app, shapeRange;
+    try {
+        // app = wpsFrame.Application;
+        var app=wps.WpsApplication();
+        var doc = app.ActiveDocument;
+        var selection = doc.ActiveWindow.Selection;
+        var pageCount = app.ActiveWindow.ActivePane.Pages.Count;
+        for(var i=1;i<=pageCount;i++){
+            selection.GoTo(1, 1, i);
+            app.ActiveWindow.ActivePane.View.SeekView=9;
+            app.ActiveDocument.Sections.Item(1).Headers.Item(1).Shapes.AddTextEffect(0, "公司绝密", "华文新魏", 36, false, false, 0, 0).Select();
+            shapeRange = app.Selection.ShapeRange;
+            shapeRange.TextEffect.NormalizedHeight = false;
+            shapeRange.Line.Visible = false;
+            shapeRange.Fill.Visible = true;
+            shapeRange.Fill.Solid();
+            shapeRange.Fill.ForeColor.RGB = 12632256;       /* WdColor枚举 wdColorGray25 代表颜色值 */
+            shapeRange.Fill.Transparency = 0.5;             /* 填充透明度，值为0.0~1.0 */
+            shapeRange.LockAspectRatio = true;
+            shapeRange.Height = 4.58 * 28.346;
+            shapeRange.Width = 28.07 * 28.346;
+            shapeRange.Rotation = 315;                      /* 图形按照Z轴旋转度数，正值为顺时针旋转，负值为逆时针旋转 */
+            shapeRange.WrapFormat.AllowOverlap = true;
+            shapeRange.WrapFormat.Side = 3;                 /* WdWrapSideType枚举 wdWrapLargest 形状距离页边距最远的一侧 */
+            shapeRange.WrapFormat.Type = 3;                 
+            shapeRange.RelativeHorizontalPosition = 0;      
+            shapeRange.RelativeVerticalPosition = 0;        
+            shapeRange.Left = '-999995';                   
+            shapeRange.Top = '-999995';                     
+           
+        }                  /* WdShapePosition枚举 wdShapeCenter 形状的位置在中央 */
+        selection.GoTo(1, 1, 1);
+        app.ActiveWindow.ActivePane.View.SeekView=0;
+    } catch (error) {
+        alert(error.message);
+    }
+}
 
 /**
  * 插入电子印章的功能
@@ -981,6 +1033,8 @@ function OnAction(control) {
         case "btnInsertPic": //插入图片
             DoInsertPicToDoc();
             break;
+        case "btnInsertWater":
+            DoInsertWaterToDoc()
         case "btnInsertDate": //插入日期
             OnInsertDateClicked();
             break;
@@ -1010,6 +1064,16 @@ function OnAction(control) {
             break;
         case "FileSaveAsMenu": //通过idMso进行「另存为」功能的自定义
         case "FileSaveAs":
+            {
+                if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
+                    alert("这是OA文档，将Ctrl+S动作做了重定义，可以调用OA的保存文件流到业务系统的接口。")
+                    OnBtnSaveToServer();
+                } else { //本地的文档，期望不做自定义，通过转调idMso的方法实现
+                    wps.WpsApplication().CommandBars.ExecuteMso("FileSaveAsWordDocx");
+                    //此处一定不能去调用与重写idMso相同的ID，否则就是个无线递归了，即在这个场景下不可调用FileSaveAs和FileSaveAsMenu这两个方法
+                }
+                break;
+            }
         case "FileSave": //通过idMso进行「保存」功能的自定义
             {
                 if (pCheckIfOADoc()) { //文档来源是业务系统的，做自定义
@@ -1156,6 +1220,7 @@ function GetImage(control) {
             return "./icon/w_RejectRev.png";
         case "btnSaveAsFile":
             return "";
+        case "btnInsertWater":
         case "btnInsertPic": //插入图片
             return "./icon/w_InsPictures.png";
         case "btnOpenScan": //打开扫描仪
@@ -1251,6 +1316,8 @@ function OnGetLabel(control) {
             return "插日期";
         case "btnOpenScan": //打开扫描仪
             return "扫描仪";
+        case "btnInsertWater":
+            return "插入水印"
         case "btnPageSetup": //打开页面设置
             return "页面设置";
         case "btnPrintDOC": //打开页面设置

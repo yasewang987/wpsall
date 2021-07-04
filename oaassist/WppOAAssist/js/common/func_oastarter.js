@@ -16,6 +16,7 @@ function dispatcher(info) {
     for (var index = 0; index < funcs.length; index++) {
         var func = funcs[index];
         for (var key in func) {
+            func[key].isOA=true
             if (key === "OpenDoc") { // OpenDoc 属于普通的打开文档的操作方式，文档落地操作
                 OpenDoc(func[key]); //进入打开文档处理函数
             } else if (key === "OnlineEditDoc") { //在线方式打开文档，属于文档不落地的方式打开
@@ -25,6 +26,7 @@ function dispatcher(info) {
             }
         }
     }
+    return {message:"ok", app:wps.Application.Name}
 }
 
 /**

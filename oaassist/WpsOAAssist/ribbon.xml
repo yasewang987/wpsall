@@ -52,6 +52,7 @@
 
                     </box>
                     <box id="boxFreqUsed2" boxStyle="horizontal" visible="true">
+                        <button id="btnInsertWater" label="插入水印" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                         <button id="btnOpenScan" label="打开扫描仪" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                         <button id="btnQRCode" label="二维码" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                         <button id="btnPrintDOC" label="打印设置" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>

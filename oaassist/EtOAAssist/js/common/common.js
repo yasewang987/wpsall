@@ -118,7 +118,12 @@ function pGetParamName(data, attr) {
     return data;
 }
 
-function pGetFileName(request, url) {
+/**
+ * 从requst中获取文件名（确保请求中有filename这个参数）
+ * @param {*} request 
+ * @param {*} url 
+ */
+ function pGetFileName(request, url) {
     var disposition = request.getResponseHeader("Content-Disposition");
     var filename = "";
     if (disposition) {
@@ -129,7 +134,8 @@ function pGetFileName(request, url) {
             filename = "petro" + Date.getTime();
         }
     } else {
-        var filename = url.substring(url.lastIndexOf("/") + 1);
+        filename = url.substring(url.lastIndexOf("/") + 1);
+        filename=filename.split("?")[0]
     }
     return filename;
 }

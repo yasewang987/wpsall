@@ -112,10 +112,10 @@ function OnWorkbookAfterClose(doc) {
 //文档打开事件
 function OnWorkbookOpen(doc) {
     //设置当前新增文档是否来自OA的文档
-    if (wps.PluginStorage.getItem("IsInCurrOADocOpen") == false) {
-        //如果是用户自己在WPS环境打开文档，则设置非OA文档标识
-        pSetNoneOADocFlag(doc);
-    }
+    // if (wps.PluginStorage.getItem("IsInCurrOADocOpen") == false) {
+    //     //如果是用户自己在WPS环境打开文档，则设置非OA文档标识
+    //     pSetNoneOADocFlag(doc);
+    // }
 
     OnWindowActivate();
     ChangeOATabOnDocOpen(); //打开文档后，默认打开Tab页
@@ -124,10 +124,10 @@ function OnWorkbookOpen(doc) {
 //新建文档事件
 function OnWorkbookNew(doc) {
     //设置当前新增文档是否来自OA的文档
-    if (wps.PluginStorage.getItem("IsInCurrOADocOpen") == false) {
-        //如果是用户自己在WPS环境打开文档，则设置非OA文档标识
-        pSetNoneOADocFlag(doc);
-    }
+    // if (wps.PluginStorage.getItem("IsInCurrOADocOpen") == false) {
+    //     //如果是用户自己在WPS环境打开文档，则设置非OA文档标识
+    //     pSetNoneOADocFlag(doc);
+    // }
     ChangeOATabOnDocOpen(); // 打开OA助手Tab菜单页
     wps.ribbonUI.Invalidate(); // 刷新Ribbon按钮的状态
 }
