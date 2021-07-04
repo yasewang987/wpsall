@@ -11,7 +11,8 @@ var regedit = require('regedit')
 const os = require('os');
 const app = express()
 var cp = require('child_process');
-
+var mode=-1;
+const querystring=require("querystring")
 //----开发者将WPS加载项集成到业务系统中时，需要实现的功能 Start--------
 /** 
  * 支持jsplugins.xml中，在线模式下，WPS加载项的请求地址
@@ -154,7 +155,7 @@ app.use("/OAAssistDeploy", (request, response) => {
 });
 //检测WPS客户端环境
 app.use("/WpsSetupTest", function (request, response) {
-	configOem(function (res) {
+	configOem(request.query.pluginsMode,function (res) {
 		response.writeHead(200, res.status, {
 			"Content-Type": "text/html;charset=utf-8"
 		});
@@ -214,7 +215,7 @@ function getNow() {
 //配置WPS客户端的WPS加载项的配置
 //此功能开发者无需实现和考虑，在生产环境中，WPS客户端的配置文件可通过
 //独立打包或开发者编写批处理命令实现修改，业务系统无法实现修改WPS客户端配置文件
-function configOemFileInner(oemPath, callback) {
+function configOemFileInner(oemPath,pluginsMode, callback) {
 	var config = ini.parse(fs.readFileSync(oemPath, 'utf-8'))
 	var sup = config.support || config.Support;
 	var ser = config.server || config.Server;
@@ -231,19 +232,25 @@ function configOemFileInner(oemPath, callback) {
 		ser = {}
 		config.Server = ser
 	}
-	sup.JsApiPlugin = true
-	sup.JsApiShowWebDebugger = true
-	ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
-	if (needUpdate) {
+	if(pluginsMode!=0){
+		sup.JsApiPlugin = false
+		sup.JsApiShowWebDebugger = true
+		ser.JSPluginsServer = ""
+	}else{
+		sup.JsApiPlugin = true
+		sup.JsApiShowWebDebugger = true
+		ser.JSPluginsServer = "http://127.0.0.1:3888/jsplugins.xml"
+	}
+	
+	if (pluginsMode!=mode) {
 		fs.writeFileSync(oemPath, ini.stringify(config))
 		if (os.platform() != 'win32')
 			cp.exec("quickstartoffice restart");
 	}
-
 	callback({ status: 0, msg: "wps安装正常，" + oemPath + "文件设置正常。" })
 }
 //检测WPS客户端的安装情况
-function configOem(callback) {
+function configOem(pluginsMode,callback) {
 	let oemPath;
 	try {
 		if (os.platform() == 'win32') {
@@ -264,7 +271,7 @@ function configOem(callback) {
 							})
 						}
 						oemPath = path.dirname(val) + '\\cfgs\\oem.ini';
-						configOemFileInner(oemPath, callback);
+						configOemFileInner(oemPath,pluginsMode, callback);
 					});					
 				} catch (e) {
 					oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";
@@ -275,7 +282,7 @@ function configOem(callback) {
 			});
 		} else {
 			oemPath = "/opt/kingsoft/wps-office/office6/cfgs/oem.ini";
-			configOemFileInner(oemPath, callback);
+			configOemFileInner(oemPath,pluginsMode, callback);
 		}
 	} catch (e) {
 		oemResult = "配置" + oemPath + "失败，请尝试以管理员重新运行！！";

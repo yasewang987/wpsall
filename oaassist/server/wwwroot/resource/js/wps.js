@@ -1,28 +1,45 @@
-
+var pluginsMode = location.search.split("=")[1];//截取url中的参数值
+var pluginType = WpsInvoke.ClientType.wps//加载项类型wps,et,wpp
+var pluginName = "WpsOAAssist";//加载项名称
+var wpsClient = new WpsClient(pluginType);//初始化一个多进程对象，多进程时才需要
+var clientStr = pluginName + pluginType + "ClientId"
 //单进程封装开始
 /**
  * 此方法是根据wps_sdk.js做的调用方法封装
  * 可参照此定义
  * @param {*} funcs         这是在WPS加载项内部定义的方法，采用JSON格式（先方法名，再参数）
  * @param {*} front         控制着通过页面执行WPS加载项方法，WPS的界面是否在执行时在前台显示
- * @param {*} jsPluginsXml  指定一个新的WPS加载项配置文件的地址
+ * @param {*} jsPluginsXml  指定一个新的WPS加载项配置文件的地址,动态传递jsplugins.xml模式，例如：http://127.0.0.1:3888/jsplugins.xml
+ * @param {*} isSilent      隐藏打开WPS，如果需要隐藏，那么需要传递front参数为false
  */
 
-var bUseHttps = false;
-function _WpsInvoke(funcs, front, jsPluginsXml) {
+
+function _WpsInvoke(funcs, front, jsPluginsXml,isSilent) {
     var info = {};
-    info.funcs = funcs;    
-    var func = bUseHttps ? WpsInvoke.InvokeAsHttps : WpsInvoke.InvokeAsHttp
+    info.funcs = funcs;
+    if(isSilent){//隐藏启动时，front必须为false
+        front=false;
+    }
     /**
      * 下面函数为调起WPS，并且执行加载项WpsOAAssist中的函数dispatcher,该函数的参数为业务系统传递过去的info
      */
-    func(WpsInvoke.ClientType.wps, // 组件类型
-        "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
+    if (pluginsMode != 2) {//单进程
+        singleInvoke(info,front,jsPluginsXml,isSilent)
+    } else {//多进程
+        multInvoke(info,front,jsPluginsXml,isSilent)
+    }
+
+}
+
+//单进程
+function singleInvoke(info,front,jsPluginsXml,isSilent){
+    WpsInvoke.InvokeAsHttp(pluginType, // 组件类型
+        pluginName, // 插件名，与wps客户端加载的加载的插件名对应
         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
         info, // 传递给插件的数据        
         function (result) { // 调用回调，status为0为成功，其他是错误
             if (result.status) {
-                if (bUseHttps && result.status == 100) {
+                if (result.status == 100) {
                     WpsInvoke.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
                     return;
                 }
@@ -34,86 +51,80 @@ function _WpsInvoke(funcs, front, jsPluginsXml) {
             }
         },
         front,
-        jsPluginsXml)
-}
-/**
- * 该方法封装了发送给WPS客户端的请求，不需要用户去实现
- * 接收消息：WpsInvoke.RegWebNotify（type，name,callback）
- * WPS客户端返回消息： wps.OAAssist.WebNotify（message）
- * @param {*} type 加载项对应的插件类型
- * @param {*} name 加载项对应的名字
- * @param {func} callback 接收到WPS客户端的消息后的回调函数
- */
-WpsInvoke.RegWebNotify(WpsInvoke.ClientType.wps, "WpsOAAssist",handleOaMessage)
-//单进程封装结束
+        jsPluginsXml,
+        isSilent)
 
-// 多进程封装开始
-// var wpsClient=new WpsClient(WpsInvoke.ClientType.wps);//加载项类型wps,et,wpp
-// function _WpsInvoke(funcs, front, jsPluginsXml) {
-//     var info = {};
-//     info.funcs = funcs;    
-//     wpsClient.jsPluginsXml=jsPluginsXml?jsPluginsXml:"";
-//     if(localStorage.getItem("wpsClientId")){
-//         wpsClient.clientId=localStorage.getItem("wpsClientId")
-//     }
-//     wpsClient.InvokeAsHttp(
-//         "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
-//         "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
-//         info, // 传递给插件的数据        
-//         function (result) { // 调用回调，status为0为成功，其他是错误
-//             if(wpsClient.clientId){
-//                 localStorage.setItem("wpsClientId",wpsClient.clientId)
-//             }
-//             if (result.status !== 0){
-//                 alert(result.message)
-//             }else {
-//                 if (result.response == "Failed to send message to WPS.") {
-//                     wpsClient.IsClientRunning(function (status) {
-//                         if (status.response == "Client is running.")
-//                             alert("任务发送失败，WPS 正在执行其他任务，请前往WPS完成当前任务")
-//                         else{
-//                             wpsClient.clientId="";
-//                             wpsClient.notifyRegsitered=false;
-//                             localStorage.setItem("wpsClientId","")
-//                             _WpsInvoke(funcs,front,jsPluginsXml);
-//                         }
-//                     })
-//                 } else {
-//                     console.log(result.response)
-//                 }
-//             }
-//         },
-//         front)
-// }
-// /**
-//  * 该方法封装了发送给WPS客户端的请求，不需要用户去实现
-//  * 接收消息：WpsInvoke.RegWebNotify（type，name,callback）
-//  * WPS客户端返回消息： wps.OAAssist.WebNotify（message）
-//  * @param {*} type 加载项对应的插件类型
-//  * @param {*} name 加载项对应的名字
-//  * @param {func} callback 接收到WPS客户端的消息后的回调函数
-//  */
-// wpsClient.onMessage=handleOaMessage
-//多进程封装结束
-function handleOaMessage(data){
-    data=typeof (data) == 'object' ? data : JSON.parse(data)
-    var type=data.type;
-    switch(type){
-        case "executeFunc1":
-            handleOaFunc1(data.message);
-            break;
-        case "executeFunc2":
-            handleOaFunc2(data.message + data.msgInfoStr);
-            break;
-        default:
-            alert(data.messageData)
+    /**
+     * 接受WPS加载项发送的消息
+     * 接收消息：WpsInvoke.RegWebNotify（type，name,callback）
+     * WPS客户端返回消息： wps.OAAssist.WebNotify（message）
+     * @param {*} type 加载项对应的插件类型
+     * @param {*} name 加载项对应的名字
+     * @param {func} callback 接收到WPS客户端的消息后的回调函数，参数为接受到的数据
+     */
+    WpsInvoke.RegWebNotify(pluginType, pluginName, handleOaMessage)
+}
+//多进程
+function multInvoke(info,front,jsPluginsXml,isSilent){
+    wpsClient.jsPluginsXml = jsPluginsXml ? jsPluginsXml : "https://127.0.0.1:3888/jsplugins.xml";
+    if (localStorage.getItem(clientStr)) {
+        wpsClient.clientId = localStorage.getItem(clientStr)
     }
+    if(isSilent){
+        wpsClient.StartWpsInSilentMode(pluginName,function(){//隐藏启动后的回调函数
+            mult(info,front)
+        })
+    }else{
+        mult(info,front)
+    }
+    wpsClient.onMessage = handleOaMessage
 }
-function handleOaFunc1(message){
-    alert("我是函数handleOaFunc1，我接收到的参数是："+message)
+//多进程二次封装
+function mult(info,front){
+    wpsClient.InvokeAsHttp(
+        pluginName, // 插件名，与wps客户端加载的加载的插件名对应
+        "dispatcher", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
+        info, // 传递给插件的数据        
+        function (result) { // 调用回调，status为0为成功，其他是错误
+            if (wpsClient.clientId) {
+                localStorage.setItem(clientStr, wpsClient.clientId)
+            }
+            if (result.status !== 0) {
+                console.log(result)
+                if (result.message == '{\"data\": \"Failed to send message to WPS.\"}') {
+                    wpsClient.IsClientRunning(function (status) {
+                        console.log(status)
+                        if (status.response == "Client is running.")
+                            alert("任务发送失败，WPS 正在执行其他任务，请前往WPS完成当前任务")
+                        else {
+                            wpsClient.clientId = "";
+                            wpsClient.notifyRegsitered = false;
+                            localStorage.setItem(clientStr, "")
+                            mult(info)
+                        }
+                    })
+                    return;
+                }
+                else if (result.status == 100) {
+                    // WpsInvoke.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
+                    return;
+                }
+                alert(result.message)
+            } else {
+                console.log(result.response)
+            }
+        },
+        front)
 }
-function handleOaFunc2(message){
-    alert("我是函数handleOaFunc2，我接收到的参数是："+message)
+function handleOaMessage(data) {
+    console.log(data)
+}
+
+function handleOaFunc1(message) {
+    alert("我是函数handleOaFunc1，我接收到的参数是：" + message)
+}
+function handleOaFunc2(message) {
+    alert("我是函数handleOaFunc2，我接收到的参数是：" + message)
     var span = window.parent.document.getElementById("webnotifyspan")
     span.innerHTML = message
 }
@@ -147,8 +158,8 @@ var _wps = {}
 
 function newDoc() {
     _WpsInvoke([{
-            "NewDoc": {}
-        }],
+        "NewDoc": {}
+    }],
         true,
         "http://127.0.0.1:8080/iestart/jsplugins.xml") // NewDoc方法对应于OA助手dispatcher支持的方法名
 }
@@ -251,7 +262,7 @@ function onlineEditDoc() {
             "buttonGroups": "btnSaveAsFile,btnImportDoc,btnPageSetup,btnInsertDate,btnSelectBookmark", //屏蔽功能按钮
             "userName": "东方不败"
         }
-    }],true) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
+    }], true) // onlineEditDoc方法对应于OA助手dispatcher支持的方法名
 }
 
 _wps['onlineEditDoc'] = {
@@ -541,7 +552,7 @@ _wps['taskPaneBookMark'] = {
 function exitWPS() {
     _WpsInvoke([{
         "ExitWPS": {}
-    }],true)
+    }], true)
 }
 
 _wps['exitWPS'] = {
@@ -562,7 +573,7 @@ function getDocStatus() {
     _WpsInvoke([{
         "GetDocStatus": {}
     }],
-    false)
+        false)
 }
 
 _wps['getDocStatus'] = {
