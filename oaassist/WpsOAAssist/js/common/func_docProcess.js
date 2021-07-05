@@ -213,9 +213,15 @@ function GetServerTemplateData(template, pTemplateDataUrl) {
                     }
                 }
                 var selection=wps.WpsApplication().ActiveWindow.Selection;
-                selection.Start=bookmark.Range.End-(bookEnd-bookStart);
-                selection.End=bookmark.Range.End;
-                selection.Cut()
+                if (bookmark.Range.Text) {
+                    selection.Start = bookmark.Range.End - (bookEnd - bookStart);
+                    selection.End = bookmark.Range.End;
+                    selection.Cut();
+                } else {
+                    selection.Start = bookmark.Range.End;
+                    selection.End = bookmark.Range.End+it.text.length;
+                    ActiveDocument.Bookmarks.Add(bookmark.Name, selection.Range);
+                }
             })
         }
     });
