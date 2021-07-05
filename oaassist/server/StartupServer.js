@@ -282,6 +282,8 @@ function configOem(pluginsMode,callback) {
 			});
 		} else {
 			oemPath = "/opt/kingsoft/wps-office/office6/cfgs/oem.ini";
+			if (!fs.existsSync(oemPath))
+			oemPath = "/opt/apps/cn.wps.wps-office-pro/files/kingsoft/wps-office/office6/cfgs/oem.ini";
 			configOemFileInner(oemPath,pluginsMode, callback);
 		}
 	} catch (e) {
